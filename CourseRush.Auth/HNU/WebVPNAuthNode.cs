@@ -5,8 +5,8 @@ namespace CourseRush.Auth.HNU;
 using static HNUAuthData;
 public class WebVpnAuthNode : AuthNode
 {
-    private const string AuthConfig = "https://webvpn.hnu.edu.cn/passport/v1/public/authConfig?clientType=SDPBrowserClient&platform=Windows&lang=zh-CN&mod=1&needTicket=1";
-    private const string AccessCheck = "https://webvpn.hnu.edu.cn/passport/v1/auth/accessCheck?clientType=SDPBrowserClient&platform=Windows&lang=zh-CN";
+    private const string AuthConfig = "https://webvpn2.hnu.edu.cn/passport/v1/public/authConfig?clientType=SDPBrowserClient&platform=Windows&lang=zh-CN&mod=1&needTicket=1";
+    private const string AccessCheck = "https://webvpn2.hnu.edu.cn/passport/v1/auth/accessCheck?clientType=SDPBrowserClient&platform=Windows&lang=zh-CN";
     public WebVpnAuthNode(params AuthNode[] requires) : base(new AuthConvention()
         .Requires(CAS_AUTH_REDIRECT_URL)
         .Provides(SID, SID_SIG, SID_LEGACY, SID_LEGACY_SIG), requires)

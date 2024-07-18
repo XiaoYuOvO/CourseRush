@@ -15,7 +15,7 @@ public class AuthClient
     public delegate void RequestConfigurator(HttpRequestMessage request);
     public AuthClient()
     {
-        // _handler.Proxy = new WebProxy("127.0.0.1",8888);
+        _handler.Proxy = new WebProxy("127.0.0.1",8888);
         _handler.UseProxy = true;
         _handler.AutomaticDecompression = DecompressionMethods.All;
         _handler.UseCookies = true;

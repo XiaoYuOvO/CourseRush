@@ -10,6 +10,7 @@ public class HNUAuthData
     public static readonly AuthDataKey<string> PV0 = new("_pv0");
     public static readonly AuthDataKey<string> JSESSIONID = new("JSESSIONID");
     public static readonly AuthDataKey<string> SDP_USER_TOKEN = new("sdp_user_token");  
+    public static readonly AuthDataKey<string> SDP_APP_SESSION_80 = new("sdp_app_session-80");  
     public static readonly AuthDataKey<string> SESSION = new("SESSION");  
     public static readonly AuthDataKey<string> TOKEN = new("TOKEN");  
     public static readonly AuthDataKey<string> SID = new("sid");  

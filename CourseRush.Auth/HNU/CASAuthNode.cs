@@ -8,7 +8,7 @@ public class CASAuthNode : AuthNode
     private const string PubKey = "http://cas.web.hnu.edu.cn//cas/v2/getPubKey?sf_request_type=ajax";
 
     private const string CASLoginWebVpn =
-        "http://cas.web.hnu.edu.cn/cas/login?service=https%3A%2F%2Fwebvpn.hnu.edu.cn%3A443%2Fpassport%2Fv1%2Fauth%2Fcas";
+        "http://cas.web.hnu.edu.cn/cas/login?service=https%3A%2F%2Fwebvpn2.hnu.edu.cn%3A443%2Fpassport%2Fv1%2Fauth%2Fcas";
     public CASAuthNode(params AuthNode[] requires) : base(new AuthConvention().
             Requires(CommonDataKey.UserName, CommonDataKey.Password).
             Provides(HNUAuthData.PC0, HNUAuthData.PF0, HNUAuthData.PV0, HNUAuthData.JSESSIONID, HNUAuthData.CAS_AUTH_REDIRECT_URL), requires) {}
