@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseRush", "CourseRush\CourseRush.csproj", "{F8D324C9-A590-4E61-8E22-3D3A1A506CD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseRush.Core", "CourseRush.Core\CourseRush.Core.csproj", "{5F35DF2C-8DC9-4392-AF7E-FD78916AE1B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseRush.CLI", "CourseRush.CLI\CourseRush.CLI.csproj", "{5401CE2D-63CC-41C7-9E27-83F82F699FE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseRush.Auth", "CourseRush.Auth\CourseRush.Auth.csproj", "{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F8D324C9-A590-4E61-8E22-3D3A1A506CD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8D324C9-A590-4E61-8E22-3D3A1A506CD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8D324C9-A590-4E61-8E22-3D3A1A506CD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8D324C9-A590-4E61-8E22-3D3A1A506CD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F35DF2C-8DC9-4392-AF7E-FD78916AE1B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F35DF2C-8DC9-4392-AF7E-FD78916AE1B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F35DF2C-8DC9-4392-AF7E-FD78916AE1B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F35DF2C-8DC9-4392-AF7E-FD78916AE1B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5401CE2D-63CC-41C7-9E27-83F82F699FE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5401CE2D-63CC-41C7-9E27-83F82F699FE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5401CE2D-63CC-41C7-9E27-83F82F699FE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5401CE2D-63CC-41C7-9E27-83F82F699FE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.56" />
+      <PackageReference Include="Microsoft.ClearScript.V8" Version="7.4.4" />
+      <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CourseRush.Auth\CourseRush.Auth.csproj" />
+    </ItemGroup>
+
+</Project>
