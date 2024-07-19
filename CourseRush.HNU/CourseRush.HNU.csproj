@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CourseRush.Auth\CourseRush.Auth.csproj" />
+      <ProjectReference Include="..\CourseRush.Core\CourseRush.Core.csproj" />
+    </ItemGroup>
+
+</Project>

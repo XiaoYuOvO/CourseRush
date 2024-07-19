@@ -1,3 +1,5 @@
+using CourseRush.Core.Network;
+
 namespace CourseRush.Auth;
 
 public class AuthChain<TResult> where TResult : AuthResult
@@ -13,7 +15,7 @@ public class AuthChain<TResult> where TResult : AuthResult
         ValidateNode(finalNode);
     }
 
-    public TResult Auth(UsernamePassword usernamePassword, AuthClient client)
+    public TResult Auth(UsernamePassword usernamePassword, WebClient client)
     {
         var authDataTable = new AuthDataTable();
         authDataTable.UpdateData(CommonDataKey.UserName, usernamePassword.Username);
@@ -22,7 +24,7 @@ public class AuthChain<TResult> where TResult : AuthResult
         return _resultFactory(authDataTable);
     }
 
-    private void PopulateAuthNode(AuthNode node, AuthDataTable dataTable, AuthClient client)
+    private void PopulateAuthNode(AuthNode node, AuthDataTable dataTable, WebClient client)
     {
         foreach (var nodeRequire in node.Requires)
         {

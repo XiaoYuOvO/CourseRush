@@ -2,14 +2,14 @@ using System.Net;
 using System.Text.Json.Nodes;
 using HtmlAgilityPack;
 
-namespace CourseRush.Auth;
+namespace CourseRush.Core.Network;
 
-public class AuthResponse
+public class WebResponse
 {
     protected readonly HttpResponseMessage Response;
     private readonly HttpClientHandler _handler;
 
-    public AuthResponse(HttpResponseMessage response, HttpClientHandler handler)
+    public WebResponse(HttpResponseMessage response, HttpClientHandler handler)
     {
         Response = response;
         _handler = handler;

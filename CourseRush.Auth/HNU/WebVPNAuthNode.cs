@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
+using CourseRush.Core.Network;
 
 namespace CourseRush.Auth.HNU;
 using static HNUAuthData;
@@ -13,20 +14,20 @@ public class WebVpnAuthNode : AuthNode
     {
     }
 
-    internal override void Auth(AuthDataTable table, AuthClient client)
+    internal override void Auth(AuthDataTable table, WebClient client)
     {
         var webVpnAuthUri = client.GetRedirectedUri(table.RequireData<AuthDataKey<Uri>, Uri>(CAS_AUTH_REDIRECT_URL));
-        client.GetAny(webVpnAuthUri);
+        client.Get(webVpnAuthUri);
         
         //Auth Config
-        var jsonDocument = client.GetAny(new Uri(AuthConfig)).ReadJsonObject();
+        var jsonDocument = client.Get(new Uri(AuthConfig), accept:MediaType.Json).ReadJsonObject();
         if (jsonDocument["code"]?.GetValue<int>() != 0)
         {
             throw new HttpRequestException($"The result of the Auth Config is not zero {jsonDocument.ToJsonString()}");
         }
 
         //Access Check
-        var authResponse = client.GetAny(new Uri(AccessCheck), request =>
+        var authResponse = client.Get(new Uri(AccessCheck), accept:MediaType.Json, configurator:request =>
         {
             request.Method = HttpMethod.Post;
             request.Content = new FormUrlEncodedContent(new []

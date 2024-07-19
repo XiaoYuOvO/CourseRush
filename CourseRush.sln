@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseRush.CLI", "CourseRus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseRush.Auth", "CourseRush.Auth\CourseRush.Auth.csproj", "{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseRush.HNU", "CourseRush.HNU\CourseRush.HNU.csproj", "{CF29CBBB-8BD1-4C36-82A7-61C70CC42D28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84B0FC58-DE0F-4340-B51C-CD19E1EFCACA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF29CBBB-8BD1-4C36-82A7-61C70CC42D28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF29CBBB-8BD1-4C36-82A7-61C70CC42D28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF29CBBB-8BD1-4C36-82A7-61C70CC42D28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF29CBBB-8BD1-4C36-82A7-61C70CC42D28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

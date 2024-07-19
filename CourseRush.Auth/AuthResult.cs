@@ -1,8 +1,8 @@
-using System.Net;
-
 namespace CourseRush.Auth;
 
 public abstract class AuthResult
 {
-    public abstract void InjectAuthInfo(HttpWebRequest request);
+    internal abstract void InjectAuthInfo(HttpRequestMessage request);
+
+    internal abstract void InjectAuthInfo(HttpClientHandler handler);
 }
