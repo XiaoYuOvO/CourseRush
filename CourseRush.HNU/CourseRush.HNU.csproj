@@ -11,4 +11,8 @@
       <ProjectReference Include="..\CourseRush.Core\CourseRush.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Resultful" Version="0.2.0-beta05" />
+    </ItemGroup>
+
 </Project>

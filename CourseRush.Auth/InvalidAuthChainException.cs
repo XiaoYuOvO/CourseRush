@@ -1,6 +1,6 @@
 namespace CourseRush.Auth;
 
-public class InvalidAuthChainException : Exception
+public class InvalidAuthChainException : AuthException
 {
     public InvalidAuthChainException(string message) : base(message)
     {

@@ -4,17 +4,18 @@ namespace CourseRush.Auth;
 
 public class AuthClient<TAuthResult> : WebClient where TAuthResult : AuthResult
 {
-    private readonly TAuthResult _auth;
-    public AuthClient(TAuthResult auth)
+    protected readonly TAuthResult Auth;
+
+    protected AuthClient(TAuthResult auth)
     {
-        _auth = auth;
+        Auth = auth;
         auth.InjectAuthInfo(Handler);
     }
 
     protected override HttpRequestMessage CreateRequest(Uri uri, MediaType accept, string encoding = "gzip, deflate, br", RequestConfigurator? configurator = null)
     {
         var request = base.CreateRequest(uri, accept, encoding, configurator);
-        _auth.InjectAuthInfo(request);
+        Auth.InjectAuthInfo(request);
         return request;
     }
 }

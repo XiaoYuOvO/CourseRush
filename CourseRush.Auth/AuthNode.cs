@@ -1,4 +1,5 @@
 using CourseRush.Core.Network;
+using Resultful;
 
 namespace CourseRush.Auth;
 
@@ -16,10 +17,22 @@ public abstract class AuthNode
     }
     
     internal readonly AuthNode[] Requires;
-    internal abstract void Auth(AuthDataTable table, WebClient client);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="table"></param>
+    /// <param name="client"></param>
+    /// <exception cref="AuthException">
+    /// When occurs authentication error from server or server returned invalid data
+    /// </exception>
+    /// <exception cref="InvalidDataException">
+    /// When server returned data with invalid format  
+    /// </exception>
+    internal abstract VoidResult<AuthError> Auth(AuthDataTable table, WebClient client);
     protected abstract string NodeName { get; }
 
-    public AuthChain<TResult> Terminate<TResult>(Func<AuthDataTable, TResult> resultFactory) where TResult : AuthResult
+    public AuthChain<TResult> Terminate<TResult>(Func<AuthDataTable, Result<TResult, AuthError>> resultFactory) where TResult : AuthResult
     {
         return new AuthChain<TResult>(this, resultFactory);
     }

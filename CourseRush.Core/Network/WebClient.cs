@@ -1,4 +1,5 @@
 using System.Net;
+using Resultful;
 
 namespace CourseRush.Core.Network;
 
@@ -20,12 +21,16 @@ public class WebClient
         _client = new HttpClient(Handler);
     }
 
-    protected WebResponse MakeResponse(HttpResponseMessage message)
+    protected Result<WebResponse, WebError> EnsureSuccess(HttpResponseMessage response)
     {
-        return new WebResponse(message, Handler);
+        if (response.IsSuccessStatusCode)
+        {
+            return new WebResponse(response, Handler);
+        }
+        return new WebError($"Web request not success: Status={response.StatusCode}, Phrase={response.ReasonPhrase}");
     }
 
-    public RedirectionResponse GetRedirectedUri(Uri uri,MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
+    public Result<RedirectionResponse, WebError> GetRedirectedUri(Uri uri,MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
     {
         var httpRequestMessage = CreateRequest(uri, accept, configurator:configurator);
         var httpResponseMessage = _client.Send(httpRequestMessage);
@@ -33,34 +38,42 @@ public class WebClient
         {
             return new RedirectionResponse(httpResponseMessage, Handler);
         }
-        throw new InvalidDataException("The result of request is not a redirect response");
+        return new WebError("The result of request is not a redirect response");
     }
 
-    public WebResponse Get(Uri uri, Dictionary<string, string> content,MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
+    public Result<WebResponse, WebError> Get(Uri uri, Dictionary<string, string> content,MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
     {
         var httpRequestMessage = CreateRequest(uri, accept, configurator:configurator);
         httpRequestMessage.Content = new FormUrlEncodedContent(content);
-        return MakeResponse(_client.Send(httpRequestMessage).EnsureSuccessStatusCode());
+        return EnsureSuccess(_client.Send(httpRequestMessage));
     }
     
-    public WebResponse Get(Uri uri, HttpContent? content = null, MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
+    public Result<WebResponse, WebError> Get(Uri uri, HttpContent? content = null, MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
     {
         var httpRequestMessage = CreateRequest(uri, accept, configurator:configurator);
         httpRequestMessage.Content = content;
-        return MakeResponse(_client.Send(httpRequestMessage).EnsureSuccessStatusCode());
+        return EnsureSuccess(_client.Send(httpRequestMessage));
     }
 
-    public WebResponse Post(Uri uri, HttpContent? content = null, MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
+    public Result<WebResponse, WebError> Post(Uri uri, HttpContent? content = null, MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
     {
         var httpRequestMessage = CreateRequest(uri, accept, configurator:configurator);
         httpRequestMessage.Method = HttpMethod.Post;
         httpRequestMessage.Content = content;
-        return MakeResponse(_client.Send(httpRequestMessage).EnsureSuccessStatusCode());
+        return EnsureSuccess(_client.Send(httpRequestMessage));
+    }
+    
+    public Result<WebResponse, WebError> Post(Uri uri, Dictionary<string, string> content, MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
+    {
+        var httpRequestMessage = CreateRequest(uri, accept, configurator:configurator);
+        httpRequestMessage.Method = HttpMethod.Post;
+        httpRequestMessage.Content = new FormUrlEncodedContent(content);
+        return EnsureSuccess(_client.Send(httpRequestMessage));
     }
 
-    public Cookie? GetCookie(string name)
+    public Result<Cookie, WebError> GetCookie(string name)
     {
-        return Handler.CookieContainer.GetAllCookies()[name];
+        return Handler.CookieContainer.GetAllCookies()[name]?.Ok<Cookie, WebError>() ?? new WebError($"Cannot find cookie {name} in current cookie container");
     }
 
     protected virtual HttpRequestMessage CreateRequest(Uri uri, MediaType accept, string encoding = "gzip, deflate, br", RequestConfigurator? configurator = null)
@@ -90,10 +103,22 @@ public static class MediaTypeExtensions
     {
         return mediaType switch
         {
-            MediaType.All => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
+            MediaType.All => "application/json, text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
             MediaType.Html => "text/html",
             MediaType.Json => "application/json",
             _ => throw new ArgumentOutOfRangeException(nameof(mediaType), mediaType, null)
+        };
+    }
+}
+
+public static class ConfiguratorExtensions
+{
+    public static WebClient.RequestConfigurator And(this WebClient.RequestConfigurator configurator, WebClient.RequestConfigurator other)
+    {
+        return request =>
+        {
+            configurator.Invoke(request);
+            other.Invoke(request);
         };
     }
 }

@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CourseRush.Auth\CourseRush.Auth.csproj" />
+      <ProjectReference Include="..\CourseRush.HNU\CourseRush.HNU.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,6 @@
 using CourseRush.Core.Network;
+using CourseRush.Core.Util;
+using Resultful;
 
 namespace CourseRush.Auth;
 
@@ -6,31 +8,28 @@ public class AuthChain<TResult> where TResult : AuthResult
 {
 
     private readonly AuthNode _finalNode;
-    private readonly Func<AuthDataTable, TResult> _resultFactory;
+    private readonly Func<AuthDataTable, Result<TResult, AuthError>> _resultFactory;
 
-    internal AuthChain(AuthNode finalNode, Func<AuthDataTable, TResult> resultFactory)
+    internal AuthChain(AuthNode finalNode, Func<AuthDataTable, Result<TResult, AuthError>> resultFactory)
     {
         _finalNode = finalNode;
         _resultFactory = resultFactory;
         ValidateNode(finalNode);
     }
 
-    public TResult Auth(UsernamePassword usernamePassword, WebClient client)
+    public Result<TResult, AuthError> Auth(UsernamePassword usernamePassword, WebClient client)
     {
         var authDataTable = new AuthDataTable();
         authDataTable.UpdateData(CommonDataKey.UserName, usernamePassword.Username);
         authDataTable.UpdateData(CommonDataKey.Password, usernamePassword.Password);
-        PopulateAuthNode(_finalNode, authDataTable, client);
-        return _resultFactory(authDataTable);
+        return PopulateAuthNode(_finalNode, authDataTable, client).WithResult().Bind(_ => _resultFactory(authDataTable));
     }
 
-    private void PopulateAuthNode(AuthNode node, AuthDataTable dataTable, WebClient client)
+    private VoidResult<AuthError> PopulateAuthNode(AuthNode node, AuthDataTable dataTable, WebClient client)
     {
-        foreach (var nodeRequire in node.Requires)
-        {
-            PopulateAuthNode(nodeRequire, dataTable, client);
-        }
-        node.Auth(dataTable, client);
+        return node.Requires
+            .Aggregate(Result.Ok<AuthError>(), (result, authNode) => result.Bind(_ => PopulateAuthNode(authNode, dataTable, client)))
+            .Bind(_ => node.Auth(dataTable, client));
     }
 
     private static ISet<IAuthDataKey> ValidateNode(AuthNode node)

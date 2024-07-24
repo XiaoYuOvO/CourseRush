@@ -10,6 +10,7 @@
       <PackageReference Include="HtmlAgilityPack" Version="1.11.56" />
       <PackageReference Include="Microsoft.ClearScript.V8" Version="7.4.4" />
       <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.4" />
+      <PackageReference Include="Resultful" Version="0.2.0-beta05" />
       <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />
     </ItemGroup>
 

@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using JWT;
 using JWT.Serializers;
+using Resultful;
 using WebClient = CourseRush.Core.Network.WebClient;
 
 namespace CourseRush.Auth.HNU.Hdjw;
@@ -15,25 +16,41 @@ public class HdjwSessionAuthNode : AuthNode
         .Requires(PC0, PF0, PV0, SID, SID_SIG, SID_LEGACY, SID_LEGACY_SIG)
         .Provides(SESSION, SDP_APP_SESSION_80, TOKEN), requires) {}
 
-    internal override void Auth(AuthDataTable table, WebClient client)
+    internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
     {
-        var indexResponse = client.Get(new Uri(HdjwIndex)).ReadHtml().Text;
-        var startIndex = indexResponse.IndexOf("https://", StringComparison.Ordinal);
-        var length = indexResponse.LastIndexOf("\");", StringComparison.Ordinal) - startIndex;
-        var redirectedUri = indexResponse.Substring(startIndex,length);
-        var verifyResponse = client.Get(client.GetRedirectedUri(new Uri(redirectedUri)));
-        var sdpAppSession = verifyResponse.GetCurrentCookies()["sdp_app_session-80"]?.Value ?? throw new InvalidDataException("SDP app session is missing after verification");
-        Console.WriteLine($"SDP app session: {sdpAppSession}");
-
-        var casLoggedInResponse = client.GetRedirectedUri(new Uri(CasLoginHdjw));
-        var loggedInCookies = client.GetRedirectedUri(casLoggedInResponse).GetCurrentCookies();
-        var token = loggedInCookies["token"]?.Value ?? throw new InvalidDataException("Token is missing after hdjw cas login");
-        table.UpdateData(SDP_APP_SESSION_80, sdpAppSession);
-        var decode = JsonNode.Parse(new JwtDecoder(new DefaultJsonSerializerFactory().Create(), new JwtBase64UrlEncoder())
-            .Decode(token, false))?["sid"]?.GetValue<string>() 
-                     ?? throw new InvalidDataException($"The token jwt doesn't contains the session id {token}");
-        table.UpdateData(SESSION, decode);
-        table.UpdateData(TOKEN, token);
+        return client.Get(new Uri(HdjwIndex))
+            .Map(response => response.ReadHtml().Text)
+            .Bind(indexResponse =>
+            {
+                var startIndex = indexResponse.IndexOf("https://", StringComparison.Ordinal);
+                var length = indexResponse.LastIndexOf("\");", StringComparison.Ordinal) - startIndex;
+                var redirectedUri = indexResponse.Substring(startIndex, length);
+                return client.GetRedirectedUri(new Uri(redirectedUri))
+                    .Bind(response => response.RedirectUri)
+                    .Bind(uri => client.Get(uri));
+            }).MapError(error => new AuthError("Failed to read hdjw index page", this, error))
+            .Bind(_ => client.GetCookie("sdp_app_session-80")
+                .MapError(error => new AuthError("SDP app session is missing after verification", this, error))
+                .Map(cookie => cookie.Value))
+            .Tee(sdpAppSession => Console.WriteLine($"SDP app session: {sdpAppSession}"))
+            .Bind(sdpAppSession => client.GetRedirectedUri(new Uri(CasLoginHdjw))
+                .Bind(response => response.RedirectUri
+                    .Bind(uri => client.GetRedirectedUri(uri)))
+                .MapError(error => new AuthError("Cannot find redirection url in cas login", this, error))
+                .Bind(_ => client.GetCookie("token")
+                    .MapError(error => new AuthError("Token is missing after hdjw cas login", this, error))
+                    .Map(cookie => cookie.Value)
+                    .Bind(token => (JsonNode.Parse(
+                                        new JwtDecoder(new DefaultJsonSerializerFactory().Create(), new JwtBase64UrlEncoder())
+                                            .Decode(token, false))?["sid"]?.GetValue<string?>()?.Ok<string, AuthError>()
+                                    ?? new AuthError($"The token jwt doesn't contains the session id {token}", this)
+                                        .Fail<string, AuthError>())
+                        .Tee(decodedSession =>
+                        {
+                            table.UpdateData(SDP_APP_SESSION_80, sdpAppSession);
+                            table.UpdateData(SESSION, decodedSession);
+                            table.UpdateData(TOKEN, token);
+                        })))).DiscardValue();
     }
 
     protected override string NodeName => "HdjwCasLogin";

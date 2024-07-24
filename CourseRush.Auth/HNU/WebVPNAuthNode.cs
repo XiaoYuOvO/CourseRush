@@ -1,6 +1,10 @@
-using System.Net.Http.Headers;
-using System.Text.Json;
+using System.Net;
+using CourseRush.Core;
 using CourseRush.Core.Network;
+using CourseRush.Core.Util;
+using Resultful;
+using WebClient = CourseRush.Core.Network.WebClient;
+using WebResponse = CourseRush.Core.Network.WebResponse;
 
 namespace CourseRush.Auth.HNU;
 using static HNUAuthData;
@@ -14,41 +18,63 @@ public class WebVpnAuthNode : AuthNode
     {
     }
 
-    internal override void Auth(AuthDataTable table, WebClient client)
+    internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
     {
-        var webVpnAuthUri = client.GetRedirectedUri(table.RequireData<AuthDataKey<Uri>, Uri>(CAS_AUTH_REDIRECT_URL));
-        client.Get(webVpnAuthUri);
+        table.RequireData<AuthDataKey<Uri>, Uri>(CAS_AUTH_REDIRECT_URL)
+            .Bind<WebResponse>(uri => client.GetRedirectedUri(uri)
+                .Bind<WebResponse>(response => response.RedirectUri
+                    .Bind(webVpnAuthUri => client.Get(webVpnAuthUri)))
+                .MapError(error => new AuthError("Failed to get cas auth redirect url", this, error))).DiscardValue();
         
         //Auth Config
-        var jsonDocument = client.Get(new Uri(AuthConfig), accept:MediaType.Json).ReadJsonObject();
-        if (jsonDocument["code"]?.GetValue<int>() != 0)
+        return client.Get(new Uri(AuthConfig), accept:MediaType.Json).Bind(res => res.ReadJsonObject()).MapError(error => new AuthError("Failed to read AuthConfig json", this, error))
+            .Bind<string>(jsonDocument =>
         {
-            throw new HttpRequestException($"The result of the Auth Config is not zero {jsonDocument.ToJsonString()}");
-        }
-
-        //Access Check
-        var authResponse = client.Get(new Uri(AccessCheck), accept:MediaType.Json, configurator:request =>
-        {
-            request.Method = HttpMethod.Post;
-            request.Content = new FormUrlEncodedContent(new []
+            if (jsonDocument["code"]?.GetValue<int>() != 0)
             {
-                KeyValuePair.Create("clientType","SDPBrowserClient"), 
-                KeyValuePair.Create("platform","Windows"), 
-                KeyValuePair.Create<string, string>("lang","zh-CN"),
-            });
-            request.Headers.Add("x-csrf-token", jsonDocument["data"]?["security"]?["csrfToken"]?.GetValue<string>());
-        });
-        var accessCheckResult = authResponse.ReadJsonObject();
-        if (accessCheckResult["code"]?.GetValue<int>() != 0)
-        {
-            throw new HttpRequestException($"The result of the Access Check is not zero {accessCheckResult.ToJsonString()}");
-        }
+                return new AuthError($"The result of the Auth Config is not zero {jsonDocument.ToJsonString()}", this);
+            }
 
-        var cookieCollection = authResponse.GetCurrentCookies();
-        table.UpdateData(SID, cookieCollection["sid"]?.Value ?? throw new InvalidOperationException("sid not found in cookie collection after access check"));
-        table.UpdateData(SID_SIG, cookieCollection["sid.sig"]?.Value ?? throw new InvalidOperationException("sid.sig not found in cookie collection after access check"));
-        table.UpdateData(SID_LEGACY, cookieCollection["sid-legacy"]?.Value ?? throw new InvalidOperationException("sid.legacy not found in cookie collection after access check"));
-        table.UpdateData(SID_LEGACY_SIG, cookieCollection["sid-legacy.sig"]?.Value ?? throw new InvalidOperationException("sid.sig not found in cookie collection after access check"));
+            return jsonDocument["data"]?["security"]?["csrfToken"]?.GetValue<string?>()?.Ok<string, AuthError>() 
+                   ?? new AuthError($"Cannot find data.security.csrfToken in json: {jsonDocument.ToJsonString()}", this);
+        })
+            .Bind<CookieCollection>(csrfToken =>
+        {
+            var authResponse = client.Post(new Uri(AccessCheck), accept:MediaType.All, content:new Dictionary<string, string>{
+                {"clientType", "SDPBrowserClient"},
+                {"platform","Windows"},
+                {"lang","zh-CN"}
+            }, configurator:request =>
+            {
+                request.Headers.Add("x-csrf-token", csrfToken);
+            }).MapError(error => new AuthError("Failed to check access", this, error));
+            
+            //Access Check
+            return authResponse
+                .Bind(res => res.ReadJsonObject().MapError(error => new AuthError("Failed to read access check json", this, error)))
+                .Bind<CookieCollection>(accessCheckResult =>
+            {
+                if (accessCheckResult["code"]?.GetValue<int>() != 0)
+                {
+                    return new AuthError($"The result of the Access Check is not zero {accessCheckResult.ToJsonString()}");
+                }
+
+                return authResponse
+                    .Bind<CookieCollection>(res => res.GetCurrentCookies());
+            });
+        })
+            //Store results
+            .DiscardValue(cookieCollection =>
+            {
+                return cookieCollection["sid"].ToOption().AcceptOr(val => table.UpdateData(SID, val.Value),
+                         () => new AuthError("sid not found in cookie collection after access check", this))
+                    .Bind(_ => cookieCollection["sid.sig"].ToOption().AcceptOr(val => table.UpdateData(SID_SIG, val.Value),
+                        () => new AuthError("sid.sig not found in cookie collection after access check", this)))
+                    .Bind(_ => cookieCollection["sid-legacy"].ToOption().AcceptOr(val => table.UpdateData(SID_LEGACY, val.Value),
+                        () => new AuthError("sid.legacy not found in cookie collection after access check", this)))
+                    .Bind(_ => cookieCollection["sid-legacy.sig"].ToOption().AcceptOr(val => table.UpdateData(SID_LEGACY_SIG, val.Value), 
+                        () => new AuthError("sid.sig not found in cookie collection after access check")));
+        });
     }
 
     protected override string NodeName => "WebVPNAuth";

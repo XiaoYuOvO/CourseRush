@@ -1,3 +1,5 @@
+using Resultful;
+
 namespace CourseRush.Core.Network;
 
 public class RedirectionResponse : WebResponse
@@ -6,7 +8,5 @@ public class RedirectionResponse : WebResponse
     {
     }
 
-    public static implicit operator Uri(RedirectionResponse response) => response.RedirectUri;
-
-    private Uri RedirectUri => Response.Headers.Location ?? throw new InvalidOperationException("Invalid redirect response message, Location Header is missing");
+    public Result<Uri, WebError> RedirectUri => Response.Headers.Location?.Ok<Uri, WebError>() ?? new WebError("Invalid redirect response message, Location Header is missing");
 }

@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text.Json.Nodes;
+using CourseRush.Core.Util;
 using HtmlAgilityPack;
+using Resultful;
 
 namespace CourseRush.Core.Network;
 
@@ -15,9 +17,11 @@ public class WebResponse
         _handler = handler;
     }
 
-    public JsonObject ReadJsonObject()
+    public Result<JsonObject, WebError> ReadJsonObject()
     {
-        return JsonNode.Parse(Response.Content.ReadAsStream())?.AsObject() ?? throw new InvalidDataException("The response is not a JSON object");
+        return Response.Content.ReadAsStream().Ok<Stream, WebError>().TryBind<Stream, WebError, JsonObject>(
+            stream => JsonNode.Parse(stream)?.AsObject() ??
+                      new WebError("The response is not a Json object").Fail<JsonObject, WebError>(), WebError.Wrap);
     }
 
     public HtmlDocument ReadHtml()

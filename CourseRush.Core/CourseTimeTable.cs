@@ -6,7 +6,7 @@ public class CourseTimeTable
 {
     public ImmutableList<CourseWeeklyTime> WeeklyInformation { get; }
 
-    public CourseTimeTable(IEnumerable<CourseWeeklyTime> weeklyInformation)
+    protected CourseTimeTable(IEnumerable<CourseWeeklyTime> weeklyInformation)
     {
         WeeklyInformation = weeklyInformation.ToImmutableList();
     }
@@ -16,10 +16,16 @@ public class CourseTimeTable
         var conflictResultList = new List<CourseWeeklyTime.ConflictResult>();
         foreach (var thisWeeklyTime in WeeklyInformation)
         {
-            conflictResultList.AddRange(other.WeeklyInformation.Select(otherWeeklyTime => thisWeeklyTime.ResolveConflictWith(otherWeeklyTime)).Where(weeklyConflict => weeklyConflict != null)!);
+            conflictResultList.AddRange(other.WeeklyInformation
+                .Select(otherWeeklyTime => thisWeeklyTime.ResolveConflictWith(otherWeeklyTime))
+                .Where(weeklyConflict => weeklyConflict != null)!);
         }
+
         return conflictResultList.Any() ? conflictResultList : null;
     }
 
-
+    public override string ToString()
+    {
+        return $"{nameof(WeeklyInformation)}: {string.Join("|", WeeklyInformation)}";
+    }
 }

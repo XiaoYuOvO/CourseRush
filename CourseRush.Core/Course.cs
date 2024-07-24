@@ -1,8 +1,10 @@
+using System.Text.Json.Nodes;
+
 namespace CourseRush.Core;
 
-public class Course
+public abstract class Course
 {
-    public Course(int selectedStudentCount, int totalStudentCount, float totalLearningHours, float totalCredits, string teacherName, string className, string lessonName, string offerInstitution, string campus, CourseTimeTable timeTable, TeachingMethod teachingMethod, CommonLessonType lessonType)
+    protected Course(int selectedStudentCount, int totalStudentCount, float totalLearningHours, float totalCredits, string teacherName, string className, string courseName, string offerInstitution, string campus, CourseTimeTable timeTable, TeachingMethod teachingMethod, CourseType courseType, ExaminationMethod examinationMethod)
     {
         SelectedStudentCount = selectedStudentCount;
         TotalStudentCount = totalStudentCount;
@@ -10,12 +12,13 @@ public class Course
         TotalCredits = totalCredits;
         TeacherName = teacherName;
         ClassName = className;
-        LessonName = lessonName;
+        CourseName = courseName;
         OfferInstitution = offerInstitution;
         Campus = campus;
         TimeTable = timeTable;
         TeachingMethod = teachingMethod;
-        LessonType = lessonType;
+        CourseType = courseType;
+        ExaminationMethod = examinationMethod;
     }
 
     public int SelectedStudentCount { get; }
@@ -25,11 +28,19 @@ public class Course
     public float TotalCredits { get; }
     public string TeacherName { get; }
     public string ClassName { get; }
-    public string LessonName { get; }
+    public string CourseName { get; }
     public string OfferInstitution { get; }
     public string Campus { get; }
 
     public CourseTimeTable TimeTable { get; }
     public TeachingMethod TeachingMethod { get; }
-    public CommonLessonType LessonType { get; }
+    public CourseType CourseType { get; }
+    public ExaminationMethod ExaminationMethod { get; }
+
+    public override string ToString()
+    {
+        return $"{nameof(SelectedStudentCount)}: {SelectedStudentCount}, {nameof(TotalStudentCount)}: {TotalStudentCount}, {nameof(TotalLearningHours)}: {TotalLearningHours}, {nameof(TotalCredits)}: {TotalCredits}, {nameof(TeacherName)}: {TeacherName}, {nameof(ClassName)}: {ClassName}, {nameof(CourseName)}: {CourseName}, {nameof(OfferInstitution)}: {OfferInstitution}, {nameof(Campus)}: {Campus}, {nameof(TimeTable)}: {TimeTable}, {nameof(TeachingMethod)}: {TeachingMethod}, {nameof(CourseType)}: {CourseType}, {nameof(ExaminationMethod)}: {ExaminationMethod}";
+    }
+
+    public abstract void AddCourseSelectionToJson(JsonObject jsonObject);
 }
