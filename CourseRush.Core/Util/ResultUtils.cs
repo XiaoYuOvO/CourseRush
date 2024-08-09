@@ -19,6 +19,22 @@ public static class ResultUtils
             }
         });
     }
+    
+    public static Result<TResult, TError> TryMap<TValue, TError, TResult>(this Result<TValue, TError> result, Func<TValue, TResult> mapper, Func<Exception, TError> exceptionWrapper)
+    {
+        return result.Bind<TResult>(res =>
+        {
+            try
+            {
+                return mapper(res);
+            }
+            catch (Exception ex)
+
+            {
+                return exceptionWrapper(ex);
+            }
+        });
+    }
 
     public static bool IsFail<TResult, TError>(this Result<TResult, TError> result) =>
         result.Match(_ => false, _ => true);
@@ -26,7 +42,7 @@ public static class ResultUtils
     public static TResult GetOrDefault<TResult, TError>(this Result<TResult, TError> result, TResult defaultValue) =>
         result.Match(r => r, _ => defaultValue);
     
-    public static Result<List<TResult>, TError> CombineResults<TResult, TError>(this IEnumerable<Result<TResult, TError>> results, Func<IList<TError>, TError> errorCombinator)
+    public static Result<IReadOnlyList<TResult>, TError> CombineResults<TResult, TError>(this IEnumerable<Result<TResult, TError>> results, Func<IList<TError>, TError> errorCombinator)
     {
         var successes = new List<TResult>();
         var errors = new List<TError>();
@@ -42,7 +58,7 @@ public static class ResultUtils
                 successes.Add(oneOf.AsT0);
             }
         }
-        return errors.Any() ? Result.Fail<List<TResult>, TError>(errorCombinator(errors)) : successes.Ok<List<TResult>, TError>();
+        return errors.Any() ? Result.Fail<IReadOnlyList<TResult>, TError>(errorCombinator(errors)) : successes.Ok<IReadOnlyList<TResult>, TError>();
     }
 
     public static VoidResult<TError> AcceptOr<TValue, TError>(this Option<TValue?> option, Action<TValue> acceptor, Func<TError> errorSupplier) where TValue : notnull

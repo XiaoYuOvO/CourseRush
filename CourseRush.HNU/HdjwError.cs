@@ -29,6 +29,7 @@ public class HdjwError : BasicError
     
     public static HdjwError Combine<TError>(IList<TError> errors) where TError : BasicError
     {
+        // ReSharper disable once CoVariantArrayConversion
         return new HdjwError("Combined Errors", suppressedErrors: errors.ToArray());
     }
 

@@ -1,4 +1,6 @@
+using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.InteropServices;
 using System.Text.Json.Nodes;
 using CourseRush.Auth;
 using CourseRush.Auth.HNU.Hdjw;
@@ -6,22 +8,25 @@ using CourseRush.Core;
 using CourseRush.Core.Network;
 using CourseRush.Core.Util;
 using Resultful;
+using WebResponse = CourseRush.Core.Network.WebResponse;
 
 namespace CourseRush.HNU;
 
-public class HdjwClient : AuthClient<HdjwAuthResult>
+public class HdjwClient : AuthClient<HdjwAuthResult>, ISessionClient<HdjwError, HNUCourseSelection, HNUCourse, HNUCourseCategory>
 {
     private static readonly Uri GetOngoingCourseSelectionsUri = new(
         "http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/findXsxkjdList?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findXsxkjdList&sf_request_type=ajax");
 
-    private static readonly Uri IsOnlineUri =
-        new("http://hdjw.hnu.edu.cn/sf-webproxy/api/online_status?sf_request_type=ajax");
+    private static readonly Uri IsOnlineUri = new("http://hdjw.hnu.edu.cn/sf-webproxy/api/online_status?sf_request_type=ajax");
+    private static readonly Uri GetUserInfoUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/jczy/userIndex/findUserDetail?resourceCode=ZYGL08&apiCode=jwPublic.controller.UserIndexController.findUserDetail&sf_request_type=ajax");
+
+    private const string AvatarUriTemplate =
+        "http://hdjw.hnu.edu.cn/resService/sys/v1/doc/view/{0}?resourceCode=ZYGL08&apiCode=framework.assembly.doc.controller.SysDocController.view&app=PCWEB&userRoleCode=student&resourceCode=ZYGL08&apiCode=framework.security.controller.SysUserController.roleList";
     public HdjwClient(HdjwAuthResult authResult) : base(authResult)
     {
-        
     }
 
-    public Result<List<CourseSelection>, HdjwError> GetOngoingCourseSelections()
+    public Result<IReadOnlyList<HNUCourseSelection>, HdjwError> GetOngoingCourseSelections()
     {
         var request = new JsonObject
         {
@@ -32,15 +37,38 @@ public class HdjwClient : AuthClient<HdjwAuthResult>
             }
         };
         
-        return EnsureResultSuccess(Post(GetOngoingCourseSelectionsUri, JsonContent.Create(request)).Bind((response => response.ReadJsonObject())))
+        return EnsureResultSuccess(Post(GetOngoingCourseSelectionsUri, JsonContent.Create(request)))
             .Bind(json => json.Require("data")
                 .Bind(data => data.Require("resRmd")
                     .Bind(resRmd => resRmd.Require("items")
-                        .Bind<List<CourseSelection>>(items =>
+                        .Bind<IReadOnlyList<HNUCourseSelection>>(items =>
                             (from jsonNode in items.AsArray()
                                 where jsonNode != null
-                                select CourseSelection.FromJson(jsonNode.AsObject())).ToList()
+                                select HNUCourseSelection.FromJson(jsonNode.AsObject())).ToList()
                             .CombineResults(HdjwError.Combine)))));
+    }
+
+    public Result<IUserInfo, HdjwError> GetUserInfo()
+    {
+        return EnsureResultSuccess(Post(GetUserInfoUri, JsonContent.Create(new JsonObject
+            {
+                ["sctype"] = "hndx",
+                ["userType"] = "student"
+            })))
+            .Bind(userDetailJson => userDetailJson.Require("data")
+                .Bind(data => data.Require("xsInfo")
+                    .Bind(xsInfo => xsInfo.RequireString("bj_name")
+                        .Bind(className => xsInfo.RequireString("xs_name")
+                            .Bind(studentName => xsInfo.RequireString("zpdz")
+                                .Bind<IUserInfo>(avatarId => new HNUUserInfo(studentName, new AvatarGetter(()=>
+                                {
+                                    return Get(new Uri(string.Format(AvatarUriTemplate, avatarId)))
+                                        .MapError(HdjwError.Wrap)
+                                        .Bind<WebResponse>(response => response.GetStatusCode() == HttpStatusCode.OK ? 
+                                            response 
+                                            : new HdjwError($"Invalid response code from server: {response.GetStatusCode()}, cannot get the avatar"))
+                                        .Bind<Task<Stream>>(response => response.ReadStreamAsync()).CastError<BasicError>();
+                                }), className)))))));
     }
 
     public Result<bool, HdjwError> IsOnline()
@@ -48,15 +76,14 @@ public class HdjwClient : AuthClient<HdjwAuthResult>
         return Get(IsOnlineUri).Bind(response => response.ReadJsonObject()).MapError(HdjwError.Wrap).Bind(json => json.Require("online")).Map(node => node.GetValue<bool>());
     }
 
-    public CourseSelectClient GetSelectionClient(CourseSelection target)
+    public ICourseSelectionClient<HdjwError, HNUCourse, HNUCourseCategory> GetSelectionClient(HNUCourseSelection target)
     {
-        
-        return new CourseSelectClient(Auth, target);
+        return new HNUCourseSelectClient(Auth, target);
     }
     
-    protected static Result<JsonObject, HdjwError> EnsureResultSuccess(Result<JsonObject, WebError> result)
+    protected static Result<JsonObject, HdjwError> EnsureResultSuccess(Result<WebResponse, WebError> result)
     {
-        return result.MapError(HdjwError.Wrap).Bind<JsonObject>(jsonObject =>
+        return result.Bind(response => response.ReadJsonObject()).MapError(HdjwError.Wrap).Bind<JsonObject>(jsonObject =>
         {
             if (!jsonObject.ContainsKey("errorCode"))
             {

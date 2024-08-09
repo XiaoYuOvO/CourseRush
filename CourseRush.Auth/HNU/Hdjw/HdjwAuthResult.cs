@@ -6,6 +6,7 @@ namespace CourseRush.Auth.HNU.Hdjw;
 public class HdjwAuthResult : AuthResult
 {
     public static readonly Func<AuthDataTable, Result<HdjwAuthResult, AuthError>> Hdjw = CreateResult;
+    public static readonly Func<AuthDataTable, Result<HdjwAuthResult, AuthError>> Debug = CreateDebugResult;
     private readonly string _sdpAppSession, _session, _token, _authcode;
     private HdjwAuthResult(string sdpAppSession,
         string session,
@@ -25,6 +26,12 @@ public class HdjwAuthResult : AuthResult
                 dataTable.RequireData<AuthDataKey<string>, string>(HNUAuthData.TOKEN).Bind(token =>
                     dataTable.RequireData<AuthDataKey<string>, string>(CommonDataKey.UserName).Map(username =>
                         new HdjwAuthResult(appSession, session, token, username)))));
+    }
+
+
+    private static Result<HdjwAuthResult, AuthError> CreateDebugResult(AuthDataTable dataTable)
+    {
+        return new HdjwAuthResult("","","","");
     }
 
     internal override void InjectAuthInfo(HttpRequestMessage request)

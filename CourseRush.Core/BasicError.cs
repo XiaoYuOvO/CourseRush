@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Text;
 
 namespace CourseRush.Core;
@@ -20,12 +21,12 @@ public class BasicError
     private string? _messageCache;
     private string BaseMessage { get; }
 
-    public IList<BasicError> SuppressedErrors { get; }
+    public ImmutableList<BasicError> SuppressedErrors { get; }
 
     protected BasicError(string message, params BasicError[] suppressedErrors)
     {
         BaseMessage = message;
-        SuppressedErrors = suppressedErrors.ToList();
+        SuppressedErrors = suppressedErrors.ToImmutableList();
     }
 
     public override string ToString()

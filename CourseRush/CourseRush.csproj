@@ -12,4 +12,25 @@
       <PackageReference Include="MahApps.Metro" Version="3.0.0-alpha0492" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\CourseRush.Core\CourseRush.Core.csproj" />
+      <ProjectReference Include="..\CourseRush.HNU\CourseRush.HNU.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Language.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <LastGenOutput>Language.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Language.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <Visible>True</Visible>
+          <DependentUpon>Language.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

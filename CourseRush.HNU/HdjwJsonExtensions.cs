@@ -11,6 +11,22 @@ public static class HdjwJsonExtensions
         return jsonNode[nodeName]?.Ok<JsonNode, HdjwError>() ?? HdjwError.JsonError($"Cannot find required field \"{nodeName}\" in json", jsonNode);
     }
     
+    public static Result<JsonArray, HdjwError> RequireArray(this JsonNode jsonNode, string nodeName)
+    {
+        return jsonNode[nodeName]?.Ok<JsonNode, HdjwError>().TryBind<JsonNode, HdjwError, JsonArray>(node => node.AsArray(), HdjwError.Wrap) ?? HdjwError.JsonError($"Cannot find required field \"{nodeName}\" in json", jsonNode);
+    }
+
+    public static Result<IEnumerable<JsonObject>, HdjwError> RequireObjectArray(this JsonArray array)
+    {
+        return array.Where(node => node is JsonObject).Select(node => node!.AsObject()).Ok<IEnumerable<JsonObject>, HdjwError>();
+    }
+
+    public static JsonArray ToJsonArray<TValue>(this IEnumerable<TValue> enumerable,
+        Func<TValue, JsonObject> toObjectFunc)
+    {
+        return new JsonArray((from o in enumerable select toObjectFunc(o)).ToArray<JsonNode>());
+    }
+
     public static Result<string, HdjwError> RequireString(this JsonNode jsonNode, string nodeName)
     {
         return jsonNode[nodeName]?.GetString() ?? HdjwError.JsonError($"Cannot find required string field \"{nodeName}\" in json", jsonNode);

@@ -1,8 +1,10 @@
 using System.Collections.Immutable;
+using System.Text.Json.Nodes;
+using Resultful;
 
 namespace CourseRush.Core;
 
-public class CourseTimeTable
+public abstract class CourseTimeTable
 {
     public ImmutableList<CourseWeeklyTime> WeeklyInformation { get; }
 
@@ -24,8 +26,15 @@ public class CourseTimeTable
         return conflictResultList.Any() ? conflictResultList : null;
     }
 
+    public Option<CourseWeeklyTime> GetTimeTableAtWeek(int weekIndex)
+    {
+        return WeeklyInformation.FirstOrDefault(time => time.TeachingWeek.Contains(weekIndex))?.ToOption<CourseWeeklyTime>() ?? Option<CourseWeeklyTime>.None;
+    }
+
     public override string ToString()
     {
         return $"{nameof(WeeklyInformation)}: {string.Join("|", WeeklyInformation)}";
     }
+
+    public abstract string ToJsonString();
 }

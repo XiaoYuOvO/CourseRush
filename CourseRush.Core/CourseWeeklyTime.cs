@@ -1,10 +1,11 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using CourseRush.Core.Util;
+using Resultful;
 
 namespace CourseRush.Core;
 
-public class CourseWeeklyTime
+public abstract class CourseWeeklyTime
 {
     /// <summary>
     /// The day of week and the lesson index on that day.
@@ -16,6 +17,7 @@ public class CourseWeeklyTime
     public string TeachingCampus { get; }
 
     private string? _toStringCache;
+    public Option<ICourse> BindingCourse = Option<ICourse>.None;
 
 
     protected CourseWeeklyTime(string teachingLocation, string teachingCampus, IEnumerable<int> teachingWeek, IDictionary<DayOfWeek, ImmutableList<int>> weeklySchedule)
@@ -37,45 +39,11 @@ public class CourseWeeklyTime
         string GetSimplifiedRangeString(ImmutableList<int> list)
         {
             return string.Join(",",
-                FindRanges(list).Select(range =>
+                CollectionUtils.FindRanges(list).Select(range =>
                     range.Start.Equals(range.End) ? range.Start.Value.ToString() : $"{range.Start}-{range.End}").ToList());
         }
     }
-
-    private static IEnumerable<Range> FindRanges(ImmutableList<int> enumerable)
-    {
-        enumerable = enumerable.Sort();
-        var ranges = new List<Range>();
-        int? rangeStart = null;
-        for (var i = 0; i < enumerable.Count; i++)
-        {
-            rangeStart ??= enumerable[i];
-            if (i == enumerable.Count - 1)
-            {
-                ranges.Add(new Range((Index)rangeStart, enumerable[i]));
-            }else if (enumerable[i + 1] - enumerable[i] > 1)
-            {
-                ranges.Add(new Range((Index)rangeStart, enumerable[i]));
-                rangeStart = null;
-            }
-        }
-        return ranges;
-    }
-
-    public static List<CourseWeeklyTime> TryMerge(List<CourseWeeklyTime> times)
-    {
-        if (times.Count == 0) return times;
-        if (!times.Select(time => time.TeachingCampus).AllSame()) return times;
-        if (!times.Select(time => time.TeachingLocation).AllSame()) return times;
-        if (!times.Select(time => time.TeachingWeek).AllSubsequencesEqual()) return times;
-
-        var first = times.First();
-        return new List<CourseWeeklyTime>
-        {
-            new(first.TeachingLocation, first.TeachingCampus, first.TeachingWeek,
-                times.Select(time => time.WeeklySchedule).Aggregate(CollectionUtils.MergeDictionaries))
-        };
-    }
+    
     
     public ConflictResult? ResolveConflictWith(CourseWeeklyTime other)
     {
@@ -104,4 +72,6 @@ public class CourseWeeklyTime
         public ImmutableDictionary<DayOfWeek, List<int>> ConflictMap { get; }
         public ImmutableList<int> ConflictWeeks { get; }
     }
+
+    public abstract string ToJsonString();
 }

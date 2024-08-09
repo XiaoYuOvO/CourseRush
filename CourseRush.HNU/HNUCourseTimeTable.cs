@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using CourseRush.Core;
 using CourseRush.Core.Util;
 using Resultful;
@@ -6,7 +7,7 @@ namespace CourseRush.HNU;
 
 public class HNUCourseTimeTable : CourseTimeTable
 {
-    public HNUCourseTimeTable(IEnumerable<CourseWeeklyTime> weeklyInformation) : base(weeklyInformation)
+    public HNUCourseTimeTable(IEnumerable<HNUCourseWeeklyTime> weeklyInformation) : base(weeklyInformation)
     {
     }
     
@@ -16,7 +17,12 @@ public class HNUCourseTimeTable : CourseTimeTable
             .Where(s => s.Length != 0)
             .Select(HNUCourseWeeklyTime.FromString)
             .CombineResults(HdjwError.Combine)
-            .Map(CourseWeeklyTime.TryMerge)
+            .Map(HNUCourseWeeklyTime.TryMerge)
             .Map(list => new HNUCourseTimeTable(list));
+    }
+
+    public override string ToJsonString()
+    {
+        return string.Join("~", WeeklyInformation.Select(info => info.ToJsonString()));
     }
 }

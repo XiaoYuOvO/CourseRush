@@ -40,6 +40,11 @@ public class WebResponse
         return readAsStringAsync.Result;
     }
 
+    public Task<Stream> ReadStreamAsync()
+    {
+        return Response.Content.ReadAsStreamAsync();
+    }
+
     public HttpStatusCode GetStatusCode()
     {
         return Response.StatusCode;

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+
+
+    <data name="course.code" xml:space="preserve">
+        <value>Course Code</value>
+    </data>
+    <data name="course.name" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="course.teacher_name" xml:space="preserve">
+        <value>Teacher</value>
+    </data>
+    <data name="course.class_name" xml:space="preserve">
+        <value>Class Name</value>
+    </data>
+    <data name="course.offer_institution" xml:space="preserve">
+        <value>Offer Institution</value>
+    </data>
+    <data name="course.campus" xml:space="preserve">
+        <value>Teaching Campus</value>
+    </data>
+    <data name="course.total_learning_hours" xml:space="preserve">
+        <value>Total Learning Hours</value>
+    </data>
+    <data name="course.total_learning_hours.value" xml:space="preserve">
+        <value>{0} Hours</value>
+    </data>
+    <data name="course.total_credit" xml:space="preserve">
+        <value>Total Credits</value>
+    </data>
+    <data name="course.total_credit.value" xml:space="preserve">
+        <value>{0}</value>
+    </data>
+    <data name="course.type" xml:space="preserve">
+        <value>Type</value>
+    </data>
+    <data name="course.teaching_method" xml:space="preserve">
+        <value>Teaching Method</value>
+    </data>
+    <data name="course.examination_method" xml:space="preserve">
+        <value>Examination Method</value>
+    </data>
+    <data name="course.student_count" xml:space="preserve">
+        <value>Selected Students/Course Capacity</value>
+    </data>
+    <data name="course.time_table" xml:space="preserve">
+        <value>Course Time Table</value>
+    </data>
+    <data name="course_selection.selection_term" xml:space="preserve">
+        <value>Selection Term</value>
+    </data>
+    <data name="course_selection.selection_name" xml:space="preserve">
+        <value>Selection Name</value>
+    </data>
+</root>

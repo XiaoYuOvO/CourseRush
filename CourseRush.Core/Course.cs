@@ -2,7 +2,27 @@ using System.Text.Json.Nodes;
 
 namespace CourseRush.Core;
 
-public abstract class Course
+public interface ICourse
+{
+    public int SelectedStudentCount { get; }
+    public int TotalStudentCount { get; }
+    public float TotalLearningHours { get; }
+    public float TotalCredits { get; }
+    public string TeacherName { get; }
+    public string ClassName { get; }
+    public string CourseName { get; }
+    public string OfferInstitution { get; }
+    public string Campus { get; }
+
+    public CourseTimeTable TimeTable { get; }
+    public TeachingMethod TeachingMethod { get; }
+    public CourseType CourseType { get; }
+    public ExaminationMethod ExaminationMethod { get; }
+
+    public string ToSimpleString();
+}
+
+public abstract class Course<TCourse> : ICourse where TCourse : ICourse
 {
     protected Course(int selectedStudentCount, int totalStudentCount, float totalLearningHours, float totalCredits, string teacherName, string className, string courseName, string offerInstitution, string campus, CourseTimeTable timeTable, TeachingMethod teachingMethod, CourseType courseType, ExaminationMethod examinationMethod)
     {
@@ -19,6 +39,7 @@ public abstract class Course
         TeachingMethod = teachingMethod;
         CourseType = courseType;
         ExaminationMethod = examinationMethod;
+        timeTable.WeeklyInformation.ForEach(time => time.BindingCourse = this);
     }
 
     public int SelectedStudentCount { get; }
@@ -36,6 +57,7 @@ public abstract class Course
     public TeachingMethod TeachingMethod { get; }
     public CourseType CourseType { get; }
     public ExaminationMethod ExaminationMethod { get; }
+    public abstract string ToSimpleString();
 
     public override string ToString()
     {

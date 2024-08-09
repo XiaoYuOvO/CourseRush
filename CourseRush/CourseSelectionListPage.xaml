@@ -1,0 +1,40 @@
+<Page x:Class="CourseRush.CourseSelectionListPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:CourseRush"
+      xmlns:hc="clr-namespace:HandyControl.Controls;assembly=HandyControl"
+      mc:Ignorable="d"
+      Title="CourseSelectionList" Height="1080" Width="1600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="20*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" VerticalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <ToolBar Grid.Column="0" Height="Auto" DockPanel.Dock="Left">
+                <ToolBar.Items>
+                    <Menu Background="Transparent" VerticalAlignment="Center">
+                        <MenuItem Name="FilesMenu" Header="{Binding Source={x:Static local:Language.ui_menu_file_op}}" Height="Auto">
+                            <MenuItem Click="Export_OnClick"  Name="ExportButton" Header="{Binding Source={x:Static local:Language.ui_button_export}}" Height="Auto"></MenuItem>
+                            <MenuItem Click="Import_OnClick"  Name="ImportButton" Header="{Binding Source={x:Static local:Language.ui_button_import}}"  Height="Auto"></MenuItem>
+                        </MenuItem>
+                    </Menu>
+                    <Separator Margin="10,0,10,0"/>
+                    <Button Click="Refresh_OnClick" Name="RefreshButton" Content="{Binding Source={x:Static local:Language.ui_button_refresh}}" Height="Auto"></Button>
+                    <Separator Margin="10,0,10,0"/>
+                    <CheckBox Click="OnFilterButtonClicked" Margin="10,0,0,0" Content="{Binding Source={x:Static local:Language.ui_button_show_only_in_class_course}}" Name="ShowOnlyInClassCourse"></CheckBox>
+                    <CheckBox Click="OnFilterButtonClicked" Margin="10,0,0,0" Content="{Binding Source={x:Static local:Language.ui_button_show_full_course}}" Name="ShowFullCourse" IsChecked="True"></CheckBox>
+                    <CheckBox Click="OnFilterButtonClicked" Margin="10,0,0,0" Content="{Binding Source={x:Static local:Language.ui_button_show_conflict_course}}" Name="ShowConflictCourse" IsChecked="True"></CheckBox>
+                </ToolBar.Items>
+            </ToolBar>
+            <ToggleButton Grid.Column="1" Name="ShowSearchButton" Click="ToggleButton_OnClick" VerticalAlignment="Stretch" Content="{Binding Source={x:Static local:Language.ui_button_show_search}}" Margin="5,0,5,0" Padding="10,0,10,0" Height="Auto"></ToggleButton>
+        </Grid>
+        <TabControl Grid.Row="1" Name="DataTableTab" Style="{StaticResource TabControlInLine}"/>
+    </Grid>
+</Page>

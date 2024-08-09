@@ -1,16 +1,14 @@
 namespace CourseRush.Core;
 
-public class CourseType
+public abstract class CourseType
 {
-    public static readonly CourseType Compulsory = new("选修");
-    public static readonly CourseType Elective = new("必修");
-    public static readonly CourseType CompulsoryElective = new("选择性必修");
-
     public string Name { get; }
+    public int Code { get; }
 
-    protected CourseType(string name)
+    protected CourseType(string name, int code)
     {
         Name = name;
+        Code = code;
     }
 
     public override string ToString()

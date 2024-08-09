@@ -1,0 +1,95 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="classaccess">
+        <value>public</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="university.HNU" xml:space="preserve">
+        <value>湖南大学</value>
+    </data>
+    <data name="ui.label.password" xml:space="preserve">
+        <value>密码</value>
+    </data>
+    <data name="ui.label.username" xml:space="preserve">
+        <value>账号</value>
+    </data>
+    <data name="ui.button.login" xml:space="preserve">
+        <value>登录</value>
+    </data>
+    <data name="ui.button.import" xml:space="preserve">
+        <value>导入</value>
+    </data>
+    <data name="ui.button.export" xml:space="preserve">
+        <value>导出</value>
+    </data>
+    <data name="ui.button.refresh" xml:space="preserve">
+        <value>刷新</value>
+    </data>
+    <data name="ui.button.show_search" xml:space="preserve">
+        <value>显示搜索窗格</value>
+    </data>
+    <data name="ui.label.index" xml:space="preserve">
+        <value>索引</value>
+    </data>
+    <data name="ui.menu.file_op" xml:space="preserve">
+        <value>文件...</value>
+    </data>
+    <data name="ui.button.show_conflict_course" xml:space="preserve">
+        <value>显示冲突课程</value>
+    </data>
+    <data name="ui.button.show_full_course" xml:space="preserve">
+        <value>显示已满课程</value>
+    </data>
+    <data name="ui.button.show_only_in_class_course" xml:space="preserve">
+        <value>仅显示本班课程</value>
+    </data>
+    <data name="ui.label.choose_university" xml:space="preserve">
+        <value>请选择你的大学</value>
+    </data>
+    <data name="ui.label.university" xml:space="preserve">
+        <value>大学</value>
+    </data>
+    <data name="ui.error.empty_username_password" xml:space="preserve">
+        <value>用户名或密码不能为空</value>
+    </data>
+    <data name="ui.button.select" xml:space="preserve">
+        <value>选择</value>
+    </data>
+    <data name="ui.label.selection_session" xml:space="preserve">
+        <value>当前选课: {0}#{1}</value>
+    </data>
+    <data name="university.Debug" xml:space="preserve">
+        <value>专业调试大学</value>
+    </data>
+    <data name="ui.button.apply" xml:space="preserve">
+        <value>应用</value>
+    </data>
+    <data name="ui.message.comfirm_select" xml:space="preserve">
+        <value>确定选课以下课程?</value>
+    </data>
+    <data name="ui.message.course_conflict" xml:space="preserve">
+        <value>由于课表冲突,无法选课{0}:</value>
+    </data>
+    <data name="ui.message.course_conflict.info" xml:space="preserve">
+        <value>与课程{0}冲突: {1}</value>
+    </data>
+    <data name="ui.message.comfirm_select_title" xml:space="preserve">
+        <value>选课确认</value>
+    </data>
+    <data name="ui.button.enqueue_selected_courses" xml:space="preserve">
+        <value>提交已选中的课程</value>
+    </data>
+    <data name="ui.message.course_selected" xml:space="preserve">
+        <value>已添加{0}个课程至选课队列</value>
+    </data>
+</root>

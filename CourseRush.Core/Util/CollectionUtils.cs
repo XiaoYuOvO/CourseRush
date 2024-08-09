@@ -8,7 +8,27 @@ public static class CollectionUtils
     {
         return enumerable.Distinct().Count() <= 1;
     }
-        
+
+    public static bool True(this bool? b)
+    {
+        return b != null && b.Value;
+    }
+    
+    public static bool False(this bool? b)
+    {
+        return b != null && !b.Value;
+    }
+
+    public static Predicate<T> And<T>(this Predicate<T> predicate1, Predicate<T> predicate2)
+    {
+        return t => predicate1(t) && predicate2(t);
+    }
+    
+    public static Predicate<T> AndCombine<T>(Predicate<T> predicate1, Predicate<T> predicate2)
+    {
+        return t => predicate1(t) && predicate2(t);
+    }
+
     public static bool AllSubsequencesEqual<T>(this IEnumerable<IEnumerable<T>> sequences)
     {
         // 使用Zip来组合序列，如果序列长度不一致，Zip会自动调整到最短序列长度
@@ -51,5 +71,62 @@ public static class CollectionUtils
             .ToImmutableDictionary(
                 group => group.Key,
                 group => group.SelectMany(kvp => kvp.Value).ToImmutableList());
+    }
+    
+    public static IEnumerable<Range> FindRanges(ImmutableList<int> enumerable)
+    {
+        enumerable = enumerable.Sort();
+        var ranges = new List<Range>();
+        int? rangeStart = null;
+        for (var i = 0; i < enumerable.Count; i++)
+        {
+            rangeStart ??= enumerable[i];
+            if (i == enumerable.Count - 1)
+            {
+                ranges.Add(new Range((Index)rangeStart, enumerable[i]));
+            }else if (enumerable[i + 1] - enumerable[i] > 1)
+            {
+                ranges.Add(new Range((Index)rangeStart, enumerable[i]));
+                rangeStart = null;
+            }
+        }
+        return ranges;
+    }
+
+    public static Dictionary<Range, List<TValue>> DistinctRanges<TValue>(IEnumerable<Tuple<Range, TValue>> enumerable)
+    {
+        var mergedItems = new Dictionary<Range, List<TValue>>();
+        var rangeMax = enumerable.Select(tuple => tuple.Item1).Select(r => r.End.Value).Max();
+        List<TValue> lastItems = new();
+        var lastStart = 0;
+        for (var i = 0; i <= rangeMax; i++)
+        {
+            var index = i;
+            var currentItems = enumerable.Where(tuple => tuple.Item1.InRangeClosed(index)).Select(tuple => tuple.Item2).ToList();
+            if (i != 0)
+            {
+                if (!currentItems.SequenceEqual(lastItems))
+                {
+                    mergedItems[new Range(lastStart, index-1)] = lastItems;
+                    if (i == rangeMax)
+                    {
+                        mergedItems[new Range(index, index)] = currentItems;
+                    }
+                    lastStart = i;
+                }else if (i == rangeMax)
+                {
+                    mergedItems[new Range(lastStart, index)] = lastItems;
+                }
+            }
+            lastItems = currentItems;
+        }
+
+        return mergedItems;
+    }
+
+
+    public static bool InRangeClosed(this Range range, int index)
+    {
+        return range.Start.Value <= index && range.End.Value >= index;
     }
 }

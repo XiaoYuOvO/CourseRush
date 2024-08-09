@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using CourseRush.Core;
+using CourseRush.Core.Util;
 using Resultful;
 
 namespace CourseRush.HNU;
@@ -9,7 +10,12 @@ public class HNUCourseWeeklyTime : CourseWeeklyTime
     protected HNUCourseWeeklyTime(string teachingLocation, string teachingCampus, IEnumerable<int> teachingWeek, IDictionary<DayOfWeek, ImmutableList<int>> weeklySchedule) : base(teachingLocation, teachingCampus, teachingWeek, weeklySchedule)
     {
     }
-    
+
+    public override string ToJsonString()
+    {
+        return $"@{string.Join(",",TeachingWeek.Select(i => i.ToString()))}@@{string.Join(",",WeeklySchedule.SelectMany(pair => pair.Value.Select(lesson => DayOfWeekToId(pair.Key) + lesson.ToString("00"))))}@{TeachingLocation}@@@@{TeachingCampus}@";
+    }
+
     //1-16@
     //1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16@
     //40708@
@@ -18,7 +24,7 @@ public class HNUCourseWeeklyTime : CourseWeeklyTime
     //1610@
     //1740@3@
     //南校区(天马)@W134b3640000WH~
-    public static Result<CourseWeeklyTime, HdjwError> FromString(string data)
+    public static Result<HNUCourseWeeklyTime, HdjwError> FromString(string data)
     {
         try
         {
@@ -55,6 +61,25 @@ public class HNUCourseWeeklyTime : CourseWeeklyTime
         }
     }
     
+    public static IReadOnlyList<HNUCourseWeeklyTime> TryMerge(IReadOnlyList<HNUCourseWeeklyTime> times)
+    {
+        if (times.Count == 0) return times;
+        if (!times.Select(time => time.BindingCourse).AllSame()) return times;
+        if (!times.Select(time => time.TeachingCampus).AllSame()) return times;
+        if (!times.Select(time => time.TeachingLocation).AllSame()) return times;
+        if (!times.Select(time => time.TeachingWeek).AllSubsequencesEqual()) return times;
+
+        var first = times.First();
+        return new List<HNUCourseWeeklyTime>
+        {
+            new(first.TeachingLocation, first.TeachingCampus, first.TeachingWeek,
+                times.Select(time => time.WeeklySchedule).Aggregate(CollectionUtils.MergeDictionaries))
+            {
+                BindingCourse = first.BindingCourse
+            }
+        };
+    }
+    
     private static DayOfWeek IdToDayOfWeek(char id)
     {
         return id switch
@@ -68,6 +93,11 @@ public class HNUCourseWeeklyTime : CourseWeeklyTime
             '7' => DayOfWeek.Sunday,
             _   => DayOfWeek.Monday
         };
+    }
+    
+    private static string DayOfWeekToId(DayOfWeek dayOfWeek)
+    {
+        return dayOfWeek == DayOfWeek.Sunday ? "7" : ((int)dayOfWeek).ToString();
     }
 
 }
