@@ -1,8 +1,9 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using CourseRush.Models;
 
-namespace CourseRush;
+namespace CourseRush.Pages;
 
 public partial class SelectionSessionsPage
 {

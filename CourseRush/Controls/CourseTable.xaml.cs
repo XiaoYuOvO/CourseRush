@@ -11,21 +11,44 @@ using CourseRush.Core.Util;
 using HandyControl.Tools.Extension;
 using Color = System.Windows.Media.Color;
 
-namespace CourseRush;
+namespace CourseRush.Controls;
 
 public partial class CourseTable
 {
     public delegate void CourseClickHandler(object sender, CourseWeeklyTime course);
     private readonly Dictionary<CourseWeeklyTime, Color> _displayingTimes = new();
-    public event CourseClickHandler? OnCourseClick; 
-    public CourseTable(WeekTimeTable timeTable)
+    public Func<ICourse, ContextMenu>? CardContextMenuBuilder { get; set; }
+    public event CourseClickHandler? OnCourseClick;
+    public event EventHandler? OnOffTableCourseButtonClick;
+    private readonly List<TextBlock> _courseInfoBlocks = [];
+    public CourseTable()
     {
-        //TODO Font resize by the table render size
         InitializeComponent();
         TableGrid.RowDefinitions.Add(new RowDefinition
         {
             Height = new GridLength(1, GridUnitType.Auto)
         });
+
+        var currentCultureDateTimeFormat = CultureInfo.CurrentCulture.DateTimeFormat;
+        MondayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Monday);
+        TuesdayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Tuesday);
+        WednesdayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Wednesday);
+        ThursdayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Thursday);
+        FridayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Friday);
+        SaturdayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Saturday);
+        SundayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Sunday);
+    }
+
+    public void UpdateTimeTable(WeekTimeTable timeTable)
+    {
+        ClearChildrenOf<TextBlock>(tb => Grid.GetRow(tb) != 0);
+        TableGrid.RowDefinitions.Clear();
+        //Header
+        TableGrid.RowDefinitions.Add(new RowDefinition
+        {
+            Height = new GridLength(1, GridUnitType.Star)
+        });
+        
         for (var index = 0; index < timeTable.Lessons.Count; index++)
         {
             var timeTableLesson = timeTable.Lessons[index];
@@ -48,20 +71,29 @@ public partial class CourseTable
             Grid.SetRow(textBlock, index + 1);
             TableGrid.Children.Add(textBlock);
         }
+    }
 
-        var currentCultureDateTimeFormat = CultureInfo.CurrentCulture.DateTimeFormat;
-        MondayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Monday);
-        TuesdayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Tuesday);
-        WednesdayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Wednesday);
-        ThursdayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Thursday);
-        FridayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Friday);
-        SaturdayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Saturday);
-        SundayHeader.Text = currentCultureDateTimeFormat.GetDayName(DayOfWeek.Sunday);
+    public void UpdateFontSize(double fontSize)
+    {
+        foreach (UIElement tableGridChild in TableGrid.Children)
+        {
+            tableGridChild.SetValue(FontSizeProperty, fontSize);
+        }
+
+        foreach (var courseInfoBlock in _courseInfoBlocks)
+        {
+            courseInfoBlock.FontSize = fontSize;
+        }
     }
 
     public void AddCourse<TCourse>(TCourse course, Color color, int weekNumber) where TCourse : ICourse
     {
-        course.TimeTable.GetTimeTableAtWeek(weekNumber).Tee(time => _displayingTimes[time] = color);
+        foreach (var time in course.TimeTable.GetTimeTableAtWeek(weekNumber)) _displayingTimes[time] = color;
+    }
+
+    public void AddCourse(CourseWeeklyTime time,Color color)
+    {
+        _displayingTimes[time] = color;
     }
 
     public void RemoveAll()
@@ -72,17 +104,17 @@ public partial class CourseTable
     public void UpdateDisplay()
     {
         //Clear the former items
-        TableGrid.Children.OfType<Grid>().Cast<UIElement>().Do(TableGrid.Children.Remove);
-        
+        ClearChildrenOf<Grid>();
+        _courseInfoBlocks.Clear();
         //Map all lessons to grid cords
         var dayRanges = new Dictionary<DayOfWeek, List<Tuple<Range, CourseWeeklyTime>>>();
         foreach (var (time, _) in _displayingTimes)
         {
             foreach (var (day, lessons) in time.WeeklySchedule)
             {
-                if (dayRanges.ContainsKey(day))
+                if (dayRanges.TryGetValue(day, out var value))
                 {
-                    dayRanges[day].AddRange(CollectionUtils.FindRanges(lessons).Select(range => new Tuple<Range, CourseWeeklyTime>(range, time)));
+                    value.AddRange(CollectionUtils.FindRanges(lessons).Select(range => new Tuple<Range, CourseWeeklyTime>(range, time)));
                 }
                 else
                 {
@@ -105,6 +137,11 @@ public partial class CourseTable
         }
     }
 
+    private void ClearChildrenOf<T>(Predicate<T>? predicate = null) where T : UIElement
+    {
+        TableGrid.Children.OfType<T>().Where(t => predicate == null || predicate(t)).Do(TableGrid.Children.Remove);
+    }
+
     private Grid BuildDisplayPanelForCourses(IReadOnlyCollection<Tuple<CourseWeeklyTime, Color>> weeklyTimes)
     {
         var grid = new Grid();
@@ -116,7 +153,7 @@ public partial class CourseTable
                     TextWrapping = TextWrapping.Wrap,
                     TextAlignment = TextAlignment.Center,
                     VerticalAlignment= VerticalAlignment.Center,
-                    FontSize = 16,
+                    FontSize = FontSize,
                     Foreground = MondayHeader.Foreground
                 };
                 courseAndColor.Item1.BindingCourse.Tee(course =>
@@ -125,11 +162,12 @@ public partial class CourseTable
                     textBlock.Inlines.Add(new LineBreak());
                     textBlock.Inlines.Add(course.TeacherName);
                     textBlock.Inlines.Add(new LineBreak());
+                    textBlock.ContextMenu = CardContextMenuBuilder?.Invoke(course);
                 });
                 textBlock.Inlines.Add(courseAndColor.Item1.TeachingLocation);
                 textBlock.Inlines.Add(new LineBreak());
                 textBlock.Inlines.Add(courseAndColor.Item1.TeachingCampus);
-                
+                _courseInfoBlocks.Add(textBlock);
                 var border = new Border
                 {
                     Background = new SolidColorBrush(courseAndColor.Item2),
@@ -152,5 +190,10 @@ public partial class CourseTable
                 grid.Children.Add(item);
             });
         return grid;
+    }
+
+    private void ShowOffTableCourse_OnClick(object sender, RoutedEventArgs e)
+    {
+        OnOffTableCourseButtonClick?.Invoke(sender, e);
     }
 }

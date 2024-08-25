@@ -4,14 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using CourseRush.Controls;
 using CourseRush.Core;
 using CourseRush.Core.Util;
-using HandyControl.Controls;
 using HandyControl.Data;
 using MahApps.Metro.Controls;
 using MessageBox = HandyControl.Controls.MessageBox;
 
-namespace CourseRush;
+namespace CourseRush.Models;
 
 public interface ICourseSelectionPageModel
 {
@@ -20,29 +20,25 @@ public interface ICourseSelectionPageModel
     void LoadCoursesForCategory(Stream fileStream, ICourseCategory category);
 }
 
-public class CourseSelectionListPageModel<TCourse, TCourseCategory> : ICourseSelectionPageModel where TCourse : ICourse where TCourseCategory : ICourseCategory
+public class CourseSelectionListPageModel<TCourse, TCourseCategory>(
+    DelayedFunc<TCourseCategory, IReadOnlyList<TCourse>> courseTaskLoader,
+    DelayedFunc<Stream, IReadOnlyList<TCourse>> courseReader,
+    Action<IReadOnlyList<TCourse>> selectionCallback)
+    : ICourseSelectionPageModel
+    where TCourse : class, ICourse, IPresentedDataProvider<TCourse>
+    where TCourseCategory : ICourseCategory
 {
-    private event Action<List<CourseTabItem>>? OnCourseCategoryAdded; 
-    
-    private readonly List<PresentedData<TCourse>> _coursePresentedData;
-    private readonly DelayedFunc<TCourseCategory, IReadOnlyList<TCourse>> _courseTaskLoader;
-    private readonly DelayedFunc<Stream, IReadOnlyList<TCourse>> _courseReader;
-    private readonly Dictionary<TCourseCategory, CourseDataGrid<TCourse>> _courseDataByCategory = new();
+    private event Action<List<CourseTabItem>>? OnCourseCategoryAdded;
 
-    public CourseSelectionListPageModel(List<PresentedData<TCourse>> coursePresentedData, DelayedFunc<TCourseCategory, IReadOnlyList<TCourse>> courseTaskLoader, DelayedFunc<Stream, IReadOnlyList<TCourse>> courseReader)
-    {
-        _coursePresentedData = coursePresentedData;
-        _courseTaskLoader = courseTaskLoader;
-        _courseReader = courseReader;
-    }
+    private readonly Dictionary<TCourseCategory, CourseDataPanel<TCourse>> _courseDataByCategory = new();
 
     public void UpdateCategories(IReadOnlyList<TCourseCategory> courseCategories)
     {
-        List<CourseTabItem> categories = new();
+        List<CourseTabItem> categories = [];
         
         foreach (var courseCategory in courseCategories)
         {
-            var dataGrid = new CourseDataGrid<TCourse>(_coursePresentedData);
+            var dataGrid = new CourseDataPanel<TCourse>();
             AddContextMenuToGrid(dataGrid);
             _courseDataByCategory[courseCategory] = dataGrid;
             categories.Add(new CourseTabItem(dataGrid, courseCategory));
@@ -51,7 +47,7 @@ public class CourseSelectionListPageModel<TCourse, TCourseCategory> : ICourseSel
         OnCourseCategoryAdded?.Invoke(categories);
     }
 
-    private static void AddContextMenuToGrid(CourseDataGrid<TCourse> dataGrid)
+    private void AddContextMenuToGrid(CourseDataPanel<TCourse> dataPanel)
     {
         var selectCourseItem = new MenuItem
         {
@@ -60,25 +56,24 @@ public class CourseSelectionListPageModel<TCourse, TCourseCategory> : ICourseSel
         
         selectCourseItem.Click += (_, _) =>
         {
-            var selectedCourses = dataGrid.GetSelectedCourses();
+            var selectedCourses = dataPanel.GetSelectedCourses();
             if (MessageBox.Show(new MessageBoxInfo
                 {
-                    Message =
-                        $"{Language.ui_message_comfirm_select}\n{string.Join("\n", selectedCourses.Select(course => course.ToSimpleString()))}",
-                    Caption = Language.ui_message_comfirm_select_title,
+                    Message = $"{Language.ui_message_confirm_select}\n{string.Join("\n", selectedCourses.Select(course => course.ToSimpleString()))}",
+                    Caption = Language.ui_message_confirm_select_title,
                     Button = MessageBoxButton.OKCancel,
                     IconBrushKey = ResourceToken.InfoBrush,
                     IconKey = ResourceToken.AskGeometry,
                 }) != MessageBoxResult.OK) return;
-            Growl.Info(string.Format(Language.ui_message_course_selected, selectedCourses.Count));
-            dataGrid.CourseGrid.UnselectAll();
+            selectionCallback(selectedCourses);
+            dataPanel.CourseGrid.UnselectAll();
         };
             
-        dataGrid.CourseGrid.ContextMenuOpening += (_, _) =>
+        dataPanel.CourseGrid.ContextMenuOpening += (_, _) =>
         {
-            selectCourseItem.IsEnabled = dataGrid.GetSelectedCourses().Count != 0;
+            selectCourseItem.IsEnabled = dataPanel.GetSelectedCourses().Count != 0;
         };
-        dataGrid.CourseGrid.ContextMenu = new ContextMenu
+        dataPanel.CourseGrid.ContextMenu = new ContextMenu
         {
             Items =
             {
@@ -106,11 +101,18 @@ public class CourseSelectionListPageModel<TCourse, TCourseCategory> : ICourseSel
     {
         if (category is TCourseCategory tcategory)
         {
-            _courseTaskLoader(tcategory, list => _courseDataByCategory[tcategory].Invoke(()=>
+            courseTaskLoader(tcategory, list => _courseDataByCategory[tcategory].Invoke(()=>
             {
-                ClearCourses(tcategory);
-                AddCourse(tcategory, list);
+                _courseDataByCategory[tcategory].RefreshCourses(list);
             }));
+        }
+    }
+
+    public void CheckAllCoursesConflicts(Action<TCourse> conflictChecker)
+    {
+        foreach (var (_, courseDataPanel) in _courseDataByCategory)
+        {
+            courseDataPanel.GetCourses().AsParallel().WithMergeOptions(ParallelMergeOptions.AutoBuffered).ForAll(conflictChecker);
         }
     }
 
@@ -118,6 +120,6 @@ public class CourseSelectionListPageModel<TCourse, TCourseCategory> : ICourseSel
     {
         if (category is not TCourseCategory tcategory) return;
         var courseDataGrid = _courseDataByCategory[tcategory];
-        _courseReader(fileStream, list => courseDataGrid.Invoke(() => courseDataGrid.AddCourse(list)));
+        courseReader(fileStream, list => courseDataGrid.Invoke(() => courseDataGrid.AddCourse(list)));
     }
 }

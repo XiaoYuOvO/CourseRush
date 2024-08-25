@@ -5,28 +5,24 @@ using Resultful;
 
 namespace CourseRush.Core;
 
-public abstract class CourseWeeklyTime
+public abstract class CourseWeeklyTime(
+    string teachingLocation,
+    string teachingCampus,
+    IEnumerable<int> teachingWeek,
+    IDictionary<DayOfWeek, ImmutableList<int>> weeklySchedule)
 {
     /// <summary>
     /// The day of week and the lesson index on that day.
     /// </summary>
-    public ImmutableDictionary<DayOfWeek, ImmutableList<int>> WeeklySchedule { get; }
+    public ImmutableDictionary<DayOfWeek, ImmutableList<int>> WeeklySchedule { get; } = weeklySchedule.ToImmutableDictionary();
 
-    public ImmutableList<int> TeachingWeek { get; }
-    public string TeachingLocation { get; }
-    public string TeachingCampus { get; }
+    public ImmutableList<int> TeachingWeek { get; } = teachingWeek.ToImmutableList();
+    public string TeachingLocation { get; } = teachingLocation;
+    public string TeachingCampus { get; } = teachingCampus;
 
     private string? _toStringCache;
     public Option<ICourse> BindingCourse = Option<ICourse>.None;
 
-
-    protected CourseWeeklyTime(string teachingLocation, string teachingCampus, IEnumerable<int> teachingWeek, IDictionary<DayOfWeek, ImmutableList<int>> weeklySchedule)
-    {
-        TeachingLocation = teachingLocation;
-        TeachingCampus = teachingCampus;
-        TeachingWeek = teachingWeek.ToImmutableList();
-        WeeklySchedule = weeklySchedule.ToImmutableDictionary();
-    }
 
     //1-16周 星期一1-2节, 星期二3-4节@
     public override string ToString()
@@ -38,9 +34,7 @@ public abstract class CourseWeeklyTime
         
         string GetSimplifiedRangeString(ImmutableList<int> list)
         {
-            return string.Join(",",
-                CollectionUtils.FindRanges(list).Select(range =>
-                    range.Start.Equals(range.End) ? range.Start.Value.ToString() : $"{range.Start}-{range.End}").ToList());
+            return string.Join(",", CollectionUtils.FindRanges(list).Select(Utils.ToSimpleString).ToList());
         }
     }
     
@@ -52,7 +46,8 @@ public abstract class CourseWeeklyTime
         var conflictMap = new Dictionary<DayOfWeek, List<int>>();
         foreach (var dayOfWeek in WeeklySchedule.Keys)
         {
-            var conflictLessonIds = other.WeeklySchedule[dayOfWeek].Intersect(WeeklySchedule[dayOfWeek]).ToList();
+            if (!other.WeeklySchedule.TryGetValue(dayOfWeek, out var value)) continue;
+            var conflictLessonIds = value.Intersect(WeeklySchedule[dayOfWeek]).ToList();
             if (conflictLessonIds.Any())
             {
                 conflictMap[dayOfWeek] = conflictLessonIds;

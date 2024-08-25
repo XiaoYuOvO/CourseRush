@@ -8,7 +8,7 @@ using Resultful;
 
 namespace CourseRush.HNU;
 
-public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwError, HNUCourse, HNUCourseCategory>{
+public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseCategory>{
     private static readonly Uri GetCoursesByCategoryUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/findKcInfoByfl?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findKcInfoByfl&sf_request_type=ajax");
     private static readonly Uri GetCategoriesInRoundUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/findXsxkjdByOne?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findXsxkjdByOne&sf_request_type=ajax ");
     private static readonly Uri SelectCourseUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/saveStuXk?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.saveStuXk&sf_request_type=ajax");
@@ -42,7 +42,7 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
                     .Bind(kclist => kclist.RequireObjectArray()
                         .Bind(courses =>
                             (from course in courses select HNUCourse.FromJson(course))
-                            .CombineResults(HdjwError.Combine)))));
+                            .CombineResults()))));
     }
     
     //POST /resService/jwxtpt/v1/xsd/stuCourseCenterController/findXsxkjdByOne?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findXsxkjdByOne&sf_request_type=ajax 
@@ -55,18 +55,18 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
                 .Bind(array => array.RequireObjectArray()
                     .Bind(objects =>
                         (from jsonObject in objects where jsonObject != null select HNUCourseCategory.FromJson(jsonObject))
-                        .CombineResults(HdjwError.Combine))));
+                        .CombineResults())));
     }
 
     //POST /resService/jwxtpt/v1/xsd/stuCourseCenterController/getUserKb?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.getUserKb&sf_request_type=ajax
-    public Result<IReadOnlyList<ISelectedCourse>, HdjwError> GetCurrentCourseTable()
+    public Result<IReadOnlyList<HNUSelectedCourse>, HdjwError> GetCurrentCourseTable()
     {
         return EnsureResultSuccess(Post(GetCurrentCourseTableUri, JsonContent.Create(GetBasicJson())))
             .Bind(json => json.Require("data")
                 .Bind(data => data.RequireArray("resList")
                     .Bind(array => array.RequireObjectArray()
-                        .Bind(objects => (from jsonObject in objects select HNUSelectedCourse.FromJson(jsonObject).Cast<ISelectedCourse>())
-                            .CombineResults(HdjwError.Combine)))));
+                        .Bind(objects => (from jsonObject in objects select HNUSelectedCourse.FromJson(jsonObject))
+                            .CombineResults()))));
     }
     
     //POST /resService/jwxtpt/v1/xsd/stuCourseCenterController/saveStuXk?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.saveStuXk&sf_request_type=ajax
@@ -78,7 +78,7 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
     }
     
     //POST resService/jwxtpt/v1/xsd/stuCourseCenterController/saveTx?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.saveTx&sf_request_type=ajax
-    public VoidResult<HdjwError> RemoveSelectedCourse(List<HNUCourse> course)
+    public VoidResult<HdjwError> RemoveSelectedCourse(IReadOnlyList<HNUCourse> course)
     {
         var request = new JsonObject
         {
@@ -90,6 +90,11 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
                 }))
         };
         return EnsureResultSuccess(Post(RemoveCoursesUri, JsonContent.Create(request))).DiscardValue();
+    }
+
+    public Result<WeekTimeTable, HdjwError> GetWeekTimeTable()
+    {
+        return new WeekTimeTable(ImmutableList<LessonTime>.Empty);
     }
 
     private JsonObject GetBasicJson(JsonObject? inObject = null)

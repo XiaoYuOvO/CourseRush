@@ -1,9 +1,7 @@
 namespace CourseRush.Core.Network;
 
-public class WebError : BasicError
+public class WebError(string errorMessage) : BasicError(errorMessage, [])
 {
-    public WebError(string errorMessage) : base(errorMessage) { }
-
     public static WebError Wrap(Exception exception)
     {
         return new WebError(exception.Message);

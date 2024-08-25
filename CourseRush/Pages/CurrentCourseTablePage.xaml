@@ -1,0 +1,96 @@
+﻿<Page x:Class="CourseRush.Pages.CurrentCourseTablePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:CourseRush"
+      xmlns:hc="https://handyorg.github.io/handycontrol"
+      mc:Ignorable="d"
+      Title="CurrentCourseTablePage" Height="450" Width="800">
+    <hc:TransitioningContentControl>
+        <hc:SimplePanel>
+            <hc:DrawerContainer>
+                <Grid Name="ContentGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <!-- <hc:Drawer Grid.Row="1" Name="CourseInfoDrawer" MaskCanClose="True"> -->
+                    <!--     <Border Background="{DynamicResource RegionBrush}" Width="Auto" BorderThickness="0,1,0,0" -->
+                    <!--             BorderBrush="{DynamicResource BorderBrush}"> -->
+                    <!--         <Grid Width="Auto"> -->
+                    <!--             <Grid.RowDefinitions> -->
+                    <!--                 <RowDefinition Height="Auto" /> -->
+                    <!--                 <RowDefinition Height="*"/> -->
+                    <!--             </Grid.RowDefinitions> -->
+                    <!--             <TextBlock Grid.Row="0" Margin="10,0,0,0" Text="Header" Name="CourseDetailHeader" Style="{StaticResource TextBlockTitleBold}" -->
+                    <!--                        HorizontalAlignment="Left" /> -->
+                    <!--             <Button Command="hc:ControlCommands.Close" Grid.Row="0" HorizontalAlignment="Right" -->
+                    <!--                     Foreground="{DynamicResource PrimaryTextBrush}" Style="{StaticResource ButtonIcon}" -->
+                    <!--                     hc:IconElement.Geometry="{StaticResource DeleteFillCircleGeometry}" /> -->
+                    <!--             <hc:UniformSpacingPanel Grid.Row="1" Name="CourseContentPanel" Spacing="16" Orientation="Vertical"> -->
+                    <!--                  -->
+                    <!--             </hc:UniformSpacingPanel> -->
+                    <!--         </Grid> -->
+                    <!--     </Border> -->
+                    <!-- </hc:Drawer> -->
+                    <hc:Drawer Grid.Row="1" Name="OffTableCoursesDrawer" MaskCanClose="True">
+                        <Border Background="{DynamicResource RegionBrush}" Width="Auto" BorderThickness="0,1,0,0"
+                                BorderBrush="{DynamicResource BorderBrush}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock  Grid.Row="0" Margin="10,0,0,0" Text="Header" Name="OffTableCoursesHeader" Style="{StaticResource TextBlockTitleBold}"
+                                           HorizontalAlignment="Left" />
+                                <Button Command="hc:ControlCommands.Close" Grid.Row="0" HorizontalAlignment="Right"
+                                        Foreground="{DynamicResource PrimaryTextBrush}" Style="{StaticResource ButtonIcon}"
+                                        hc:IconElement.Geometry="{StaticResource DeleteFillCircleGeometry}" />
+                                <ScrollViewer Grid.Row="1" Name="OffTableCoursesViewer">
+                                    
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </hc:Drawer>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <ToolBar Height="Auto" HorizontalAlignment="Stretch">
+                            <ToolBar.Items>
+                                <Menu Background="Transparent" VerticalAlignment="Center">
+                                    <MenuItem Name="FilesMenu"
+                                              Header="{Binding Source={x:Static local:Language.ui_menu_file_op}}"
+                                              Height="Auto">
+                                        <MenuItem Click="Export_OnClick" Name="ExportButton"
+                                                  Header="{Binding Source={x:Static local:Language.ui_button_export}}"
+                                                  Height="Auto">
+                                        </MenuItem>
+                                        <MenuItem Click="Import_OnClick" Name="ImportButton"
+                                                  Header="{Binding Source={x:Static local:Language.ui_button_import}}"
+                                                  Height="Auto">
+                                        </MenuItem>
+                                    </MenuItem>
+                                </Menu>
+                                <Separator Margin="10,0,10,0"/>
+                                <Button Click="Refresh_OnClick" Name="RefreshButton" Content="{Binding Source={x:Static local:Language.ui_button_refresh}}" Height="Auto"></Button>
+                            </ToolBar.Items>
+                        </ToolBar>
+                        <StackPanel Grid.Column="1" DockPanel.Dock="Right" Width="Auto" Orientation="Horizontal">
+                            <Button Name="PrevWeekButton" Click="PrevWeekButton_OnClick"
+                                    hc:IconElement.Geometry="{StaticResource LeftGeometry}">
+                            </Button>
+                            <Label Name="WeekIndexLabel" MouseDoubleClick="WeekIndexLabel_OnMouseDoubleClick" Height="Auto"></Label>
+                            <Button Name="NextWeekButton" Click="NextWeekButton_OnClick"
+                                    hc:IconElement.Geometry="{StaticResource RightGeometry}">
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                </Grid>
+            </hc:DrawerContainer>
+        </hc:SimplePanel>
+    </hc:TransitioningContentControl>
+</Page>

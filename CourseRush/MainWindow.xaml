@@ -7,38 +7,40 @@
         xmlns:local="clr-namespace:CourseRush"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920">
+        Height="1080" Width="1920">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MaxWidth="200"/>
-            <ColumnDefinition Width="9*" Name="ColumnDefinition"/>
+            <ColumnDefinition Width="Auto" MinWidth="160"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="9*" />
         </Grid.ColumnDefinitions>
-        <Border BorderThickness="0,0,1,0" >
+        <Border BorderThickness="0,0,0,0" >
             <Border.BorderBrush>
                 <SolidColorBrush Color="{DynamicResource BorderColor}"/>
             </Border.BorderBrush>
             <DockPanel LastChildFill="False">
                 <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" >
                     <hc:Gravatar Name="StudentGravatar" Style="{DynamicResource GravatarCircle}"/>
-                    <Label Name="StudentNameLabel" Content="XiaoYu233" Margin="0,10,0,0" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,0"/>
-                    <Label Name="ClassLabel" Content="2301" Margin="0,10,0,0" FontSize="15" Padding="2,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <TextBlock TextWrapping="Wrap" Name="CurrentSelectionLabel" Text="当前选课:2023-2024-20" Margin="0,10,0,0" FontSize="15" Padding="2,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Label Height="Auto" Name="StudentNameLabel" Content="{Binding Source={x:Static local:Language.ui_label_user}}" Margin="0,10,0,0" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,0"/>
+                    <Label Height="Auto" Name="ClassLabel" Content="{Binding Source={x:Static local:Language.ui_label_class}}" Margin="0,10,0,0" FontSize="15" Padding="2,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock Height="Auto" TextWrapping="Wrap" Name="CurrentSelectionLabel" Text="{Binding Source={x:Static local:Language.ui_label_selection_session_default}}" Margin="0,10,0,0" FontSize="15" Padding="2,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </StackPanel>
-                <hc:SideMenu DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" Name="SideMenu" VerticalContentAlignment="Stretch" VerticalAlignment="Bottom">
-                    <hc:SideMenuItem Header="选课安排" Selected="SelectionSessionList_OnSelected" FontSize="20" IsSelected="True"
+                <hc:SideMenu DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" Name="SideMenu" VerticalContentAlignment="Center" Height="Auto" VerticalAlignment="Bottom">
+                    <hc:SideMenuItem Padding="0,5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" Height="Auto" Name="SessionListBtn" Header="{Binding Source={x:Static local:Language.ui_label_session_list}}" Selected="SelectionSessionList_OnSelected" FontSize="20" IsSelected="True"
                                      CommandParameter="{Binding Header,RelativeSource={RelativeSource Self}}"/>
-                    <hc:SideMenuItem Name="CourseSelectionBtn" Header="选课列表" IsEnabled="False" Selected="CourseSelectionList_OnSelected"  FontSize="20" BorderThickness="20" BorderBrush="Black"
+                    <hc:SideMenuItem Padding="0,5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" Height="Auto" Name="CourseSelectionBtn" Header="{Binding Source={x:Static local:Language.ui_label_course_list}}" IsEnabled="False" Selected="CourseSelectionList_OnSelected"  FontSize="20" BorderThickness="20" BorderBrush="Black"
                                      CommandParameter="{Binding Header,RelativeSource={RelativeSource Self}}">
                     </hc:SideMenuItem>
-                    <hc:SideMenuItem Name="CoursesSelectionQueueBtn" Header="选课队列" IsEnabled="False" Selected="CourseSelectionQueue_OnSelected"  FontSize="20" BorderThickness="20" BorderBrush="Black"
+                    <hc:SideMenuItem Padding="0,5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" Height="Auto" Name="CoursesSelectionQueueBtn" Header="{Binding Source={x:Static local:Language.ui_label_selection_queue}}" IsEnabled="False" Selected="CourseSelectionQueue_OnSelected"  FontSize="20" BorderThickness="20" BorderBrush="Black"
                                      CommandParameter="{Binding Header,RelativeSource={RelativeSource Self}}">
                     </hc:SideMenuItem>
-                    <hc:SideMenuItem Name="CurrentCourseTableBtn" Header="当前课表" IsEnabled="False" Selected="CurrentCourseTable_OnSelected"  FontSize="20" BorderThickness="20" BorderBrush="Black"
+                    <hc:SideMenuItem Padding="0,5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" Height="Auto" Name="CurrentCourseTableBtn" Header="{Binding Source={x:Static local:Language.ui_label_current_course_table}}" IsEnabled="False" Selected="CurrentCourseTable_OnSelected"  FontSize="20" BorderThickness="20" BorderBrush="Black"
                                      CommandParameter="{Binding Header,RelativeSource={RelativeSource Self}}">
                     </hc:SideMenuItem>
                 </hc:SideMenu>
             </DockPanel>
         </Border>
-        <Frame Name="NavFrame" Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" NavigationUIVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+        <GridSplitter Grid.Column="0" Width="5" DragIncrement="5" Background="{DynamicResource BorderBrush}"></GridSplitter>
+        <Frame Name="NavFrame" Grid.Column="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" NavigationUIVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
     </Grid>
 </mah:MetroWindow>

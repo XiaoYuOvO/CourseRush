@@ -1,0 +1,29 @@
+<mah:MetroWindow x:Class="CourseRush.PrioritizedCourseSelectionReorderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:CourseRush"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:dd="urn:gong-wpf-dragdrop"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Title="PrioritizedCourseSelectionReorderWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Margin="10,0,10,5" TextAlignment="Center" Text="{Binding Source={x:Static local:Language.ui_label_reorder_prioritized_courses}}" FontSize="15"/>
+        <ScrollViewer Grid.Row="1" Margin="10,0,10,5">
+            <ListView dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" Name="CourseList">
+            </ListView>
+        </ScrollViewer>
+        <hc:UniformSpacingPanel Grid.Row="2" Spacing="32" HorizontalAlignment="Center" Margin="5,0,5,5">
+            <Button Click="Ok_OnClick" Content="{Binding Source={x:Static hc:Lang.Confirm}}" Style="{StaticResource ButtonPrimary}" FontSize="17" MinHeight="40" MinWidth="60"></Button>
+            <Button Click="Cancel_OnClick" Content="{Binding Source={x:Static hc:Lang.No}}" FontSize="17" MinWidth="60" MinHeight="40"></Button>
+        </hc:UniformSpacingPanel>
+    </Grid>
+</mah:MetroWindow>

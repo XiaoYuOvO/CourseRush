@@ -3,7 +3,12 @@ using System.Text;
 
 namespace CourseRush.Core;
 
-public class BasicError
+public interface ICombinableError<TError> where TError : BasicError
+{
+    static abstract TError Combine(IEnumerable<TError> errors);
+}
+
+public class BasicError : ICombinableError<BasicError>
 {
     public string Message
     {
@@ -21,12 +26,17 @@ public class BasicError
     private string? _messageCache;
     private string BaseMessage { get; }
 
-    public ImmutableList<BasicError> SuppressedErrors { get; }
+    public IReadOnlyList<BasicError> SuppressedErrors { get; }
 
-    protected BasicError(string message, params BasicError[] suppressedErrors)
+    protected BasicError(string message, IReadOnlyList<BasicError> suppressedErrors)
     {
         BaseMessage = message;
         SuppressedErrors = suppressedErrors.ToImmutableList();
+    }
+
+    public static BasicError Combine(IEnumerable<BasicError> errors)
+    {
+        return new BasicError("Combined Error", errors.ToArray());
     }
 
     public override string ToString()

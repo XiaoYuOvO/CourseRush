@@ -41,7 +41,7 @@ public class PresentedData<TValue>
         SearchType = new SearchType<TValue, int>(getter, DataTip);
     }
 
-    public string? GetValue(TValue course)
+    public string GetValue(TValue course)
     {
         return _getter(course);
     }

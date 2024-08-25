@@ -1,51 +1,34 @@
-using System.Text.Json.Nodes;
-using CourseRush.Auth;
-using CourseRush.Auth.HNU;
-using CourseRush.Core.Network;
-using CourseRush.HNU;
+using System.Diagnostics;
 
 namespace CourseRush.CLI;
 
 public class Program
 {
-    public static void Main(string[] args)
+
+    class TestTask
     {
-        // var hdjwAuthResult = HNUAuthChain.HdjwAuth.Auth(
-        // new UsernamePassword(
-        // Environment.GetEnvironmentVariable("HNU_USERNAME") ??
-        // throw new InvalidOperationException("Cannot get hnu user name from env var"),
-        // Environment.GetEnvironmentVariable("HNU_PASSWORD") ??
-        // throw new InvalidOperationException("Cannot get hnu user password from env var")), new WebClient());
-        // hdjwAuthResult.Tee(result =>
-        // {
-        //     Console.WriteLine(result);
-        //     var hdjwClient = new HdjwClient(result);
-        //     hdjwClient.GetOngoingCourseSelections().Tee(ongoingCourseSelections =>
-        //     {
-        //         Console.WriteLine(string.Join(", ",ongoingCourseSelections));
-        //         hdjwClient.GetSelectionClient(ongoingCourseSelections.First()).GetCategoriesInRound().Tee(list =>
-        //         {
-        //             foreach (var courseCategory in list)
-        //             {
-        //                 Console.WriteLine(courseCategory);
-        //             }
-        //         });
-        //     });
-        // });
-
-
-        var fileStream = File.Open("H:\\CSharpeProjects\\CourseRush\\hnu_courses_type3.json", FileMode.Open);
-        var array =
-            JsonNode.Parse(fileStream)?["data"]?["showKclist"]?.AsArray();
-        if (array is null) return;
-        foreach (var jsonNode in array)
+        private static int _index;
+        private readonly int _id;
+        public TestTask()
         {
-            if (jsonNode != null)
-            {
-                HNUCourse.FromJson(jsonNode.AsObject()).Tee(Console.WriteLine);
-                Console.WriteLine();
-            }
+            _id = _index++;
         }
-        fileStream.Close();
+
+        public async Task<int> DoTask()
+        {
+            Console.WriteLine($"Task started at {Thread.CurrentThread.ManagedThreadId}");
+            await Task.Delay(1000);
+            Console.WriteLine($"Doing work at {Thread.CurrentThread.ManagedThreadId}");
+            return 0;
+        }
+    }
+    public static async Task Main(string[] args)
+    {
+        Console.WriteLine($"Starting at {Thread.CurrentThread.ManagedThreadId}");
+        var startNew = Stopwatch.StartNew();
+        List<TestTask> tasks = [new(), new(), new(), new(), new(), new(),  new(), new(), new(), new(), new()];
+        await Task.WhenAll(tasks.Select(t => t.DoTask())).ContinueWith(task => Console.WriteLine(task.Status));
+        startNew.Stop();
+        Console.WriteLine($"Tasks completed {startNew.Elapsed} at {Environment.CurrentManagedThreadId}");
     }
 }

@@ -78,22 +78,127 @@
     <data name="ui.button.apply" xml:space="preserve">
         <value>Apply</value>
     </data>
-    <data name="ui.message.comfirm_select" xml:space="preserve">
+    <data name="ui.message.confirm_select" xml:space="preserve">
         <value>Are you sure to select the following coures?</value>
     </data>
     <data name="ui.message.course_conflict" xml:space="preserve">
         <value>Time conflict occurs when selecting {0}:</value>
     </data>
     <data name="ui.message.course_conflict.info" xml:space="preserve">
-        <value>Conflict with {0} on {1}</value>
+        <value>Conflict with "{0}": {1}</value>
     </data>
-    <data name="ui.message.comfirm_select_title" xml:space="preserve">
-        <value>Selection Comfirm</value>
+    <data name="ui.message.confirm_select_title" xml:space="preserve">
+        <value>Selection Confirm</value>
     </data>
     <data name="ui.button.enqueue_selected_courses" xml:space="preserve">
         <value>Submit Selected Courses</value>
     </data>
     <data name="ui.message.course_selected" xml:space="preserve">
-        <value>Added {0} coures  to selection queue</value>
+        <value>Added {0} courses to selection queue</value>
+    </data>
+    <data name="ui.label.current_week" xml:space="preserve">
+        <value>{0} Week</value>
+    </data>
+    <data name="ui.label.compressed_courses" xml:space="preserve">
+        <value>All Courses</value>
+    </data>
+    <data name="ui.button.off_table_course" xml:space="preserve">
+        <value>Show Off Table Course</value>
+    </data>
+    <data name="ui.message.choose_multi_select_mode" xml:space="preserve">
+        <value>You are selecting multiple courses, are you want to make a Prioritized Selection task?</value>
+    </data>
+    <data name="ui.label.reorder_prioritized_courses" xml:space="preserve">
+        <value>Please reorder the list below to tweak the priority of the courses</value>
+    </data>
+    <data name="ui.title.prioritized_coures_window" xml:space="preserve">
+        <value>Reorder Prioritized Courses</value>
+    </data>
+    <data name="ui.message.choose_multi_select_mode.2" xml:space="preserve">
+        <value> (No for a Parallel Selection task)</value>
+    </data>
+    <data name="ui.label.course_detail" xml:space="preserve">
+        <value>Detail of {0}</value>
+    </data>
+    <data name="ui.label.off_table_courses" xml:space="preserve">
+        <value>Off Table Courses</value>
+    </data>
+    <data name="ui.button.remove_selection" xml:space="preserve">
+        <value>Remove Selection</value>
+    </data>
+    <data name="ui.title.remove_selection_confirm" xml:space="preserve">
+        <value>Confirm Remove Selection</value>
+    </data>
+    <data name="ui.label.remove_selection_confirm" xml:space="preserve">
+        <value>Are you sure to remove the selection of the course</value>
+    </data>
+    <data name="ui.label.task_detail" xml:space="preserve">
+        <value>Task Detail</value>
+    </data>
+    <data name="ui.label.task_status" xml:space="preserve">
+        <value>Task Status</value>
+    </data>
+    <data name="ui.label.retry_option" xml:space="preserve">
+        <value>Retry Option</value>
+    </data>
+    <data name="ui.label.retry_interval" xml:space="preserve">
+        <value>Retry Interval</value>
+    </data>
+    <data name="ui.button.pause" xml:space="preserve">
+        <value>Pause</value>
+    </data>
+    <data name="ui.button.resume" xml:space="preserve">
+        <value>Resume</value>
+    </data>
+    <data name="ui.label.target_course_info" xml:space="preserve">
+        <value>Target Course Info</value>
+    </data>
+    <data name="ui.button.show_course_detail" xml:space="preserve">
+        <value>Show Course Detail</value>
+    </data>
+    <data name="ui.message.course_conflict_solve_by_remove" xml:space="preserve">
+        <value>Click Ok to remove the conflicted courses and select these courses</value>
+    </data>
+    <data name="ui.message.course_conflict.info.week" xml:space="preserve">
+        <value>{0} Week</value>
+    </data>
+    <data name="ui.message.course_conflict.info.lesson" xml:space="preserve">
+        <value>Lesson {0}</value>
+    </data>
+    <data name="ui.button.delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="ui.button.cancel" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
+    <data name="ui.message.tasks_file_not_array" xml:space="preserve">
+        <value>Tasks file should be json array!</value>
+    </data>
+    <data name="ui.message.tasks_import_success" xml:space="preserve">
+        <value>Successfully imported {0} tasks</value>
+    </data>
+    <data name="ui.message.course_remove_submitted" xml:space="preserve">
+        <value>The task of removing the course has submitted</value>
+    </data>
+    <data name="ui.label.session_list" xml:space="preserve">
+        <value>Course Selection Sessions</value>
+    </data>
+    <data name="ui.label.course_list" xml:space="preserve">
+        <value>Course List</value>
+    </data>
+    <data name="ui.label.selection_queue" xml:space="preserve">
+        <value>Course Selection Queue</value>
+    </data>
+    <data name="ui.label.current_course_table" xml:space="preserve">
+        <value>Current Course Table</value>
+    </data>
+    <data name="ui.label.user" xml:space="preserve">
+        <value>User</value>
+    </data>
+    <data name="ui.label.class" xml:space="preserve">
+        <value>Class</value>
+    </data>
+    <data name="ui.label.selection_session.default" xml:space="preserve">
+        <value>Current Selection</value>
     </data>
 </root>

@@ -5,9 +5,8 @@ using Resultful;
 
 namespace CourseRush.HNU;
 
-public class HNUCourseSelection : ICourseSelection
+public class HNUCourseSelection : ICourseSelection, IPresentedDataProvider<HNUCourseSelection>, IJsonSerializable<HNUCourseSelection, HdjwError>
 {
-    public static readonly Codec<HNUCourseSelection, HdjwError> Codec = new(ToJson, FromJson, HdjwError.Combine);
     public string SelectionId { get; }
     public string SelectionTimeId { get; }
     public string SelectionTypeName { get; }
@@ -43,18 +42,18 @@ public class HNUCourseSelection : ICourseSelection
                                             new HNUCourseSelection(id, jczy013Id, hdName, xkkssj, xkjssj, xkfsName, mtkssj, mtjssj)))))))));
     }
 
-    public static JsonObject ToJson(HNUCourseSelection selection)
+    public JsonObject ToJson()
     {
         return new JsonObject
         {
-            ["id"] = selection.SelectionId,
-            ["jczy013id"] = selection.SelectionTimeId,
-            ["hd_name"] = selection.SelectionTypeName,
-            ["xkkssj"] = selection.StartTime.ToString("yyyy-M-d"),
-            ["xkjssj"] = selection.EndTime.ToString("yyyy-M-d"),
-            ["xkfs_name"] = selection.SelectionStage,
-            ["mtkssj"] = selection.DailyStartTime.ToString("HH:mm:ss"),
-            ["mtjssj"] = selection.DailyEndTime.ToString("HH:mm:ss")
+            ["id"] = SelectionId,
+            ["jczy013id"] = SelectionTimeId,
+            ["hd_name"] = SelectionTypeName,
+            ["xkkssj"] = StartTime.ToString("yyyy-M-d"),
+            ["xkjssj"] = EndTime.ToString("yyyy-M-d"),
+            ["xkfs_name"] = SelectionStage,
+            ["mtkssj"] = DailyStartTime.ToString("HH:mm:ss"),
+            ["mtjssj"] = DailyEndTime.ToString("HH:mm:ss")
         };
     }
 
@@ -64,13 +63,20 @@ public class HNUCourseSelection : ICourseSelection
         return $"{nameof(SelectionId)}: {SelectionId}, {nameof(SelectionTimeId)}: {SelectionTimeId}, {nameof(SelectionTypeName)}: {SelectionTypeName}, {nameof(StartTime)}: {StartTime}, {nameof(EndTime)}: {EndTime}, {nameof(SelectionStage)}: {SelectionStage}, {nameof(DailyStartTime)}: {DailyStartTime}, {nameof(DailyEndTime)}: {DailyEndTime}";
     }
 
-    public static List<PresentedData<HNUCourseSelection>> BuildPresentedData()
+    private static readonly List<PresentedData<HNUCourseSelection>> PresentedData =
+    [
+        PresentedData<HNUCourseSelection>.OfString("course_selection.selection_term", selection => selection.SelectionTimeId),
+        PresentedData<HNUCourseSelection>.OfString("course_selection.selection_name", selection => selection.SelectionTypeName)
+    ];
+
+    public static List<PresentedData<HNUCourseSelection>> GetPresentedData()
     {
-        return new List<PresentedData<HNUCourseSelection>>
-        {
-            PresentedData<HNUCourseSelection>.OfString("course_selection.selection_term", selection => selection.SelectionTimeId),
-            PresentedData<HNUCourseSelection>.OfString("course_selection.selection_name", selection => selection.SelectionTypeName)
-        };
+        return PresentedData;
+    }
+
+    public static List<PresentedData<HNUCourseSelection>> GetSimplePresentedData()
+    {
+        return PresentedData;
     }
 
     public void AddInfoToJson(JsonObject json)

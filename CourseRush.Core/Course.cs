@@ -18,6 +18,7 @@ public interface ICourse
     public TeachingMethod TeachingMethod { get; }
     public CourseType CourseType { get; }
     public ExaminationMethod ExaminationMethod { get; }
+    public Dictionary<ICourse, IEnumerable<CourseWeeklyTime.ConflictResult>> ConflictsCache { get; }
 
     public string ToSimpleString();
 }
@@ -57,6 +58,8 @@ public abstract class Course<TCourse> : ICourse where TCourse : ICourse
     public TeachingMethod TeachingMethod { get; }
     public CourseType CourseType { get; }
     public ExaminationMethod ExaminationMethod { get; }
+
+    public Dictionary<ICourse, IEnumerable<CourseWeeklyTime.ConflictResult>> ConflictsCache { get; } = new();
     public abstract string ToSimpleString();
 
     public override string ToString()
@@ -65,4 +68,8 @@ public abstract class Course<TCourse> : ICourse where TCourse : ICourse
     }
 
     public abstract void AddCourseSelectionToJson(JsonObject jsonObject);
+
+    public abstract override bool Equals(object? obj);
+    
+    public abstract override int GetHashCode();
 }

@@ -1,9 +1,11 @@
 using System;
 using System.Windows;
+using CourseRush.Controls;
 using CourseRush.Core;
+using CourseRush.Models;
 using Microsoft.Win32;
 
-namespace CourseRush;
+namespace CourseRush.Pages;
 
 public partial class CourseSelectionListPage
 {
@@ -21,7 +23,7 @@ public partial class CourseSelectionListPage
             ImportButton.FontSize = 16 * fontSizeFactor;
             ExportButton.FontSize = 16 * fontSizeFactor;
             RefreshButton.FontSize = 16 * fontSizeFactor;
-            FilesMenu.FontSize = 16 * fontSizeFactor;
+            FilesMenu.FontSize = 14 * fontSizeFactor;
             ShowConflictCourse.FontSize = 16 * fontSizeFactor;
             ShowSearchButton.FontSize = 16 * fontSizeFactor;
             ShowFullCourse.FontSize = 16 * fontSizeFactor;
@@ -38,9 +40,10 @@ public partial class CourseSelectionListPage
         });
         DataTableTab.SelectionChanged += (_, _) =>
         {
-            ShowSearchButton.IsChecked = (DataTableTab.SelectedContent as CourseDataGrid)?.IsSearchPanelVisible() ?? false;
+            ShowSearchButton.IsChecked = (DataTableTab.SelectedContent as CourseDataPanel)?.IsSearchPanelVisible() ?? false;
+            UpdateFilter();
         };
-
+        UpdateFilter();
     }
 
     private void Refresh_OnClick(object sender, RoutedEventArgs e)
@@ -56,7 +59,10 @@ public partial class CourseSelectionListPage
         if (DataTableTab.Items[DataTableTab.SelectedIndex] is not CourseTabItem courseTabItem) return;
         var openFileDialog = new OpenFileDialog
         {
-            Multiselect = false
+            Multiselect = false,
+            ShowReadOnly = true,
+            CheckFileExists = true, 
+            DefaultExt = ".json"
         };
         if (openFileDialog.ShowDialog() ?? false)
         {
@@ -71,7 +77,7 @@ public partial class CourseSelectionListPage
 
     private void ToggleButton_OnClick(object sender, RoutedEventArgs e)
     {
-        (DataTableTab.SelectedContent as CourseDataGrid)?.SetSearchPanelVisibility(ShowSearchButton.IsChecked ?? false);
+        (DataTableTab.SelectedContent as CourseDataPanel)?.SetSearchPanelVisibility(ShowSearchButton.IsChecked ?? false);
     }
 
     private void OnFilterButtonClicked(object sender, RoutedEventArgs e)
@@ -81,6 +87,6 @@ public partial class CourseSelectionListPage
 
     private void UpdateFilter()
     {
-        (DataTableTab.SelectedContent as CourseDataGrid)?.UpdateRecordFilter(ShowFullCourse.IsChecked ?? false, ShowOnlyInClassCourse.IsChecked ?? false, ShowConflictCourse.IsChecked ?? false, UserInfo?.ClassName);
+        (DataTableTab.SelectedContent as CourseDataPanel)?.UpdateRecordFilter(ShowFullCourse.IsChecked ?? false, ShowOnlyInClassCourse.IsChecked ?? false, ShowConflictCourse.IsChecked ?? false, UserInfo?.ClassName);
     }
 }

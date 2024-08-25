@@ -1,19 +1,13 @@
 using System.Collections.Immutable;
-using System.Text.Json.Nodes;
 using Resultful;
 
 namespace CourseRush.Core;
 
-public abstract class CourseTimeTable
+public abstract class CourseTimeTable(IEnumerable<CourseWeeklyTime> weeklyInformation)
 {
-    public ImmutableList<CourseWeeklyTime> WeeklyInformation { get; }
+    public ImmutableList<CourseWeeklyTime> WeeklyInformation { get; } = weeklyInformation.ToImmutableList();
 
-    protected CourseTimeTable(IEnumerable<CourseWeeklyTime> weeklyInformation)
-    {
-        WeeklyInformation = weeklyInformation.ToImmutableList();
-    }
-
-    public List<CourseWeeklyTime.ConflictResult>? ResolveConflictWith(CourseTimeTable other)
+    public Option<List<CourseWeeklyTime.ConflictResult>> ResolveConflictWith(CourseTimeTable other)
     {
         var conflictResultList = new List<CourseWeeklyTime.ConflictResult>();
         foreach (var thisWeeklyTime in WeeklyInformation)
@@ -23,13 +17,15 @@ public abstract class CourseTimeTable
                 .Where(weeklyConflict => weeklyConflict != null)!);
         }
 
-        return conflictResultList.Any() ? conflictResultList : null;
+        return conflictResultList.Count != 0 ? conflictResultList : Option<List<CourseWeeklyTime.ConflictResult>>.None;
     }
 
-    public Option<CourseWeeklyTime> GetTimeTableAtWeek(int weekIndex)
+    public ImmutableList<CourseWeeklyTime> GetTimeTableAtWeek(int weekIndex)
     {
-        return WeeklyInformation.FirstOrDefault(time => time.TeachingWeek.Contains(weekIndex))?.ToOption<CourseWeeklyTime>() ?? Option<CourseWeeklyTime>.None;
+        return WeeklyInformation.FindAll(time => time.TeachingWeek.Contains(weekIndex));
     }
+
+    public abstract Option<CourseWeeklyTime> GetCompressedTime();
 
     public override string ToString()
     {

@@ -69,6 +69,24 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string ui_button_cancel {
+            get {
+                return ResourceManager.GetString("ui.button.cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string ui_button_delete {
+            get {
+                return ResourceManager.GetString("ui.button.delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Submit Selected Courses.
         /// </summary>
         public static string ui_button_enqueue_selected_courses {
@@ -105,11 +123,47 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show Off Table Course.
+        /// </summary>
+        public static string ui_button_off_table_course {
+            get {
+                return ResourceManager.GetString("ui.button.off_table_course", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause.
+        /// </summary>
+        public static string ui_button_pause {
+            get {
+                return ResourceManager.GetString("ui.button.pause", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refresh.
         /// </summary>
         public static string ui_button_refresh {
             get {
                 return ResourceManager.GetString("ui.button.refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove Selection.
+        /// </summary>
+        public static string ui_button_remove_selection {
+            get {
+                return ResourceManager.GetString("ui.button.remove_selection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resume.
+        /// </summary>
+        public static string ui_button_resume {
+            get {
+                return ResourceManager.GetString("ui.button.resume", resourceCulture);
             }
         }
         
@@ -128,6 +182,15 @@ namespace CourseRush {
         public static string ui_button_show_conflict_course {
             get {
                 return ResourceManager.GetString("ui.button.show_conflict_course", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Course Detail.
+        /// </summary>
+        public static string ui_button_show_course_detail {
+            get {
+                return ResourceManager.GetString("ui.button.show_course_detail", resourceCulture);
             }
         }
         
@@ -177,11 +240,74 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Class.
+        /// </summary>
+        public static string ui_label_class {
+            get {
+                return ResourceManager.GetString("ui.label.class", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All Courses.
+        /// </summary>
+        public static string ui_label_compressed_courses {
+            get {
+                return ResourceManager.GetString("ui.label.compressed_courses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Detail of {0}.
+        /// </summary>
+        public static string ui_label_course_detail {
+            get {
+                return ResourceManager.GetString("ui.label.course_detail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Course List.
+        /// </summary>
+        public static string ui_label_course_list {
+            get {
+                return ResourceManager.GetString("ui.label.course_list", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current Course Table.
+        /// </summary>
+        public static string ui_label_current_course_table {
+            get {
+                return ResourceManager.GetString("ui.label.current_course_table", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Week.
+        /// </summary>
+        public static string ui_label_current_week {
+            get {
+                return ResourceManager.GetString("ui.label.current_week", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Index.
         /// </summary>
         public static string ui_label_index {
             get {
                 return ResourceManager.GetString("ui.label.index", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Off Table Courses.
+        /// </summary>
+        public static string ui_label_off_table_courses {
+            get {
+                return ResourceManager.GetString("ui.label.off_table_courses", resourceCulture);
             }
         }
         
@@ -195,6 +321,51 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure to remove the selection of the course.
+        /// </summary>
+        public static string ui_label_remove_selection_confirm {
+            get {
+                return ResourceManager.GetString("ui.label.remove_selection_confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please reorder the list below to tweak the priority of the courses.
+        /// </summary>
+        public static string ui_label_reorder_prioritized_courses {
+            get {
+                return ResourceManager.GetString("ui.label.reorder_prioritized_courses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retry Interval.
+        /// </summary>
+        public static string ui_label_retry_interval {
+            get {
+                return ResourceManager.GetString("ui.label.retry_interval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retry Option.
+        /// </summary>
+        public static string ui_label_retry_option {
+            get {
+                return ResourceManager.GetString("ui.label.retry_option", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Course Selection Queue.
+        /// </summary>
+        public static string ui_label_selection_queue {
+            get {
+                return ResourceManager.GetString("ui.label.selection_queue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current Selection: {0}#{1}.
         /// </summary>
         public static string ui_label_selection_session {
@@ -204,11 +375,65 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current Selection.
+        /// </summary>
+        public static string ui_label_selection_session_default {
+            get {
+                return ResourceManager.GetString("ui.label.selection_session.default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Course Selection Sessions.
+        /// </summary>
+        public static string ui_label_session_list {
+            get {
+                return ResourceManager.GetString("ui.label.session_list", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target Course Info.
+        /// </summary>
+        public static string ui_label_target_course_info {
+            get {
+                return ResourceManager.GetString("ui.label.target_course_info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task Detail.
+        /// </summary>
+        public static string ui_label_task_detail {
+            get {
+                return ResourceManager.GetString("ui.label.task_detail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task Status.
+        /// </summary>
+        public static string ui_label_task_status {
+            get {
+                return ResourceManager.GetString("ui.label.task_status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to University.
         /// </summary>
         public static string ui_label_university {
             get {
                 return ResourceManager.GetString("ui.label.university", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User.
+        /// </summary>
+        public static string ui_label_user {
+            get {
+                return ResourceManager.GetString("ui.label.user", resourceCulture);
             }
         }
         
@@ -231,20 +456,38 @@ namespace CourseRush {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure to select the following coures?.
+        ///   Looks up a localized string similar to You are selecting multiple courses, are you want to make a Prioritized Selection task?.
         /// </summary>
-        public static string ui_message_comfirm_select {
+        public static string ui_message_choose_multi_select_mode {
             get {
-                return ResourceManager.GetString("ui.message.comfirm_select", resourceCulture);
+                return ResourceManager.GetString("ui.message.choose_multi_select_mode", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Selection Comfirm.
+        ///   Looks up a localized string similar to  (No for a Parallel Selection task).
         /// </summary>
-        public static string ui_message_comfirm_select_title {
+        public static string ui_message_choose_multi_select_mode_2 {
             get {
-                return ResourceManager.GetString("ui.message.comfirm_select_title", resourceCulture);
+                return ResourceManager.GetString("ui.message.choose_multi_select_mode.2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure to select the following coures?.
+        /// </summary>
+        public static string ui_message_confirm_select {
+            get {
+                return ResourceManager.GetString("ui.message.confirm_select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection Confirm.
+        /// </summary>
+        public static string ui_message_confirm_select_title {
+            get {
+                return ResourceManager.GetString("ui.message.confirm_select_title", resourceCulture);
             }
         }
         
@@ -258,7 +501,7 @@ namespace CourseRush {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Conflict with {0} on {1}.
+        ///   Looks up a localized string similar to Conflict with &quot;{0}&quot;: {1}.
         /// </summary>
         public static string ui_message_course_conflict_info {
             get {
@@ -267,11 +510,83 @@ namespace CourseRush {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Added {0} coures  to selection queue.
+        ///   Looks up a localized string similar to Lesson {0}.
+        /// </summary>
+        public static string ui_message_course_conflict_info_lesson {
+            get {
+                return ResourceManager.GetString("ui.message.course_conflict.info.lesson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Week.
+        /// </summary>
+        public static string ui_message_course_conflict_info_week {
+            get {
+                return ResourceManager.GetString("ui.message.course_conflict.info.week", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click Ok to remove the conflicted courses and select these courses.
+        /// </summary>
+        public static string ui_message_course_conflict_solve_by_remove {
+            get {
+                return ResourceManager.GetString("ui.message.course_conflict_solve_by_remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The task of removing the course has submitted.
+        /// </summary>
+        public static string ui_message_course_remove_submitted {
+            get {
+                return ResourceManager.GetString("ui.message.course_remove_submitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Added {0} courses to selection queue.
         /// </summary>
         public static string ui_message_course_selected {
             get {
                 return ResourceManager.GetString("ui.message.course_selected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tasks file should be json array!.
+        /// </summary>
+        public static string ui_message_tasks_file_not_array {
+            get {
+                return ResourceManager.GetString("ui.message.tasks_file_not_array", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully imported {0} tasks.
+        /// </summary>
+        public static string ui_message_tasks_import_success {
+            get {
+                return ResourceManager.GetString("ui.message.tasks_import_success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reorder Prioritized Courses.
+        /// </summary>
+        public static string ui_title_prioritized_coures_window {
+            get {
+                return ResourceManager.GetString("ui.title.prioritized_coures_window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm Remove Selection.
+        /// </summary>
+        public static string ui_title_remove_selection_confirm {
+            get {
+                return ResourceManager.GetString("ui.title.remove_selection_confirm", resourceCulture);
             }
         }
         

@@ -1,0 +1,54 @@
+<TreeView x:Class="CourseRush.Controls.TaskTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:CourseRush.Controls"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <TreeView.Resources>
+        <ControlTemplate TargetType="local:TaskTreeViewItem" x:Name="TaskTreeViewItemTemplate" x:Key="TaskTreeViewItemTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition MinHeight="{TemplateBinding MinHeight}" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border x:Name="Bd"
+                        CornerRadius="{Binding Path=(hc:BorderElement.CornerRadius),RelativeSource={RelativeSource TemplatedParent}}"
+                        BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}"
+                        SnapsToDevicePixels="true">
+                    <DockPanel LastChildFill="True"
+                               Margin="{Binding Converter={StaticResource TreeViewItemMarginConverter}, RelativeSource={RelativeSource TemplatedParent}}">
+                        <ToggleButton x:Name="Expander" ClickMode="Press"
+                                      IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Style="{StaticResource ExpandCollapseToggleStyle}" />
+                        <ContentPresenter VerticalAlignment="Center" x:Name="PART_Header" ContentSource="Header"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </DockPanel>
+                </Border>
+                <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" />
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsExpanded" Value="false">
+                    <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed" />
+                </Trigger>
+                <Trigger Property="HasItems" Value="false">
+                    <Setter Property="Visibility" TargetName="Expander" Value="Hidden" />
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="true" />
+                        <Condition Property="IsSelectionActive" Value="false" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" TargetName="Bd" Value="{DynamicResource DarkDefaultBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                </MultiTrigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Opacity" Value=".4" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </TreeView.Resources>
+
+</TreeView>

@@ -1,4 +1,4 @@
-<UserControl x:Class="CourseRush.CourseTable"
+<UserControl x:Class="CourseRush.Controls.CourseTable"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -32,6 +32,7 @@
         <TextBlock Grid.Column="5" Grid.Row="0" Name="FridayHeader" FontSize="16" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         <TextBlock Grid.Column="6" Grid.Row="0" Name="SaturdayHeader" FontSize="16" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         <TextBlock Grid.Column="7" Grid.Row="0" Name="SundayHeader" FontSize="16" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+        <Button Grid.Column="0" Grid.Row="0" Height="Auto" Click="ShowOffTableCourse_OnClick" Content="{Binding Source={x:Static local:Language.ui_button_off_table_course}}"></Button>
         <!-- <TextBlock Grid.Column="4" Grid.Row="1" Text="dsadsa" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center"></TextBlock> -->
         <!-- <TextBlock Grid.Column="4" Grid.Row="2" Text="dsadsa" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center"></TextBlock> -->
         

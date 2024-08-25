@@ -11,6 +11,23 @@ public class HNUCourseWeeklyTime : CourseWeeklyTime
     {
     }
 
+    public HNUCourseWeeklyTime Clone()
+    {
+        return new HNUCourseWeeklyTime(TeachingLocation, TeachingCampus, new List<int>(TeachingWeek),
+            new Dictionary<DayOfWeek, ImmutableList<int>>(WeeklySchedule));
+    }
+
+    public static Option<HNUCourseWeeklyTime> Compressed(ImmutableList<HNUCourseWeeklyTime> times)
+    {
+        if(!times.Any()) return Option<HNUCourseWeeklyTime>.None;
+        var first = times.First();
+        return new HNUCourseWeeklyTime(first.TeachingLocation, first.TeachingCampus, first.TeachingWeek,
+            times.Select(t => t.WeeklySchedule).Aggregate(CollectionUtils.MergeDictionaries))
+        {
+            BindingCourse = first.BindingCourse
+        };
+    }
+
     public override string ToJsonString()
     {
         return $"@{string.Join(",",TeachingWeek.Select(i => i.ToString()))}@@{string.Join(",",WeeklySchedule.SelectMany(pair => pair.Value.Select(lesson => DayOfWeekToId(pair.Key) + lesson.ToString("00"))))}@{TeachingLocation}@@@@{TeachingCampus}@";

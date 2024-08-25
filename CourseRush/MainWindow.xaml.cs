@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using CourseRush.Core;
+using CourseRush.Models;
 using HandyControl.Controls;
 using MahApps.Metro.Controls;
 
@@ -33,7 +34,23 @@ public partial class MainWindow
             _currentPage.Width = NavFrame.RenderSize.Width;
             _currentPage.Height = NavFrame.RenderSize.Height;
             _currentPage.RenderSize = NavFrame.RenderSize;
-            _mainWindowModel.OnAutoFontSizeChanged(Math.Min(ActualWidth / 1920, ActualHeight / 1080));
+
+            var fontSizeFactor = Math.Min(ActualWidth / 1920, ActualHeight / 1080);
+            _mainWindowModel.OnAutoFontSizeChanged(fontSizeFactor);
+            StudentGravatar.Height = 80 * fontSizeFactor;
+            StudentGravatar.Width = 80 * fontSizeFactor;
+            StudentNameLabel.FontSize = 15 * fontSizeFactor;
+            ClassLabel.FontSize = 14 * fontSizeFactor;
+            CurrentSelectionLabel.FontSize = 14 * fontSizeFactor;
+            SessionListBtn.FontSize = 20 * fontSizeFactor;
+            SessionListBtn.Height = double.NaN;
+            CourseSelectionBtn.FontSize = 20 * fontSizeFactor;
+            CourseSelectionBtn.Height = double.NaN;
+            CoursesSelectionQueueBtn.FontSize = 20 * fontSizeFactor;
+            CoursesSelectionQueueBtn.Height = double.NaN;
+            CurrentCourseTableBtn.FontSize = 20 * fontSizeFactor;
+            CurrentCourseTableBtn.Height = double.NaN;
+            SideMenu.Height = double.NaN;
         };
         _mainWindowModel.RegisterUserInfoListener(userInfo =>
         {
@@ -77,7 +94,7 @@ public partial class MainWindow
 
     private void CourseSelectionQueue_OnSelected(object sender, RoutedEventArgs e)
     {
-        
+        GotoPage(_mainWindowModel.GetSelectionQueuePage());
     }
 
     private void SelectionSessionList_OnSelected(object sender, RoutedEventArgs e)
@@ -85,10 +102,10 @@ public partial class MainWindow
         GotoPage(_mainWindowModel.GetSelectionSessionsPage());
     }
 
-    private void Gravatar_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        _mainWindowModel.ReloadUserInfo();
-    }
+    // private void Gravatar_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    // {
+    //     _mainWindowModel.ReloadUserInfo();
+    // }
 
     private void CourseSelectionList_OnSelected(object sender, RoutedEventArgs e)
     {

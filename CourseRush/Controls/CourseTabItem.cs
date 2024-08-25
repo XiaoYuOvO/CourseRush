@@ -1,25 +1,26 @@
 using System;
 using System.Windows.Controls;
 using CourseRush.Core;
+using CourseRush.Models;
 
-namespace CourseRush;
+namespace CourseRush.Controls;
 
 public class CourseTabItem : TabItem
 {
-    public CourseDataGrid Grid { get; }
+    public CourseDataPanel Panel { get; }
     public ICourseCategory Category { get; }
 
-    public CourseTabItem(CourseDataGrid grid, ICourseCategory category)
+    public CourseTabItem(CourseDataPanel panel, ICourseCategory category)
     {
-        Grid = grid;
+        Panel = panel;
         Category = category;
-        Content = Grid;
+        Content = Panel;
         Header = category.CategoryName;
     }
 
     public void SubscribeAutoFontResize(Action<AutoFontSizeChanged> subscription)
     {
-        Grid.SubscribeAutoFontResize(subscription);
+        Panel.SubscribeAutoFontResize(subscription);
         subscription(factor =>
         {
             FontSize = factor * 14;

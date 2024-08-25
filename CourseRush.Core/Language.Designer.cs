@@ -7,10 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CourseRush {
-    using System;
-    
-    
+namespace CourseRush.Core {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -87,11 +84,29 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Elective Course Type.
+        /// </summary>
+        internal static string course_elective_type {
+            get {
+                return ResourceManager.GetString("course.elective_type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Examination Method.
         /// </summary>
         internal static string course_examination_method {
             get {
                 return ResourceManager.GetString("course.examination_method", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Group Name.
+        /// </summary>
+        internal static string course_group_name {
+            get {
+                return ResourceManager.GetString("course.group_name", resourceCulture);
             }
         }
         
@@ -110,6 +125,33 @@ namespace CourseRush {
         internal static string course_offer_institution {
             get {
                 return ResourceManager.GetString("course.offer_institution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection Method.
+        /// </summary>
+        internal static string course_selection_method {
+            get {
+                return ResourceManager.GetString("course.selection_method", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preset.
+        /// </summary>
+        internal static string course_selection_method_preset {
+            get {
+                return ResourceManager.GetString("course.selection_method.preset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Self Select.
+        /// </summary>
+        internal static string course_selection_method_self_select {
+            get {
+                return ResourceManager.GetString("course.selection_method.self_select", resourceCulture);
             }
         }
         
@@ -177,7 +219,7 @@ namespace CourseRush {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}.
+        ///   Looks up a localized string similar to {0} Score.
         /// </summary>
         internal static string course_total_credit_value {
             get {
@@ -209,6 +251,231 @@ namespace CourseRush {
         internal static string course_type {
             get {
                 return ResourceManager.GetString("course.type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task launched.
+        /// </summary>
+        internal static string task_info_launched {
+            get {
+                return ResourceManager.GetString("task.info.launched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current task {0} has failed, moving to No.{0} task.
+        /// </summary>
+        internal static string task_info_prioritized_next {
+            get {
+                return ResourceManager.GetString("task.info.prioritized_next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current task {0} has completed, moving to No.{0} task.
+        /// </summary>
+        internal static string task_info_sequential_task_next {
+            get {
+                return ResourceManager.GetString("task.info.sequential_task_next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task has been cancelled.
+        /// </summary>
+        internal static string task_log_cancelled {
+            get {
+                return ResourceManager.GetString("task.log.cancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task has  completed.
+        /// </summary>
+        internal static string task_log_complete {
+            get {
+                return ResourceManager.GetString("task.log.complete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task has failed.
+        /// </summary>
+        internal static string task_log_failed {
+            get {
+                return ResourceManager.GetString("task.log.failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task has paused.
+        /// </summary>
+        internal static string task_log_paused {
+            get {
+                return ResourceManager.GetString("task.log.paused", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task has resumed.
+        /// </summary>
+        internal static string task_log_resumed {
+            get {
+                return ResourceManager.GetString("task.log.resumed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task is waiting for retry ({0} time(s)).
+        /// </summary>
+        internal static string task_log_retry {
+            get {
+                return ResourceManager.GetString("task.log.retry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parallel selection task: {0} tasks.
+        /// </summary>
+        internal static string task_parallel_tasks {
+            get {
+                return ResourceManager.GetString("task.parallel_tasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prioritized selection tasks: {0} tasks.
+        /// </summary>
+        internal static string task_prioritized_tasks {
+            get {
+                return ResourceManager.GetString("task.prioritized_tasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove selection task: {0}.
+        /// </summary>
+        internal static string task_remove_task {
+            get {
+                return ResourceManager.GetString("task.remove_task", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Always Retry.
+        /// </summary>
+        internal static string task_retry_options_always {
+            get {
+                return ResourceManager.GetString("task.retry_options.always", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Never Retry.
+        /// </summary>
+        internal static string task_retry_options_never {
+            get {
+                return ResourceManager.GetString("task.retry_options.never", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retry Unless Course Full.
+        /// </summary>
+        internal static string task_retry_options_selection_limit {
+            get {
+                return ResourceManager.GetString("task.retry_options.selection_limit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection task.
+        /// </summary>
+        internal static string task_selection_task {
+            get {
+                return ResourceManager.GetString("task.selection_task", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sequential selection tasks: {0} tasks.
+        /// </summary>
+        internal static string task_sequential_tasks {
+            get {
+                return ResourceManager.GetString("task.sequential_tasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancelled.
+        /// </summary>
+        internal static string task_status_cancelled {
+            get {
+                return ResourceManager.GetString("task.status.cancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed.
+        /// </summary>
+        internal static string task_status_completed {
+            get {
+                return ResourceManager.GetString("task.status.completed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed.
+        /// </summary>
+        internal static string task_status_failed {
+            get {
+                return ResourceManager.GetString("task.status.failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Moving to next.
+        /// </summary>
+        internal static string task_status_next {
+            get {
+                return ResourceManager.GetString("task.status.next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paused.
+        /// </summary>
+        internal static string task_status_paused {
+            get {
+                return ResourceManager.GetString("task.status.paused", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Running.
+        /// </summary>
+        internal static string task_status_running {
+            get {
+                return ResourceManager.GetString("task.status.running", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting.
+        /// </summary>
+        internal static string task_status_waiting {
+            get {
+                return ResourceManager.GetString("task.status.waiting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Submit selection task: {0}.
+        /// </summary>
+        internal static string task_submit_task {
+            get {
+                return ResourceManager.GetString("task.submit_task", resourceCulture);
             }
         }
     }

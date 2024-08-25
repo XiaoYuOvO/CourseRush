@@ -31,7 +31,7 @@ public class HNUCourseCategory : ICourseCategory
                 .Bind(xkfl =>
                     (from jsonNode in xkfl.AsArray() where jsonNode != null
                         select HNUCourseSubcategory.FromJson(jsonNode.AsObject())).ToList()
-                    .CombineResults(HdjwError.Combine))
+                    .CombineResults())
                 .GetOrDefault(new List<HNUCourseSubcategory>());
         return json.RequireString("id")
             .Bind(id => json.ParseInt("xklbbh")

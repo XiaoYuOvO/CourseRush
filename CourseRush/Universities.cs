@@ -10,6 +10,7 @@ using CourseRush.Core;
 using CourseRush.Core.Network;
 using CourseRush.HNU;
 using CourseRush.HNU.Debug;
+using CourseRush.Models;
 using Resultful;
 
 namespace CourseRush;
@@ -19,12 +20,10 @@ public interface IMainWindowModelProvider
     public Result<Func<IMainWindowModel>, BasicError> LoginAndCreateMainWindowModel(UsernamePassword usernamePassword);
 }
 
-public interface IUniversity<TCourse, TError, TCourseSelection> where TCourse : ICourse where TCourseSelection : ICourseSelection where TError : BasicError{
-    public List<PresentedData<TCourse>> CoursePresentedData { get; }
-    public List<PresentedData<TCourseSelection>> SelectionPresentedData { get; }
-    public Codec<TCourse, TError> CourseCodec { get; }
-    public Codec<TCourseSelection, TError> SelectionCodec { get; }
-}
+public interface IUniversity<TCourse, TError, TCourseSelection> 
+    where TCourse : ICourse, IPresentedDataProvider<TCourse>, IJsonSerializable<TCourse, TError> 
+    where TCourseSelection : ICourseSelection, IPresentedDataProvider<TCourseSelection>, IJsonSerializable<TCourseSelection, TError>
+    where TError : BasicError, ICombinableError<TError>;
 
 [SuppressMessage("ReSharper", "ArrangeObjectCreationWhenTypeNotEvident")]
 public static class Universities
@@ -32,29 +31,26 @@ public static class Universities
     private static readonly Dictionary<string, IMainWindowModelProvider> UniversityRegistry = new();
 
     public static readonly
-        UniversityProperty<HdjwError, HNUCourse, HNUCourseSelection, HNUCourseCategory, HdjwAuthResult>
-        HNU =
-            Register<UniversityProperty<HdjwError, HNUCourse, HNUCourseSelection, HNUCourseCategory, HdjwAuthResult>,
-                HNUCourse, HdjwError, HNUCourseSelection>("HNU",
-                new(HNUAuthChain.HdjwAuth, result => new HdjwClient(result), HNUCourse.BuildPresentedData(),
-                    HNUCourseSelection.BuildPresentedData(), HNUCourse.Codec, HNUCourseSelection.Codec));
+        UniversityProperty<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseSelection, HNUCourseCategory, HdjwAuthResult, HdjwClient>
+        HNU = Register<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseSelection, HNUCourseCategory, HdjwAuthResult, HdjwClient>("HNU", HNUAuthChain.HdjwAuth);
 
     public static readonly
-        UniversityProperty<HdjwError, HNUCourse, HNUCourseSelection, HNUCourseCategory, HdjwAuthResult>
-        DEBUG =
-            Register<UniversityProperty<HdjwError, HNUCourse, HNUCourseSelection, HNUCourseCategory, HdjwAuthResult>,
-                HNUCourse, HdjwError, HNUCourseSelection>("Debug",
-                new(HNUAuthChain.DebugAuth, result => new HdjwDebugClient(result), HNUCourse.BuildPresentedData(),
-                HNUCourseSelection.BuildPresentedData(), HNUCourse.Codec, HNUCourseSelection.Codec));
-    private static TUniversity
-        Register<TUniversity, TCourse, TError, TCourseSelection>(string name, TUniversity university)
-        where TCourse : ICourse
-        where TUniversity : IUniversity<TCourse, TError, TCourseSelection>, IMainWindowModelProvider
-        where TCourseSelection : ICourseSelection
-        where TError : BasicError
+        UniversityProperty<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseSelection, HNUCourseCategory, HdjwAuthResult, HdjwDebugClient>
+        DEBUG = Register<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseSelection, HNUCourseCategory, HdjwAuthResult, HdjwDebugClient>("Debug", HNUAuthChain.DebugAuth);
+    
+    private static UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>
+        Register<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>(string name, AuthChain<TAuthResult> authChain)
+        where TCourse : Course<TCourse>, IPresentedDataProvider<TCourse>, IJsonSerializable<TCourse, TError>
+        where TCourseSelection : class, ICourseSelection, IPresentedDataProvider<TCourseSelection>, IJsonSerializable<TCourseSelection, TError>
+        where TError : BasicError, ICombinableError<TError>, ISelectionError
+        where TAuthResult : AuthResult
+        where TCourseCategory : ICourseCategory
+        where TSelectionClient : ISessionClient<TError, TCourseSelection, TCourse, TSelectedCourse, TCourseCategory>, IResultConvertible<TAuthResult, TSelectionClient>
+        where TSelectedCourse : TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>
     {
-        UniversityRegistry[name] = university;
-        return university;
+        var universityProperty = new UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>(authChain);
+        UniversityRegistry[name] = universityProperty;
+        return universityProperty;
     }
 
     public static Result<Func<IMainWindowModel>, BasicError> LoginAndGetMainWindowModelFromId(string id, UsernamePassword profile)
@@ -74,16 +70,10 @@ public static class Universities
     }
 }
 
-internal class UniversityInfo
+internal class UniversityInfo(string displayName, string id)
 {
-    public UniversityInfo(string displayName, string id)
-    {
-        DisplayName = displayName;
-        Id = id;
-    }
-
-    internal string DisplayName { get; }
-    internal string Id { get; }
+    internal string DisplayName { get; } = displayName;
+    internal string Id { get; } = id;
 
     public override string ToString()
     {
@@ -91,37 +81,22 @@ internal class UniversityInfo
     }
 }
 
-public class UniversityProperty<TError, TCourse,TCourseSelection, TCourseCategory, TAuthResult> : IUniversity<TCourse, TError, TCourseSelection>, IMainWindowModelProvider
-    where TError : BasicError
-    where TCourse : Course<TCourse>
+public class UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>
+    (AuthChain<TAuthResult> authChain)
+
+    : IUniversity<TCourse, TError, TCourseSelection>, IMainWindowModelProvider
+    where TError : BasicError, ICombinableError<TError>, ISelectionError
+    where TCourse : Course<TCourse>, IPresentedDataProvider<TCourse>, IJsonSerializable<TCourse, TError>
     where TAuthResult : AuthResult
     where TCourseCategory : ICourseCategory
-    where TCourseSelection : class, ICourseSelection
+    where TCourseSelection : class, ICourseSelection, IPresentedDataProvider<TCourseSelection>, IJsonSerializable<TCourseSelection, TError>
+    where TSelectionClient : ISessionClient<TError, TCourseSelection, TCourse, TSelectedCourse, TCourseCategory>, IResultConvertible<TAuthResult, TSelectionClient>
+    where TSelectedCourse : TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>
 {
-    public UniversityProperty(AuthChain<TAuthResult> authChain,
-        Func<TAuthResult, ISessionClient<TError, TCourseSelection, TCourse, TCourseCategory>> clientFunc,
-        List<PresentedData<TCourse>> coursePresentedData, List<PresentedData<TCourseSelection>> selectionPresentedData,
-        Codec<TCourse, TError> courseCodec, Codec<TCourseSelection, TError> selectionCodec)
-    {
-        AuthChain = authChain;
-        ClientFunc = clientFunc;
-        CoursePresentedData = coursePresentedData;
-        SelectionPresentedData = selectionPresentedData;
-        CourseCodec = courseCodec;
-        SelectionCodec = selectionCodec;
-    }
-
-    public AuthChain<TAuthResult> AuthChain { get; }
-    public Func<TAuthResult, ISessionClient<TError, TCourseSelection, TCourse, TCourseCategory>> ClientFunc { get; }
-    public List<PresentedData<TCourse>> CoursePresentedData { get; }
-    public List<PresentedData<TCourseSelection>> SelectionPresentedData { get; }
-    public Codec<TCourse, TError> CourseCodec { get; }
-    public Codec<TCourseSelection, TError> SelectionCodec { get; }
-
     public Result<Func<IMainWindowModel>, BasicError> LoginAndCreateMainWindowModel(UsernamePassword profile)
     {
-        return AuthChain.Auth(profile, new WebClient()).Bind<Func<IMainWindowModel>>(result => new Func<IMainWindowModel>(() =>
-            new MainWindowModel<UniversityProperty<TError, TCourse, TCourseSelection, TCourseCategory, TAuthResult>,
-                TCourse, TError, TCourseCategory, TCourseSelection>(this, ClientFunc(result)))).CastError<BasicError>();
+        return authChain.Auth(profile, new WebClient()).Bind<Func<IMainWindowModel>>(result => new Func<IMainWindowModel>(() =>
+            new MainWindowModel<UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>,
+                TCourse, TSelectedCourse, TError, TCourseCategory, TCourseSelection>(this, TSelectionClient.CreateFromResult(result)))).CastError<BasicError>();
     }
 }

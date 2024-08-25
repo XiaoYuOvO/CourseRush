@@ -16,11 +16,9 @@ public partial class LoginWindow
         UniversitySelection.ItemsSource = Universities.GetAllUniversities();
         var password = Environment.GetEnvironmentVariable("COURSE_RUSH_PASSWORD");
         var username = Environment.GetEnvironmentVariable("COURSE_RUSH_USERNAME");
-        if (password != null && username != null)
-        {
-            PasswordBox.Password = password;
-            UsernameBox.Text = username;
-        }
+        if (password == null || username == null) return;
+        PasswordBox.Password = password;
+        UsernameBox.Text = username;
     }
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
@@ -47,6 +45,7 @@ public partial class LoginWindow
                         mainWindow.Top = Top + Height / 2 - mainWindow.Height / 2;
                         mainWindow.Left = Left + Width / 2 - mainWindow.Width / 2;
                         mainWindow.Show();
+                        mainWindow.Title = $"COURSE RUSH >>> {info.Id}";
                         Close();
                     })).TeeError(error => this.Invoke(()=>
                     {

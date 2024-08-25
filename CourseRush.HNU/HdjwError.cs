@@ -5,7 +5,8 @@ using CourseRush.Core.Network;
 
 namespace CourseRush.HNU;
 
-public class HdjwError : BasicError
+public class HdjwError(string message, params BasicError[] suppressedErrors)
+    : BasicError(message, suppressedErrors), ICombinableError<HdjwError>, ISelectionError
 {
     public static HdjwError Wrap(Exception exception)
     {
@@ -27,19 +28,22 @@ public class HdjwError : BasicError
         return new HdjwJsonError(message, data);
     }
     
-    public static HdjwError Combine<TError>(IList<TError> errors) where TError : BasicError
+    public static HdjwError Combine(IEnumerable<HdjwError> errors)
     {
         // ReSharper disable once CoVariantArrayConversion
         return new HdjwError("Combined Errors", suppressedErrors: errors.ToArray());
     }
 
-    public HdjwError(string message, params BasicError[] suppressedErrors) : base(message, suppressedErrors) { }
+    public bool IsStudentLimitsError()
+    {
+        return this is HdjwRequestError requestError && "eywxt.save.stuLimit.error".Equals(requestError.ErrorCode, StringComparison.Ordinal);
+    }
 }
 
 public class HdjwRequestError : HdjwError
 {
     private JsonNode RequestResult { get; }
-    private string? ErrorCode { get; }
+    public string? ErrorCode { get; }
 
     public HdjwRequestError(string message, JsonNode requestResult) : base(message)
     {

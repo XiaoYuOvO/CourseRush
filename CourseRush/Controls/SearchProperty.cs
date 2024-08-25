@@ -1,15 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Security.Cryptography.Pkcs;
 using System.Windows;
 using System.Windows.Controls;
 using CourseRush.Core;
 using HandyControl.Controls;
 using HandyControl.Data;
 using ComboBox = System.Windows.Controls.ComboBox;
-using TextBox = HandyControl.Controls.TextBox;
 
-namespace CourseRush;
+namespace CourseRush.Controls;
 
 public interface ISearchProperty<in TCourse> where TCourse : ICourse
 {
@@ -67,8 +65,8 @@ public abstract class SearchProperty<TCourse, TElement> : ISearchProperty<TCours
     {
         _searchPanel.MouseLeftButtonDown += (_, _) =>
         {
-            InputElement.IsEnabled = true;
-            _enabled.IsChecked = true;
+            InputElement.IsEnabled = !InputElement.IsEnabled;
+            _enabled.IsChecked = !_enabled.IsChecked;
         };
         
         _searchPanel.MouseRightButtonDown += (_, _) =>

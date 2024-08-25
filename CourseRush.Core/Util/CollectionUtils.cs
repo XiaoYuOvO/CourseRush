@@ -37,10 +37,11 @@ public static class CollectionUtils
         return sequences.Skip(1).All(innerSeq => innerSeq.SequenceEqual(sequences.First()));
     }
 
-    public static Dictionary<TKey, List<TValue>> MergeDictionaries<TKey, TValue>(
-        Dictionary<TKey, List<TValue>> dict1,
-        Dictionary<TKey, List<TValue>> dict2) where TKey : notnull
+    public static IDictionary<TKey, List<TValue>> MergeDictionaries<TKey, TValue>(
+        IDictionary<TKey, List<TValue>> dict1,
+        IDictionary<TKey, List<TValue>> dict2) where TKey : notnull
     {
+        dict2 = new Dictionary<TKey, List<TValue>>(dict2);
         foreach (var kvp in dict1)
         {
             if (dict2.ContainsKey(kvp.Key))

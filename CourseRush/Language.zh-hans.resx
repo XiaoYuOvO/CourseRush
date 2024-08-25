@@ -74,16 +74,16 @@
     <data name="ui.button.apply" xml:space="preserve">
         <value>应用</value>
     </data>
-    <data name="ui.message.comfirm_select" xml:space="preserve">
+    <data name="ui.message.confirm_select" xml:space="preserve">
         <value>确定选课以下课程?</value>
     </data>
     <data name="ui.message.course_conflict" xml:space="preserve">
-        <value>由于课表冲突,无法选课{0}:</value>
+        <value>{0} 由于课表冲突,无法选课:</value>
     </data>
     <data name="ui.message.course_conflict.info" xml:space="preserve">
-        <value>与课程{0}冲突: {1}</value>
+        <value>与"{0}"冲突: {1}</value>
     </data>
-    <data name="ui.message.comfirm_select_title" xml:space="preserve">
+    <data name="ui.message.confirm_select_title" xml:space="preserve">
         <value>选课确认</value>
     </data>
     <data name="ui.button.enqueue_selected_courses" xml:space="preserve">
@@ -91,5 +91,110 @@
     </data>
     <data name="ui.message.course_selected" xml:space="preserve">
         <value>已添加{0}个课程至选课队列</value>
+    </data>
+    <data name="ui.label.current_week" xml:space="preserve">
+        <value>第{0}周</value>
+    </data>
+    <data name="ui.label.compressed_courses" xml:space="preserve">
+        <value>全部课程</value>
+    </data>
+    <data name="ui.button.off_table_course" xml:space="preserve">
+        <value>显示非课表课程</value>
+    </data>
+    <data name="ui.message.choose_multi_select_mode" xml:space="preserve">
+        <value>你正在选取多个课程,是否创建优先选课任务?</value>
+    </data>
+    <data name="ui.label.reorder_prioritized_courses" xml:space="preserve">
+        <value>请排序下方列表的顺序以调整课程优先级</value>
+    </data>
+    <data name="ui.title.prioritized_coures_window" xml:space="preserve">
+        <value>排序优选选课</value>
+    </data>
+    <data name="ui.message.choose_multi_select_mode.2" xml:space="preserve">
+        <value> (选择"否"将创建并行选课任务)</value>
+    </data>
+    <data name="ui.label.course_detail" xml:space="preserve">
+        <value>{0} 详细信息</value>
+    </data>
+    <data name="ui.label.off_table_courses" xml:space="preserve">
+        <value>非课表课程</value>
+    </data>
+    <data name="ui.button.remove_selection" xml:space="preserve">
+        <value>退选</value>
+    </data>
+    <data name="ui.title.remove_selection_confirm" xml:space="preserve">
+        <value>确认退选</value>
+    </data>
+    <data name="ui.label.remove_selection_confirm" xml:space="preserve">
+        <value>确定退选该课程?</value>
+    </data>
+    <data name="ui.label.task_detail" xml:space="preserve">
+        <value>任务详情</value>
+    </data>
+    <data name="ui.label.task_status" xml:space="preserve">
+        <value>任务状态</value>
+    </data>
+    <data name="ui.label.retry_option" xml:space="preserve">
+        <value>自动重试规则</value>
+    </data>
+    <data name="ui.label.retry_interval" xml:space="preserve">
+        <value>自动重试间隔</value>
+    </data>
+    <data name="ui.button.pause" xml:space="preserve">
+        <value>暂停</value>
+    </data>
+    <data name="ui.button.resume" xml:space="preserve">
+        <value>继续</value>
+    </data>
+    <data name="ui.label.target_course_info" xml:space="preserve">
+        <value>目标课程信息</value>
+    </data>
+    <data name="ui.button.show_course_detail" xml:space="preserve">
+        <value>显示课程信息</value>
+    </data>
+    <data name="ui.message.course_conflict_solve_by_remove" xml:space="preserve">
+        <value>点击"确定"来退选所有冲突的课程并提交所选课程</value>
+    </data>
+    <data name="ui.message.course_conflict.info.week" xml:space="preserve">
+        <value>{0}周</value>
+    </data>
+    <data name="ui.message.course_conflict.info.lesson" xml:space="preserve">
+        <value>{0}节</value>
+    </data>
+    <data name="ui.button.delete" xml:space="preserve">
+        <value>删除</value>
+    </data>
+    <data name="ui.button.cancel" xml:space="preserve">
+        <value>取消</value>
+    </data>
+    <data name="ui.message.tasks_file_not_array" xml:space="preserve">
+        <value>任务列表文件应为JSON数组</value>
+    </data>
+    <data name="ui.message.tasks_import_success" xml:space="preserve">
+        <value>成功导入{0}个任务</value>
+    </data>
+    <data name="ui.message.course_remove_submitted" xml:space="preserve">
+        <value>退选任务已提交</value>
+    </data>
+    <data name="ui.label.session_list" xml:space="preserve">
+        <value>选课安排</value>
+    </data>
+    <data name="ui.label.course_list" xml:space="preserve">
+        <value>选课列表</value>
+    </data>
+    <data name="ui.label.selection_queue" xml:space="preserve">
+        <value>选课队列</value>
+    </data>
+    <data name="ui.label.current_course_table" xml:space="preserve">
+        <value>当前课表</value>
+    </data>
+    <data name="ui.label.user" xml:space="preserve">
+        <value>用户名</value>
+    </data>
+    <data name="ui.label.class" xml:space="preserve">
+        <value>班级</value>
+    </data>
+    <data name="ui.label.selection_session.default" xml:space="preserve">
+        <value>当前选课</value>
     </data>
 </root>

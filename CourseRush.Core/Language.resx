@@ -48,7 +48,7 @@
         <value>Total Credits</value>
     </data>
     <data name="course.total_credit.value" xml:space="preserve">
-        <value>{0}</value>
+        <value>{0} Score</value>
     </data>
     <data name="course.type" xml:space="preserve">
         <value>Type</value>
@@ -70,5 +70,95 @@
     </data>
     <data name="course_selection.selection_name" xml:space="preserve">
         <value>Selection Name</value>
+    </data>
+    <data name="course.elective_type" xml:space="preserve">
+        <value>Elective Course Type</value>
+    </data>
+    <data name="course.selection_method.preset" xml:space="preserve">
+        <value>Preset</value>
+    </data>
+    <data name="course.selection_method.self_select" xml:space="preserve">
+        <value>Self Select</value>
+    </data>
+    <data name="course.selection_method" xml:space="preserve">
+        <value>Selection Method</value>
+    </data>
+    <data name="task.status.running" xml:space="preserve">
+        <value>Running</value>
+    </data>
+    <data name="task.status.waiting" xml:space="preserve">
+        <value>Waiting</value>
+    </data>
+    <data name="task.status.completed" xml:space="preserve">
+        <value>Completed</value>
+    </data>
+    <data name="task.status.failed" xml:space="preserve">
+        <value>Failed</value>
+    </data>
+    <data name="task.status.cancelled" xml:space="preserve">
+        <value>Cancelled</value>
+    </data>
+    <data name="task.status.paused" xml:space="preserve">
+        <value>Paused</value>
+    </data>
+    <data name="task.retry_options.always" xml:space="preserve">
+        <value>Always Retry</value>
+    </data>
+    <data name="task.retry_options.never" xml:space="preserve">
+        <value>Never Retry</value>
+    </data>
+    <data name="task.retry_options.selection_limit" xml:space="preserve">
+        <value>Retry Unless Course Full</value>
+    </data>
+    <data name="task.submit_task" xml:space="preserve">
+        <value>Submit selection task: {0}</value>
+    </data>
+    <data name="task.remove_task" xml:space="preserve">
+        <value>Remove selection task: {0}</value>
+    </data>
+    <data name="task.parallel_tasks" xml:space="preserve">
+        <value>Parallel selection task: {0} tasks</value>
+    </data>
+    <data name="task.prioritized_tasks" xml:space="preserve">
+        <value>Prioritized selection tasks: {0} tasks</value>
+    </data>
+    <data name="task.sequential_tasks" xml:space="preserve">
+        <value>Sequential selection tasks: {0} tasks</value>
+    </data>
+    <data name="task.selection_task" xml:space="preserve">
+        <value>Selection task</value>
+    </data>
+    <data name="task.status.next" xml:space="preserve">
+        <value>Moving to next</value>
+    </data>
+    <data name="course.group_name" xml:space="preserve">
+        <value>Group Name</value>
+    </data>
+    <data name="task.log.complete" xml:space="preserve">
+        <value>Task has  completed</value>
+    </data>
+    <data name="task.log.failed" xml:space="preserve">
+        <value>Task has failed</value>
+    </data>
+    <data name="task.log.retry" xml:space="preserve">
+        <value>Task is waiting for retry ({0} time(s))</value>
+    </data>
+    <data name="task.log.paused" xml:space="preserve">
+        <value>Task has paused</value>
+    </data>
+    <data name="task.log.resumed" xml:space="preserve">
+        <value>Task has resumed</value>
+    </data>
+    <data name="task.log.cancelled" xml:space="preserve">
+        <value>Task has been cancelled</value>
+    </data>
+    <data name="task.info.launched" xml:space="preserve">
+        <value>Task launched</value>
+    </data>
+    <data name="task.info.prioritized_next" xml:space="preserve">
+        <value>Current task {0} has failed, moving to No.{0} task</value>
+    </data>
+    <data name="task.info.sequential_task_next" xml:space="preserve">
+        <value>Current task {0} has completed, moving to No.{0} task</value>
     </data>
 </root>

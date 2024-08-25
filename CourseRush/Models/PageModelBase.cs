@@ -1,4 +1,4 @@
-namespace CourseRush;
+namespace CourseRush.Models;
 
 public abstract class PageModelBase
 {

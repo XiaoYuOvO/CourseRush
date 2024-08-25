@@ -11,7 +11,7 @@ using CourseRush.Core;
 using HandyControl.Controls;
 using HandyControl.Tools.Extension;
 
-namespace CourseRush;
+namespace CourseRush.Models;
 
 public interface ISelectionSessionPageModel
 {
@@ -22,8 +22,9 @@ public class SelectionSessionPageModel<TCourseSelection> : ISelectionSessionPage
 {
     private readonly ObservableCollection<TCourseSelection> _selections;
     private readonly DataGrid _grid;
+    public event Action<TCourseSelection>? OnSessionSelected;
 
-    public SelectionSessionPageModel(List<PresentedData<TCourseSelection>> presentedData,Action<TCourseSelection> selectCallback)
+    public SelectionSessionPageModel(List<PresentedData<TCourseSelection>> presentedData)
     {
         _selections = new ObservableCollection<TCourseSelection>();
         _grid = new DataGrid
@@ -59,7 +60,7 @@ public class SelectionSessionPageModel<TCourseSelection> : ISelectionSessionPage
         {
             if (((sender as FrameworkElement)?.TemplatedParent as ContentPresenter)?.Content is TCourseSelection courseSelection)
             {
-                selectCallback(courseSelection);
+                OnSessionSelected?.Invoke(courseSelection);
             }
         }));
         

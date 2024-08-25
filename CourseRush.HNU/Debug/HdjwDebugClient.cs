@@ -5,24 +5,24 @@ using Resultful;
 
 namespace CourseRush.HNU.Debug;
 
-public class HdjwDebugClient : AuthClient<HdjwAuthResult>, ISessionClient<HdjwError, HNUCourseSelection, HNUCourse, HNUCourseCategory>
+public class HdjwDebugClient(HdjwAuthResult auth) : AuthClient<HdjwAuthResult>(auth),
+    ISessionClient<HdjwError, HNUCourseSelection, HNUCourse, HNUSelectedCourse, HNUCourseCategory>,
+    IResultConvertible<HdjwAuthResult, HdjwDebugClient>
 {
-    public HdjwDebugClient(HdjwAuthResult auth) : base(auth)
-    {
-    }
-
     public Result<bool, HdjwError> IsOnline()
     {
+        Thread.Sleep(1000);
         return true;
     }
 
-    public ICourseSelectionClient<HdjwError, HNUCourse, HNUCourseCategory> GetSelectionClient(HNUCourseSelection target)
+    public ICourseSelectionClient<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseCategory> GetSelectionClient(HNUCourseSelection target)
     {
         return new HNUDebugSelectionClient(Auth);
     }
 
     public Result<IReadOnlyList<HNUCourseSelection>, HdjwError> GetOngoingCourseSelections()
     {
+        // Thread.Sleep(1000);
         return new List<HNUCourseSelection>
         {
             new("WZTESTID", "2023-2024-3", "初修选课", DateTime.Today, DateTime.Today, "一选", TimeOnly.FromDateTime(DateTime.Now),TimeOnly.FromDateTime(DateTime.Now)),
@@ -32,6 +32,12 @@ public class HdjwDebugClient : AuthClient<HdjwAuthResult>, ISessionClient<HdjwEr
 
     public Result<IUserInfo, HdjwError> GetUserInfo()
     {
+        // Thread.Sleep(1000);
         return new HNUUserInfo("Test", new AvatarGetter(() => new HdjwError("No avatar for test")),"TestingClass");
+    }
+
+    public static HdjwDebugClient CreateFromResult(HdjwAuthResult result)
+    {
+        return new HdjwDebugClient(result);
     }
 }
