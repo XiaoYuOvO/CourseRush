@@ -6,7 +6,7 @@ public class AuthDataTable
 {
     private readonly Dictionary<IAuthDataKey, object> _userAuthDataTable = new();
 
-    public Result<TResult, AuthError> RequireData<TKey, TResult>(TKey key) where TKey : AuthDataKey<TResult> where TResult : notnull
+    public Result<TResult, AuthError> RequireData<TResult>(AuthDataKey<TResult> key) where TResult : notnull
     {
         return _userAuthDataTable[key] is TResult ? (TResult)_userAuthDataTable[key] : new AuthError("Cannot find required data for key " + key + " with type " + typeof(TResult));
     }

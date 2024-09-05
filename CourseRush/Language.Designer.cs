@@ -141,11 +141,38 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pause All.
+        /// </summary>
+        public static string ui_button_pause_all {
+            get {
+                return ResourceManager.GetString("ui.button.pause_all", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refresh.
         /// </summary>
         public static string ui_button_refresh {
             get {
                 return ResourceManager.GetString("ui.button.refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove All.
+        /// </summary>
+        public static string ui_button_remove_all {
+            get {
+                return ResourceManager.GetString("ui.button.remove_all", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove All Finished.
+        /// </summary>
+        public static string ui_button_remove_all_finished {
+            get {
+                return ResourceManager.GetString("ui.button.remove_all_finished", resourceCulture);
             }
         }
         
@@ -164,6 +191,15 @@ namespace CourseRush {
         public static string ui_button_resume {
             get {
                 return ResourceManager.GetString("ui.button.resume", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resume All.
+        /// </summary>
+        public static string ui_button_resume_all {
+            get {
+                return ResourceManager.GetString("ui.button.resume_all", resourceCulture);
             }
         }
         
@@ -393,6 +429,15 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto Start Tasks.
+        /// </summary>
+        public static string ui_label_should_start_after_add {
+            get {
+                return ResourceManager.GetString("ui.label.should_start_after_add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target Course Info.
         /// </summary>
         public static string ui_label_target_course_info {
@@ -470,6 +515,15 @@ namespace CourseRush {
         public static string ui_message_choose_multi_select_mode_2 {
             get {
                 return ResourceManager.GetString("ui.message.choose_multi_select_mode.2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are  you sure to remove all tasks?.
+        /// </summary>
+        public static string ui_message_confirm_remove_all {
+            get {
+                return ResourceManager.GetString("ui.message.confirm_remove_all", resourceCulture);
             }
         }
         
@@ -555,6 +609,15 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully imported {0} sessions.
+        /// </summary>
+        public static string ui_message_sessions_import_success {
+            get {
+                return ResourceManager.GetString("ui.message.sessions_import_success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tasks file should be json array!.
         /// </summary>
         public static string ui_message_tasks_file_not_array {
@@ -569,6 +632,15 @@ namespace CourseRush {
         public static string ui_message_tasks_import_success {
             get {
                 return ResourceManager.GetString("ui.message.tasks_import_success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sessions file should be json array!.
+        /// </summary>
+        public static string ui_messsage_sessions_file_not_array {
+            get {
+                return ResourceManager.GetString("ui.messsage.sessions_file_not_array", resourceCulture);
             }
         }
         
@@ -605,6 +677,15 @@ namespace CourseRush {
         public static string university_HNU {
             get {
                 return ResourceManager.GetString("university.HNU", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hunan University (Internal Network).
+        /// </summary>
+        public static string university_HNU_INTERNAL {
+            get {
+                return ResourceManager.GetString("university.HNU_INTERNAL", resourceCulture);
             }
         }
     }

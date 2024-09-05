@@ -25,34 +25,61 @@ public class HNUSelectedCourse(
     string electiveCourseType,
     string groupName,
     SelectionMethod selectionMethod)
-    : HNUCourse(selectedStudentCount, totalStudentCount, totalLearningHours, totalCredits, teacherName, className,
+    : HNUCourse(selectedStudentCount, totalStudentCount, totalLearningHours, totalCredits, teacherName, className,"",
         courseName, offerInstitution, campus, timeTable, teachingMethod, courseType, examinationMethod, id, code,
         jczy010Id, electiveCourseType, groupName), ISelectedCourse, IPresentedDataProvider<HNUSelectedCourse>
 {
     public SelectionMethod SelectionMethod { get; } = selectionMethod;
 
-    public new static Result<HNUSelectedCourse, HdjwError> FromJson(JsonObject jsonObject)
+    public new static Result<HNUSelectedCourse, HdjwError> FromJson(JsonObject node)
     {
-        return jsonObject.RequireInt("xkrs")
-            .Bind(xkrs => jsonObject.RequireInt("pkrs")
-                .Bind(pkrs => jsonObject.RequireFloat("zxs")
-                    .Bind(zxs => jsonObject.RequireFloat("zxf")
-                        .Bind(zxf => jsonObject.GetString("skls_name","无")
-                            .Bind(sklsName => jsonObject.RequireString("ktmc_name")
-                                .Bind(ktmcName => jsonObject.RequireString("kcmc_name")
-                                    .Bind(kcmcName => jsonObject.RequireString("kkdw_name")
-                                        .Bind(kkdwName => jsonObject.RequireString("xq_name")
-                                            .Bind(xqName => jsonObject.GetString("kbinfo", "").Bind(HNUCourseTimeTable.FromString)
-                                                .Bind(table => jsonObject.ParseInt("skfscode").Map(IdToTeacherMethod)
-                                                    .Bind(teachingMethod => jsonObject.ParseInt("kclbcode").Map(HNUCourseType.TypeFromCode)
-                                                        .Bind(courseType => jsonObject.ParseInt("khfscode",0).Map(IdToExaminationMethod)
-                                                            .Bind(examinationMethod => jsonObject.RequireString("id")
-                                                                .Bind(id => jsonObject.RequireString("kcbh")
-                                                                    .Bind(kcbh => jsonObject.RequireString("jczy010id")
-                                                                        .Bind(jczy010Id => jsonObject.GetString("szkclb_name", "无")
-                                                                            .Bind(szkclb => jsonObject.ParseInt("xkfscode").Bind(FromId)
-                                                                                .Bind(method => jsonObject.GetString("fzmc_name","")
-                                                                                    .Bind<HNUSelectedCourse>(groupName => new HNUSelectedCourse(xkrs, pkrs, zxs,zxf,sklsName,ktmcName,kcmcName,kkdwName,xqName,table, teachingMethod,courseType, examinationMethod, id, kcbh, jczy010Id, szkclb, groupName, method))))))))))))))))))));
+        return node.GetInt("xkrs", 0)
+                .Bind<HNUSelectedCourse>(xkrs => node.GetInt("pkrs", 0)
+                    .Bind<HNUSelectedCourse>(pkrs => node.RequireFloat("zxs")
+                        .Bind<HNUSelectedCourse>(zxs => node.RequireFloat("zxf")
+                            .Bind<HNUSelectedCourse>(zxf => node.GetString("skls_name", "无")
+                                .Bind<HNUSelectedCourse>(sklsName => node.RequireString("ktmc_name")
+                                    .Bind<HNUSelectedCourse>(ktmcName => node.RequireString("kcmc_name")
+                                        .Bind<HNUSelectedCourse>(kcmcName => node.RequireString("kkdw_name")
+                                            .Bind<HNUSelectedCourse>(kkdwName => node.RequireString("xq_name")
+                                                .Bind<HNUSelectedCourse>(xqName => node.GetString("kbinfo", "")
+                                                    .Bind(HNUCourseTimeTable.FromString)
+                                                    .Bind<HNUSelectedCourse>(table => node.ParseInt("skfscode")
+                                                        .Map(IdToTeacherMethod)
+                                                        .Bind<HNUSelectedCourse>(teachingMethod => node.ParseInt("kclbcode")
+                                                            .Map(HNUCourseType.TypeFromCode)
+                                                            .Bind<HNUSelectedCourse>(courseType => node.ParseInt("khfscode", 0)
+                                                                .Map(IdToExaminationMethod)
+                                                                .Bind<HNUSelectedCourse>(examinationMethod => node
+                                                                    .RequireString("id")
+                                                                    .Bind<HNUSelectedCourse>(id => node.RequireString("kcbh")
+                                                                        .Bind<HNUSelectedCourse>(kcbh => node
+                                                                            .GetString("jczy010id", "")
+                                                                            .Bind<HNUSelectedCourse>(jczy010Id => node
+                                                                                .GetString("szkclb_name", "无")
+                                                                                .Bind<HNUSelectedCourse>(szkclb => node
+                                                                                    .ParseInt("xkfscode","0").Bind(SelectionMethodFromId)
+                                                                                    .Bind<HNUSelectedCourse>(method => node
+                                                                                        .GetString("fzmc_name", "")
+                                                                                        .Bind<HNUSelectedCourse>(
+                                                                                            groupName =>
+                                                                                                new HNUSelectedCourse(
+                                                                                                    xkrs, 
+                                                                                                    pkrs, 
+                                                                                                    zxs,
+                                                                                                    zxf, 
+                                                                                                    sklsName,
+                                                                                                    ktmcName, 
+                                                                                                    kcmcName,
+                                                                                                    kkdwName,
+                                                                                                    xqName,
+                                                                                                    table,
+                                                                                                    teachingMethod,
+                                                                                                    courseType,
+                                                                                                    examinationMethod,
+                                                                                                    id, kcbh, jczy010Id,
+                                                                                                    szkclb, groupName,
+                                                                                                    method))))))))))))))))))));
     }
 
     public static HNUSelectedCourse SelectFromCourse(HNUCourse course, SelectionMethod selectionMethod)
@@ -69,6 +96,7 @@ public class HNUSelectedCourse(
         OfString("course.code", course => course.Code),
         OfString("course.name", course => course.CourseName),
         OfString("course.group_name", course => course.GroupName),
+        OfString("course.class_code", course => course.ClassCode),
         OfString("course.selection_method", course => course.SelectionMethod.LocalizedName),
         OfString("course.teacher_name", course => course.TeacherName),
         OfString("course.class_name", course => course.ClassName),
@@ -110,7 +138,7 @@ public class HNUSelectedCourse(
         return $"{base.ToString()}, {nameof(SelectionMethod)}: {SelectionMethod}";
     }
     
-    internal static Result<SelectionMethod, HdjwError> FromId(int id)
+    internal static Result<SelectionMethod, HdjwError> SelectionMethodFromId(int id)
     {
         return id switch
         {

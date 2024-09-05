@@ -22,6 +22,7 @@ public partial class TaskTreeView
     {
         _registerer = registerer;
         InitializeComponent();
+        Name = "TaskTreeView";
         _itemTemplate = FindResource("TaskTreeViewItemTemplate") as ControlTemplate;
         Style = FindResource("TreeViewBaseStyle") as Style;
         
@@ -84,7 +85,7 @@ internal class TaskTreeViewItem : TreeViewItem
                 defaultBackground = Brushes.DarkGreen;
                 mouseOverBackground = Brushes.Green;
                 selectedBackground = Brushes.ForestGreen;
-            }else if (_status == TaskStatus.Paused)
+            }else if (_status == TaskStatus.Paused || _status == TaskStatus.Uninitialized)
             {
                 defaultBackground = Brushes.Gray;
                 mouseOverBackground = Brushes.Silver;

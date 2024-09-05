@@ -8,19 +8,16 @@ using WebResponse = CourseRush.Core.Network.WebResponse;
 
 namespace CourseRush.Auth.HNU;
 using static HNUAuthData;
-public class WebVpnAuthNode : AuthNode
+public class WebVpnAuthNode(params AuthNode[] requires) : AuthNode(new AuthConvention()
+    .Requires(CAS_AUTH_REDIRECT_URL)
+    .Provides(SID, SID_SIG, SID_LEGACY, SID_LEGACY_SIG), requires)
 {
     private const string AuthConfig = "https://webvpn2.hnu.edu.cn/passport/v1/public/authConfig?clientType=SDPBrowserClient&platform=Windows&lang=zh-CN&mod=1&needTicket=1";
     private const string AccessCheck = "https://webvpn2.hnu.edu.cn/passport/v1/auth/accessCheck?clientType=SDPBrowserClient&platform=Windows&lang=zh-CN";
-    public WebVpnAuthNode(params AuthNode[] requires) : base(new AuthConvention()
-        .Requires(CAS_AUTH_REDIRECT_URL)
-        .Provides(SID, SID_SIG, SID_LEGACY, SID_LEGACY_SIG), requires)
-    {
-    }
 
     internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
     {
-        table.RequireData<AuthDataKey<Uri>, Uri>(CAS_AUTH_REDIRECT_URL)
+        table.RequireData(CAS_AUTH_REDIRECT_URL)
             .Bind<WebResponse>(uri => client.GetRedirectedUri(uri)
                 .Bind<WebResponse>(response => response.RedirectUri
                     .Bind(webVpnAuthUri => client.Get(webVpnAuthUri)))

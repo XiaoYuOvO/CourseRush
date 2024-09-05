@@ -5,7 +5,7 @@ namespace CourseRush.Core.Task;
 
 public abstract class
     SingleSelectionTask<TError, TCourse>(ITaskType type, TCourse targetCourse, ITaskLogger? logger = null)
-    : SelectionTask<TError, TCourse>(type, logger) where TError : BasicError, ISelectionError, ICombinableError<TError>
+    : SelectionTask<TError, TCourse>(type, logger) where TError : BasicError, ISelectionError, ICombinableError<TError>, IError<TError>
     where TCourse : ICourse, IJsonSerializable<TCourse, TError>
 {
     public TCourse TargetCourse { get; } = targetCourse;

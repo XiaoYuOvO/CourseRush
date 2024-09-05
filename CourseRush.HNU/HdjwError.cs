@@ -38,6 +38,11 @@ public class HdjwError(string message, params BasicError[] suppressedErrors)
     {
         return this is HdjwRequestError requestError && "eywxt.save.stuLimit.error".Equals(requestError.ErrorCode, StringComparison.Ordinal);
     }
+
+    public new static HdjwError Create(string message)
+    {
+        return new HdjwError(message);
+    }
 }
 
 public class HdjwRequestError : HdjwError

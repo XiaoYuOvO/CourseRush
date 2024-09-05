@@ -89,6 +89,9 @@
     <data name="task.status.waiting" xml:space="preserve">
         <value>Waiting</value>
     </data>
+    <data name="task.status.uninitialized" xml:space="preserve">
+        <value>Uninitialized</value>
+    </data>
     <data name="task.status.completed" xml:space="preserve">
         <value>Completed</value>
     </data>
@@ -160,5 +163,20 @@
     </data>
     <data name="task.info.sequential_task_next" xml:space="preserve">
         <value>Current task {0} has completed, moving to No.{0} task</value>
+    </data>
+    <data name="course_selection.start_time" xml:space="preserve">
+        <value>Start Time</value>
+    </data>
+    <data name="course_selection.end_time" xml:space="preserve">
+        <value>End Time</value>
+    </data>
+    <data name="course_selection.daily_start_time" xml:space="preserve">
+        <value>Daily Start Time</value>
+    </data>
+    <data name="course_selection.daily_end_time" xml:space="preserve">
+        <value>Daily End Time</value>
+    </data>
+    <data name="course.class_code" xml:space="preserve">
+        <value>Class Code</value>
     </data>
 </root>

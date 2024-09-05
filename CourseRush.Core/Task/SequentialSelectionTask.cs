@@ -25,12 +25,12 @@ public class SequentialSelectionTask<TError, TCourse>(
         }
         var currentTask = SubTasks[_current];
         currentTask.Status = TaskStatus.Running;
-        return await currentTask.DoSelectionTask(selector).ContinueWith(task => task.Result.Tee(_ =>
+        return await currentTask.InitializeAndStartTask(selector).ContinueWith(task => task.Result.Tee(_ =>
         {
             currentTask.Status = TaskStatus.Completed;
             Status = TaskStatus.Next;
             _current++;
-            LogInfo(string.Format(Language.task_info_sequential_task_next, currentTask.Name, _current));
+            LogInfo(string.Format(Language.task_info_sequential_task_next, currentTask.Name, _current + 1));
         }).TeeError(_ => Status = TaskStatus.Failed));
     }
 

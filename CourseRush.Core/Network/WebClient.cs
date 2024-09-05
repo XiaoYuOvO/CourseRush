@@ -38,7 +38,9 @@ public class WebClient
         {
             return new RedirectionResponse(httpResponseMessage, Handler);
         }
-        return new WebError("The result of request is not a redirect response");
+        var readAsStringAsync = httpResponseMessage.Content.ReadAsStringAsync();
+        readAsStringAsync.Wait();
+        return new WebError($"The result of request is not a redirect response: {readAsStringAsync.Result}");
     }
 
     public Result<WebResponse, WebError> Get(Uri uri, Dictionary<string, string> content,MediaType accept = MediaType.All, RequestConfigurator? configurator = null)

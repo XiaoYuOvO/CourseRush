@@ -39,7 +39,7 @@ public partial class CurrentCourseTablePage
         registerer(factor =>
         {
             FilesMenu.FontSize = 14 * factor;
-            RefreshButton.FontSize = 14 * factor;
+            RefreshButton.FontSize = 16 * factor;
             WeekIndexLabel.FontSize = 16 * factor;
             OffTableCoursesHeader.FontSize = 16 * factor;
             OffTableCoursesViewer.SetValue(FontSizeProperty, 13 * factor);

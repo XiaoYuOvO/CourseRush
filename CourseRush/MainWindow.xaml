@@ -8,20 +8,19 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d"
         Height="1080" Width="1920">
+    <AdornerDecorator>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MinWidth="160"/>
-            <ColumnDefinition Width="5"/>
+           
             <ColumnDefinition Width="9*" />
         </Grid.ColumnDefinitions>
-        <Border BorderThickness="0,0,0,0" >
-            <Border.BorderBrush>
-                <SolidColorBrush Color="{DynamicResource BorderColor}"/>
-            </Border.BorderBrush>
+        <!-- <Border BorderThickness="0,0,0,0" > -->
             <DockPanel LastChildFill="False">
                 <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" >
                     <hc:Gravatar Name="StudentGravatar" Style="{DynamicResource GravatarCircle}"/>
                     <Label Height="Auto" Name="StudentNameLabel" Content="{Binding Source={x:Static local:Language.ui_label_user}}" Margin="0,10,0,0" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,0"/>
+                    <Label Height="Auto" Name="AccountLabel" Content="" Margin="0,10,0,0" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,0"/>
                     <Label Height="Auto" Name="ClassLabel" Content="{Binding Source={x:Static local:Language.ui_label_class}}" Margin="0,10,0,0" FontSize="15" Padding="2,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <TextBlock Height="Auto" TextWrapping="Wrap" Name="CurrentSelectionLabel" Text="{Binding Source={x:Static local:Language.ui_label_selection_session_default}}" Margin="0,10,0,0" FontSize="15" Padding="2,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -39,8 +38,9 @@
                     </hc:SideMenuItem>
                 </hc:SideMenu>
             </DockPanel>
-        </Border>
+        <!-- </Border> -->
         <GridSplitter Grid.Column="0" Width="5" DragIncrement="5" Background="{DynamicResource BorderBrush}"></GridSplitter>
-        <Frame Name="NavFrame" Grid.Column="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" NavigationUIVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+        <Frame Name="NavFrame" Grid.Column="1" BorderBrush="{x:Null}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" NavigationUIVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
     </Grid>
+    </AdornerDecorator>
 </mah:MetroWindow>

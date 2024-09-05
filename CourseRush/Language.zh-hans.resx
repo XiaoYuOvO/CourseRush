@@ -197,4 +197,31 @@
     <data name="ui.label.selection_session.default" xml:space="preserve">
         <value>当前选课</value>
     </data>
+    <data name="ui.button.remove_all_finished" xml:space="preserve">
+        <value>清除已完成任务</value>
+    </data>
+    <data name="ui.button.pause_all" xml:space="preserve">
+        <value>全部暂停</value>
+    </data>
+    <data name="ui.button.resume_all" xml:space="preserve">
+        <value>全部继续</value>
+    </data>
+    <data name="ui.button.remove_all" xml:space="preserve">
+        <value>全部删除</value>
+    </data>
+    <data name="ui.message.confirm_remove_all" xml:space="preserve">
+        <value>确定要删除所有选课任务?</value>
+    </data>
+    <data name="university.HNU_INTERNAL" xml:space="preserve">
+        <value>湖南大学(内网)</value>
+    </data>
+    <data name="ui.messsage.sessions_file_not_array" xml:space="preserve">
+        <value>选课安排列表文件应为JSON数组</value>
+    </data>
+    <data name="ui.message.sessions_import_success" xml:space="preserve">
+        <value>成功导入{0}个选课安排</value>
+    </data>
+    <data name="ui.label.should_start_after_add" xml:space="preserve">
+        <value>任务添加后立即开始</value>
+    </data>
 </root>

@@ -2,10 +2,10 @@ using System.Text.Json.Nodes;
 using CourseRush.Core;
 using CourseRush.Core.Util;
 using Resultful;
-
+using static CourseRush.Core.PresentedData<CourseRush.HNU.HNUSelectionSession>;
 namespace CourseRush.HNU;
 
-public class HNUCourseSelection : ICourseSelection, IPresentedDataProvider<HNUCourseSelection>, IJsonSerializable<HNUCourseSelection, HdjwError>
+public class HNUSelectionSession : ISelectionSession, IPresentedDataProvider<HNUSelectionSession>, IJsonSerializable<HNUSelectionSession, HdjwError>
 {
     public string SelectionId { get; }
     public string SelectionTimeId { get; }
@@ -15,8 +15,9 @@ public class HNUCourseSelection : ICourseSelection, IPresentedDataProvider<HNUCo
     public string SelectionStage { get; }
     public TimeOnly DailyStartTime { get; }
     public TimeOnly DailyEndTime { get; }
+    private readonly string xkgl017id; 
 
-    internal HNUCourseSelection(string selectionId, string selectionTimeId, string selectionTypeName, DateTime startTime, DateTime endTime, string selectionStage, TimeOnly dailyStartTime, TimeOnly dailyEndTime)
+    internal HNUSelectionSession(string selectionId, string selectionTimeId, string selectionTypeName, DateTime startTime, DateTime endTime, string selectionStage, TimeOnly dailyStartTime, TimeOnly dailyEndTime, string xkgl017Id)
     {
         SelectionId = selectionId;
         SelectionTimeId = selectionTimeId;
@@ -26,9 +27,10 @@ public class HNUCourseSelection : ICourseSelection, IPresentedDataProvider<HNUCo
         SelectionStage = selectionStage;
         DailyStartTime = dailyStartTime;
         DailyEndTime = dailyEndTime;
+        xkgl017id = xkgl017Id;
     }
 
-    public static Result<HNUCourseSelection, HdjwError> FromJson(JsonObject jsonObject)
+    public static Result<HNUSelectionSession, HdjwError> FromJson(JsonObject jsonObject)
     {
         return jsonObject.RequireString("id")
             .Bind(id => jsonObject.RequireString("jczy013id")
@@ -38,8 +40,8 @@ public class HNUCourseSelection : ICourseSelection, IPresentedDataProvider<HNUCo
                             .Bind(xkjssj => jsonObject.RequireString("xkfs_name")
                                 .Bind(xkfsName => jsonObject.RequireString("mtkssj").TryMap(TimeOnly.Parse, HdjwError.Wrap)
                                     .Bind(mtkssj => jsonObject.RequireString("mtjssj").TryMap(TimeOnly.Parse, HdjwError.Wrap)
-                                        .Bind<HNUCourseSelection>(mtjssj => 
-                                            new HNUCourseSelection(id, jczy013Id, hdName, xkkssj, xkjssj, xkfsName, mtkssj, mtjssj)))))))));
+                                        .Bind<HNUSelectionSession>(mtjssj => jsonObject.RequireString("xkgl017id")
+                                            .Bind<HNUSelectionSession>(xkgl017id => new HNUSelectionSession(id, jczy013Id, hdName, xkkssj, xkjssj, xkfsName, mtkssj, mtjssj, xkgl017id))))))))));
     }
 
     public JsonObject ToJson()
@@ -63,18 +65,22 @@ public class HNUCourseSelection : ICourseSelection, IPresentedDataProvider<HNUCo
         return $"{nameof(SelectionId)}: {SelectionId}, {nameof(SelectionTimeId)}: {SelectionTimeId}, {nameof(SelectionTypeName)}: {SelectionTypeName}, {nameof(StartTime)}: {StartTime}, {nameof(EndTime)}: {EndTime}, {nameof(SelectionStage)}: {SelectionStage}, {nameof(DailyStartTime)}: {DailyStartTime}, {nameof(DailyEndTime)}: {DailyEndTime}";
     }
 
-    private static readonly List<PresentedData<HNUCourseSelection>> PresentedData =
+    private static readonly List<PresentedData<HNUSelectionSession>> PresentedData =
     [
-        PresentedData<HNUCourseSelection>.OfString("course_selection.selection_term", selection => selection.SelectionTimeId),
-        PresentedData<HNUCourseSelection>.OfString("course_selection.selection_name", selection => selection.SelectionTypeName)
+        OfString("course_selection.selection_term", selection => selection.SelectionTimeId),
+        OfString("course_selection.selection_name", selection => selection.SelectionTypeName),
+        OfString("course_selection.start_time", selection => $"{selection.StartTime:yyyy-MM-dd}"),
+        OfString("course_selection.end_time", selection => $"{selection.EndTime:yyyy-MM-dd}"),
+        OfString("course_selection.daily_start_time", selection => $"{selection.DailyStartTime:t}"),
+        OfString("course_selection.daily_end_time", selection => $"{selection.DailyEndTime:t}")
     ];
 
-    public static List<PresentedData<HNUCourseSelection>> GetPresentedData()
+    public static List<PresentedData<HNUSelectionSession>> GetPresentedData()
     {
         return PresentedData;
     }
 
-    public static List<PresentedData<HNUCourseSelection>> GetSimplePresentedData()
+    public static List<PresentedData<HNUSelectionSession>> GetSimplePresentedData()
     {
         return PresentedData;
     }
@@ -85,7 +91,7 @@ public class HNUCourseSelection : ICourseSelection, IPresentedDataProvider<HNUCo
         {
             json["id"] = SelectionId; 
         }
-        json["xkgl017id"] = SelectionId;
+        json["xkgl017id"] = xkgl017id;
         json["xkgl019id"] = SelectionId;
         json["jczy013id"] = SelectionTimeId;
     }

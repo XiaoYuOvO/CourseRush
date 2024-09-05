@@ -41,7 +41,13 @@ public class CourseDataGrid : DataGrid
 {
     protected override DependencyObject GetContainerForItemOverride()
     {
-        return new CourseDataGridRow();
+        var courseDataGridRow = new CourseDataGridRow();
+        courseDataGridRow.SetBinding(FontSizeProperty, new Binding
+        {
+            Source = this,
+            Path = new PropertyPath("FontSize")
+        });
+        return courseDataGridRow;
     }
 
     private class CourseDataGridRow : DataGridRow
@@ -145,7 +151,7 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
         var gridSplitter = new GridSplitter
         {
             ResizeDirection = GridResizeDirection.Columns,
-            Width = 10,
+            Width = 4,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             Background = FindResource("BorderBrush") as Brush,
             ShowsPreview = true

@@ -6,15 +6,13 @@ using WebClient = CourseRush.Core.Network.WebClient;
 
 namespace CourseRush.Auth.HNU.Hdjw;
 using static HNUAuthData;
-public class HdjwSessionAuthNode : AuthNode
+public class HdjwSessionAuthNode(params AuthNode[] requires) : AuthNode(new AuthConvention()
+    .Requires(PC0, PF0, PV0, SID, SID_SIG, SID_LEGACY, SID_LEGACY_SIG)
+    .Provides(SESSION, SDP_APP_SESSION_80, TOKEN), requires)
 {
     private const string HdjwIndex = "http://hdjw.hnu.edu.cn/";
 
-    private const string CasLoginHdjw =
-        "http://cas.web.hnu.edu.cn/cas/login?service=http://hdjw.hnu.edu.cn/caslogin?redirect_url=/Njw2017/index.html";
-    public HdjwSessionAuthNode(params AuthNode[] requires) : base(new AuthConvention()
-        .Requires(PC0, PF0, PV0, SID, SID_SIG, SID_LEGACY, SID_LEGACY_SIG)
-        .Provides(SESSION, SDP_APP_SESSION_80, TOKEN), requires) {}
+    private const string CasLoginHdjw = "https://cas.hnu.edu.cn/cas/login?service=http://hdjw.hnu.edu.cn/caslogin?redirect_url=/Njw2017/index.html";
 
     internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
     {

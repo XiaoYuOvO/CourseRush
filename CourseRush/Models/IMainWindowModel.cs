@@ -12,6 +12,7 @@ public interface IMainWindowModel
     internal Page GetSelectionQueuePage();
     internal void OnAutoFontSizeChanged(double fontSizeFactor);
     internal void RegisterUserInfoListener(Action<IUserInfo> userInfoAction);
-    internal void RegisterSessionSelectedListener(Action<ICourseSelection> action);
+    internal void RegisterSessionSelectedListener(Action<ISelectionSession> action);
     internal void ReloadUserInfo();
+    internal string GetUserAccount();
 }

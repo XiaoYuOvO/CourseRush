@@ -8,8 +8,8 @@
       Title="SelectionSessionsPage"  Height="1080" Width="1600">
     <Grid Name="Grid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="19*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="20*"></RowDefinition>
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0" Height="Auto">
             <ToolBar.Items>

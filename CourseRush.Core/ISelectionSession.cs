@@ -2,7 +2,7 @@ using System.Text.Json.Nodes;
 
 namespace CourseRush.Core;
 
-public interface ICourseSelection
+public interface ISelectionSession
 {
     public string SelectionId { get; }
     public string SelectionTimeId { get; }

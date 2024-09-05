@@ -154,4 +154,22 @@
     <data name="task.info.sequential_task_next" xml:space="preserve">
         <value>当前任务{0}完成,转至第{1}个任务</value>
     </data>
+    <data name="course_selection.start_time" xml:space="preserve">
+        <value>开始时间</value>
+    </data>
+    <data name="course_selection.end_time" xml:space="preserve">
+        <value>结束时间</value>
+    </data>
+    <data name="course_selection.daily_start_time" xml:space="preserve">
+        <value>每天开始时间</value>
+    </data>
+    <data name="course_selection.daily_end_time" xml:space="preserve">
+        <value>每天结束时间</value>
+    </data>
+    <data name="task.status.uninitialized" xml:space="preserve">
+        <value>未开始</value>
+    </data>
+    <data name="course.class_code" xml:space="preserve">
+        <value>课堂号</value>
+    </data>
 </root>

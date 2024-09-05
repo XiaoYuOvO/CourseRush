@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json.Nodes;
 using CourseRush.Core;
 using Resultful;
@@ -12,6 +13,7 @@ public class HNUCourse(
     float totalCredits,
     string teacherName,
     string className,
+    string classCode,
     string courseName,
     string offerInstitution,
     string campus,
@@ -33,28 +35,46 @@ public class HNUCourse(
     public string Jczy010Id { get; } = jczy010Id;
     public string ElectiveCourseType { get; } = electiveCourseType;
     public string GroupName { get; } = groupName;
+    public string ClassCode { get; } = classCode;
 
     public static Result<HNUCourse, HdjwError> FromJson(JsonObject jsonObject)
     {
-        return jsonObject.RequireInt("xkrs")
-            .Bind(xkrs => jsonObject.RequireInt("pkrs")
-                .Bind(pkrs => jsonObject.RequireFloat("zxs")
-                    .Bind(zxs => jsonObject.RequireFloat("zxf")
-                        .Bind(zxf => jsonObject.GetString("skls_name","无")
-                            .Bind(sklsName => jsonObject.RequireString("ktmc_name")
-                                .Bind(ktmcName => jsonObject.RequireString("kcmc_name")
-                                    .Bind(kcmcName => jsonObject.RequireString("kkdw_name")
-                                        .Bind(kkdwName => jsonObject.RequireString("xq_name")
-                                            .Bind(xqName => jsonObject.GetString("kbinfo", "").Bind(HNUCourseTimeTable.FromString)
-                                                .Bind(table => jsonObject.ParseInt("skfscode").Map(IdToTeacherMethod)
-                                                    .Bind(teachingMethod => jsonObject.ParseInt("kclbcode").Map(HNUCourseType.TypeFromCode)
-                                                        .Bind(courseType => jsonObject.ParseInt("khfscode",0).Map(IdToExaminationMethod)
-                                                            .Bind(examinationMethod => jsonObject.RequireString("id")
-                                                                .Bind(id => jsonObject.RequireString("kcbh")
-                                                                    .Bind(kcbh => jsonObject.RequireString("jczy010id")
-                                                                        .Bind(jczy010Id => jsonObject.GetString("szkclb_name", "无")
-                                                                            .Bind(szkclb => jsonObject.GetString("fzmc_name", "")
-                                                                                .Bind<HNUCourse>(additionalName => new HNUCourse(xkrs, pkrs, zxs,zxf,sklsName,ktmcName,kcmcName,kkdwName,xqName,table, teachingMethod,courseType, examinationMethod, id, kcbh, jczy010Id, szkclb, additionalName)))))))))))))))))));
+        return jsonObject.GetString("kth", "")
+            .Bind<HNUCourse>(kth => jsonObject.GetInt("xkrs", 0)
+                .Bind<HNUCourse>(xkrs => jsonObject.GetInt("pkrs", 0)
+                    .Bind<HNUCourse>(pkrs => jsonObject.RequireFloat("zxs")
+                        .Bind<HNUCourse>(zxs => jsonObject.RequireFloat("zxf")
+                            .Bind<HNUCourse>(zxf => jsonObject.GetString("skls_name", "无")
+                                .Bind<HNUCourse>(sklsName => jsonObject.GetString("ktmc_name", "无")
+                                    .Bind<HNUCourse>(ktmcName => jsonObject.RequireString("kcmc_name")
+                                        .Bind<HNUCourse>(kcmcName => jsonObject.RequireString("kkdw_name")
+                                            .Bind<HNUCourse>(kkdwName => jsonObject.RequireString("xq_name")
+                                                .Bind<HNUCourse>(xqName => jsonObject.GetString("kbinfo", "")
+                                                    .Bind(HNUCourseTimeTable.FromString)
+                                                    .Bind<HNUCourse>(table => jsonObject.ParseInt("skfscode")
+                                                        .Map(IdToTeacherMethod)
+                                                        .Bind<HNUCourse>(teachingMethod => jsonObject.ParseInt("kclbcode")
+                                                            .Map(HNUCourseType.TypeFromCode)
+                                                            .Bind<HNUCourse>(courseType => jsonObject.ParseInt("khfscode", 0)
+                                                                .Map(IdToExaminationMethod)
+                                                                .Bind<HNUCourse>(examinationMethod => jsonObject
+                                                                    .RequireString("id")
+                                                                    .Bind<HNUCourse>(id => jsonObject.RequireString("kcbh")
+                                                                        .Bind<HNUCourse>(kcbh => jsonObject
+                                                                            .RequireString("jczy010id")
+                                                                            .Bind<HNUCourse>(jczy010Id => jsonObject
+                                                                                .GetString("szkclb_name", "无")
+                                                                                .Bind<HNUCourse>(szkclb => jsonObject
+                                                                                    .GetString("fzmc_name", "")
+                                                                                    .Bind<HNUCourse>(additionalName =>
+                                                                                        new HNUCourse(xkrs, pkrs, zxs,
+                                                                                            zxf, sklsName, ktmcName,
+                                                                                            kth, kcmcName, kkdwName,
+                                                                                            xqName, table,
+                                                                                            teachingMethod, courseType,
+                                                                                            examinationMethod, id, kcbh,
+                                                                                            jczy010Id, szkclb,
+                                                                                            additionalName))))))))))))))))))));
     }
 
     public JsonObject ToJson()
@@ -137,6 +157,15 @@ public class HNUCourse(
     public override void AddCourseSelectionToJson(JsonObject jsonObject)
     {
         jsonObject["id"] = Id;
+        jsonObject["jczy010id"] = Jczy010Id;
+        jsonObject["xkfsid"] = "1";
+        jsonObject["xkfs_name"] = "一选";
+        jsonObject["zxf"] = TotalCredits.ToString(CultureInfo.InvariantCulture);
+        jsonObject["zxs"] = TotalLearningHours.ToString(CultureInfo.InvariantCulture);
+        jsonObject["isTqxd"] = "0";
+        jsonObject["kcbh"] = Code;
+        jsonObject["falb"] = "1";
+        jsonObject["khfs"] = ExaminationMethodToId(ExaminationMethod).ToString(CultureInfo.InvariantCulture);
     }
 
     protected bool Equals(HNUCourse other)
@@ -161,6 +190,7 @@ public class HNUCourse(
         OfString("course.code", course => course.Code),
         OfString("course.name", course => course.CourseName),
         OfString("course.group_name", course => course.GroupName),
+        OfString("course.class_code", course => course.ClassCode),
         OfString("course.teacher_name", course => course.TeacherName),
         OfString("course.class_name", course => course.ClassName),
         OfEnum("course.offer_institution", course => course.OfferInstitution),

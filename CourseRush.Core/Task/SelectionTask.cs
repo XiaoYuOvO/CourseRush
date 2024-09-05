@@ -13,7 +13,7 @@ public interface ISelectionTask
 }
 
 public abstract class SelectionTask<TError, TCourse> : ISelectionTask
-    where TError : BasicError, ISelectionError where TCourse : ICourse
+    where TError : BasicError, IError<TError>, ISelectionError where TCourse : ICourse
 {
     public event Action<TaskStatus>? StatusChanged;
     public RetryOption RetryOption { get; set; } = RetryOption.AlwaysRetry;
@@ -22,7 +22,7 @@ public abstract class SelectionTask<TError, TCourse> : ISelectionTask
 
     public bool IsPaused { get; private set; }
 
-    public ITaskLogger? Logger { protected get; set; }
+    public virtual ITaskLogger? Logger { protected get; set; }
 
     public TaskStatus Status {
         get => _status;
@@ -36,7 +36,7 @@ public abstract class SelectionTask<TError, TCourse> : ISelectionTask
     public abstract string Name { get; }
     public ITaskType Type { get; }
 
-    private TaskStatus _status = TaskStatus.Waiting;
+    private TaskStatus _status = TaskStatus.Uninitialized;
     private readonly CancellationTokenSource _cts = new();
     private TaskCompletionSource<bool> _pauseTcs = new();
     private int _retryCount;
@@ -48,7 +48,7 @@ public abstract class SelectionTask<TError, TCourse> : ISelectionTask
         Logger = logger;
     }
 
-    public virtual async Task InitializeAndStartTask(ICourseSelector<TError, TCourse> selector)
+    public virtual async Task<VoidResult<TError>> InitializeAndStartTask(ICourseSelector<TError, TCourse> selector)
     {
         LogInfo(Language.task_info_launched);
         while (true)
@@ -58,30 +58,40 @@ public abstract class SelectionTask<TError, TCourse> : ISelectionTask
             {
                 Status = TaskStatus.Cancelled;
                 LogInfo(Language.task_log_cancelled);
-                return;
+                return Result.Ok<TError>();
             }
             Status = TaskStatus.Running;
-            var result = await DoSelectionTask(selector);
-            if (result.Match(_ =>
-                {
-                    if (Status == TaskStatus.Next) return false;
-                    Status = TaskStatus.Completed;
-                    LogInfo(Language.task_log_complete);
-                    return true;
-                }, error =>
-                {
-                    if (RetryOption.ShouldRetry(error))
-                    {
-                        Status = TaskStatus.Waiting;
-                        _retryCount++;
-                        return false;
-                    }
-                    Status = TaskStatus.Failed;
-                    LogError(Language.task_log_failed, error);
-                    return true;
-                }))
+            try
             {
-                return;
+                var result = await DoSelectionTask(selector);
+                if (result.Match(_ =>
+                    {
+                        if (Status == TaskStatus.Next) return false;
+                        Status = TaskStatus.Completed;
+                        LogInfo(Language.task_log_complete);
+                        return true;
+                    }, error =>
+                    {
+                        if (RetryOption.ShouldRetry(error))
+                        {
+                            Status = TaskStatus.Waiting;
+                            _retryCount++;
+                            return false;
+                        }
+                        Status = TaskStatus.Failed;
+                        LogError(Language.task_log_failed, error);
+                        return true;
+                    }))
+                {
+                    return result.ToOneOf().TryPickT1(out var error ,out _) ? error : Result.Ok<TError>();
+                }
+            }
+            catch (Exception e)
+            {
+                Status = TaskStatus.Failed;
+                var selectionError = TError.Create(e.ToString());
+                LogError(Language.task_log_failed, selectionError);
+                return selectionError;
             }
             if (RetryInterval <= 0 || Status == TaskStatus.Next) continue;
             Status = TaskStatus.Waiting;
@@ -100,7 +110,7 @@ public abstract class SelectionTask<TError, TCourse> : ISelectionTask
 
     public virtual void Pause()
     {
-        if (IsPaused || _status == TaskStatus.Waiting || _status.IsFinished()) return;
+        if (IsPaused || _status == TaskStatus.Uninitialized || _status.IsFinished()) return;
         _pauseTcs = new TaskCompletionSource<bool>();
         IsPaused = true;
         Status = TaskStatus.Paused;

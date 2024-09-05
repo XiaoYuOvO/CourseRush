@@ -6,7 +6,7 @@ using Resultful;
 namespace CourseRush.HNU.Debug;
 
 public class HdjwDebugClient(HdjwAuthResult auth) : AuthClient<HdjwAuthResult>(auth),
-    ISessionClient<HdjwError, HNUCourseSelection, HNUCourse, HNUSelectedCourse, HNUCourseCategory>,
+    ISessionClient<HdjwError, HNUSelectionSession, HNUCourse, HNUSelectedCourse, HNUCourseCategory>,
     IResultConvertible<HdjwAuthResult, HdjwDebugClient>
 {
     public Result<bool, HdjwError> IsOnline()
@@ -15,18 +15,18 @@ public class HdjwDebugClient(HdjwAuthResult auth) : AuthClient<HdjwAuthResult>(a
         return true;
     }
 
-    public ICourseSelectionClient<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseCategory> GetSelectionClient(HNUCourseSelection target)
+    public ICourseSelectionClient<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseCategory> GetSelectionClient(HNUSelectionSession target)
     {
         return new HNUDebugSelectionClient(Auth);
     }
 
-    public Result<IReadOnlyList<HNUCourseSelection>, HdjwError> GetOngoingCourseSelections()
+    public Result<IReadOnlyList<HNUSelectionSession>, HdjwError> GetOngoingCourseSelections()
     {
         // Thread.Sleep(1000);
-        return new List<HNUCourseSelection>
+        return new List<HNUSelectionSession>
         {
-            new("WZTESTID", "2023-2024-3", "初修选课", DateTime.Today, DateTime.Today, "一选", TimeOnly.FromDateTime(DateTime.Now),TimeOnly.FromDateTime(DateTime.Now)),
-            new("WZTESTID2", "2023-2024-4", "重修选课", DateTime.Today, DateTime.Today, "二选", TimeOnly.FromDateTime(DateTime.Now),TimeOnly.FromDateTime(DateTime.Now))
+            new("WZTESTID", "2023-2024-3", "初修选课", DateTime.Today, DateTime.Today, "一选", TimeOnly.FromDateTime(DateTime.Now),TimeOnly.FromDateTime(DateTime.Now), "W134d9bb0000WH"),
+            new("WZTESTID2", "2023-2024-4", "重修选课", DateTime.Today, DateTime.Today, "二选", TimeOnly.FromDateTime(DateTime.Now),TimeOnly.FromDateTime(DateTime.Now), "W134d9bb0000WH")
         };
     }
 

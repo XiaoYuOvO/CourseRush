@@ -37,6 +37,11 @@ public static class HdjwJsonExtensions
         return jsonNode.RequireString(nodeName).Bind(s => int.TryParse(s, out var num) ? num.Ok<int, HdjwError>() : HdjwError.JsonError($"Cannot parse integer", jsonNode));
     }
     
+    public static Result<int, HdjwError> ParseInt(this JsonNode jsonNode, string nodeName, string fallback)
+    {
+        return jsonNode.GetString(nodeName, fallback).Bind(s => int.TryParse(s, out var num) ? num.Ok<int, HdjwError>() : HdjwError.JsonError($"Cannot parse integer", jsonNode));
+    }
+    
     public static Result<int, HdjwError> ParseInt(this JsonNode jsonNode, string nodeName, int fallbackValue)
     {
         return ParseInt(jsonNode, nodeName).ReturnOrValue(_ => fallbackValue);
@@ -45,6 +50,11 @@ public static class HdjwJsonExtensions
     public static Result<int, HdjwError> RequireInt(this JsonNode jsonNode, string nodeName)
     {
         return jsonNode.Require(nodeName).Map(node => node.GetValue<int>());
+    }
+    
+    public static Result<int, HdjwError> GetInt(this JsonNode jsonNode, string nodeName, int fallbackValue)
+    {
+        return jsonNode[nodeName]?.GetValue<int>() ?? fallbackValue;
     }
     
     public static Result<float, HdjwError> RequireFloat(this JsonNode jsonNode, string nodeName)

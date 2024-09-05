@@ -26,7 +26,7 @@ public partial class MainWindow
         InitializeComponent();
         
         GotoPage(_currentPage = _mainWindowModel.GetSelectionSessionsPage());
-        
+        Dialog.Register("MainWindow", this);
         NavFrame.HorizontalContentAlignment = HorizontalAlignment.Stretch;
         NavFrame.VerticalContentAlignment = VerticalAlignment.Stretch;
         NavFrame.SizeChanged += (_, _) =>
@@ -68,6 +68,7 @@ public partial class MainWindow
             CurrentCourseTableBtn.IsEnabled = true;
         }));
         _mainWindowModel.ReloadUserInfo();
+        AccountLabel.Content = _mainWindowModel.GetUserAccount();
     }
 
     private void UpdateUserAvatar(IUserInfo userInfo)

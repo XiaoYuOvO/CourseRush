@@ -10,7 +10,7 @@ public class ParallelSelectionTask<TError, TCourse>(IReadOnlyList<SelectionTask<
     where TCourse : ICourse, IJsonSerializable<TCourse, TError>
 {
     public override string Name => string.Format(Language.task_parallel_tasks, SubTasks.Count);
-    public override async Task InitializeAndStartTask(ICourseSelector<TError, TCourse> selector)
+    public override async Task<VoidResult<TError>> InitializeAndStartTask(ICourseSelector<TError, TCourse> selector)
     {
         LogInfo(Language.task_info_launched);
         Status = TaskStatus.Running;
@@ -25,6 +25,8 @@ public class ParallelSelectionTask<TError, TCourse>(IReadOnlyList<SelectionTask<
             Status = TaskStatus.Failed;
             LogInfo(Language.task_log_failed);
         }
+
+        return Result.Ok<TError>();
     }
     
     protected internal override Task<VoidResult<TError>> DoSelectionTask(ICourseSelector<TError, TCourse> selector)

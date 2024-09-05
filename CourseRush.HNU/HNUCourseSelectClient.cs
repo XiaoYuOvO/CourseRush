@@ -10,14 +10,14 @@ namespace CourseRush.HNU;
 
 public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseCategory>{
     private static readonly Uri GetCoursesByCategoryUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/findKcInfoByfl?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findKcInfoByfl&sf_request_type=ajax");
-    private static readonly Uri GetCategoriesInRoundUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/findXsxkjdByOne?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findXsxkjdByOne&sf_request_type=ajax ");
+    private static readonly Uri GetCategoriesInRoundUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/findZxxkByEntry?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findZxxkByEntry");
     private static readonly Uri SelectCourseUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/saveStuXk?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.saveStuXk&sf_request_type=ajax");
     private static readonly Uri RemoveCoursesUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/saveTx?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.saveTx&sf_request_type=ajax");
-    private static readonly Uri GetCurrentCourseTableUri = new("http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/getUserKb?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.getUserKb&sf_request_type=ajax");
-    private readonly HNUCourseSelection _target;
-    public HNUCourseSelectClient(HdjwAuthResult authResult, HNUCourseSelection targetSelection) : base(authResult)
+    private static readonly Uri GetCurrentCourseTableUri = new("http://hdjw.hnu.edu.cn//resService/jwxtpt/v1/xsd/stuCourseCenterController/findXkResList?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findXkResList");
+    private readonly HNUSelectionSession _target;
+    public HNUCourseSelectClient(HdjwAuthResult authResult, HNUSelectionSession targetSelectionSession) : base(authResult)
     {
-        _target = targetSelection;
+        _target = targetSelectionSession;
     }
     
     //TODO Get max credits
@@ -32,9 +32,9 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
                     ["pageIndex"] = 0,
                     ["pageSize"] = 0,
                     ["orderBy"] = "",
-                    ["conditions"] = ""
+                    ["conditions"] = "QZDATASOFT"
                 },
-                ["xkfl"] = new JsonArray(),
+                ["xkfl"] = category.GetSubcategoriesJson(),
                 ["xklbbh"] = category.CategoryNumber.ToString()
             }))))
             .Bind(result => result.Require("data")
@@ -50,8 +50,7 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
     {
         return EnsureResultSuccess(Post(GetCategoriesInRoundUri, JsonContent.Create(GetBasicJson())))
             .Bind(json => json.Require("data"))
-            .Bind(data => data.Require("xfyqMap"))
-            .Bind(xfyqMap => xfyqMap.RequireArray("xkgl011011List")
+            .Bind(data => data.RequireArray("showXklbList")
                 .Bind(array => array.RequireObjectArray()
                     .Bind(objects =>
                         (from jsonObject in objects where jsonObject != null select HNUCourseCategory.FromJson(jsonObject))
@@ -63,7 +62,7 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
     {
         return EnsureResultSuccess(Post(GetCurrentCourseTableUri, JsonContent.Create(GetBasicJson())))
             .Bind(json => json.Require("data")
-                .Bind(data => data.RequireArray("resList")
+                .Bind(data => data.RequireArray("kcCahe")
                     .Bind(array => array.RequireObjectArray()
                         .Bind(objects => (from jsonObject in objects select HNUSelectedCourse.FromJson(jsonObject))
                             .CombineResults()))));
@@ -86,7 +85,10 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
                 {
                     ["id"] = hnuCourse.Id,
                     ["kcbh"] = hnuCourse.Code,
-                    ["jczy010id"] = hnuCourse.Jczy010Id
+                    ["jczy010id"] = hnuCourse.Jczy010Id,
+                    ["kcbh"] = hnuCourse.Code,
+                    ["xkfscode"] = "1",
+                    ["zycode"] = null
                 }))
         };
         return EnsureResultSuccess(Post(RemoveCoursesUri, JsonContent.Create(request))).DiscardValue();
@@ -94,7 +96,20 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
 
     public Result<WeekTimeTable, HdjwError> GetWeekTimeTable()
     {
-        return new WeekTimeTable(ImmutableList<LessonTime>.Empty);
+        return new WeekTimeTable(ImmutableList.CreateRange(new List<LessonTime>
+        {
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50)),
+            new(new TimeOnly(8, 0), new TimeOnly(8, 50))
+        }));
     }
 
     private JsonObject GetBasicJson(JsonObject? inObject = null)

@@ -2,12 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Unicode;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using CourseRush.Core;
+using CourseRush.Core.Task;
+using CourseRush.Core.Util;
 using HandyControl.Controls;
 using HandyControl.Tools.Extension;
 
@@ -16,9 +24,13 @@ namespace CourseRush.Models;
 public interface ISelectionSessionPageModel
 {
     DataGrid GetDataGrid();
+    Task SaveSessionsAsync(FileStream fileStream);
+    Task LoadSessionsAsync(Stream openFile);
 }
 
-public class SelectionSessionPageModel<TCourseSelection> : ISelectionSessionPageModel where TCourseSelection : class, ICourseSelection
+public class SelectionSessionPageModel<TCourseSelection, TError> : ISelectionSessionPageModel
+    where TCourseSelection : class, ISelectionSession, IJsonSerializable<TCourseSelection, TError>
+    where TError : BasicError, ICombinableError<TError>
 {
     private readonly ObservableCollection<TCourseSelection> _selections;
     private readonly DataGrid _grid;
@@ -95,22 +107,62 @@ public class SelectionSessionPageModel<TCourseSelection> : ISelectionSessionPage
     {
         return _grid;
     }
-}
 
-public class PresentedSessionConverter<TCourseSelection> : IValueConverter where TCourseSelection : ICourseSelection
-{
-    private readonly PresentedData<TCourseSelection> _data;
-
-    public PresentedSessionConverter(PresentedData<TCourseSelection> data)
+    public async Task SaveSessionsAsync(FileStream fileStream)
     {
-        _data = data;
+        var javaScriptEncoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+        await using var writer = new Utf8JsonWriter(fileStream, new JsonWriterOptions
+        {
+            Encoder = javaScriptEncoder,
+            Indented = true
+        });
+        var jsonSerializerOptions = new JsonSerializerOptions
+        {
+            Encoder = javaScriptEncoder,
+            WriteIndented = true
+        };
+        await Task.Run(()=>new JsonArray(_selections.Select(session => session.ToJson()).Cast<JsonNode>().ToArray()).WriteTo(writer, jsonSerializerOptions));
     }
 
+    public async Task LoadSessionsAsync(Stream openFile)
+    {
+        try
+        {
+            if (await JsonNode.ParseAsync(openFile) is not JsonArray sessionArray)
+            {
+                Growl.Error(Language.ui_messsage_sessions_file_not_array);
+                return;
+            }
+
+            (await Task.Run(() =>
+                (from node in sessionArray
+                    where node is JsonObject
+                    select TCourseSelection.FromJson(node as JsonObject)).CombineResults())).Tee(
+                selectionSessions =>
+            {
+                foreach (var session in selectionSessions)
+                {
+                    _selections.Add(session);
+                }
+                
+                Growl.Info(string.Format(Language.ui_message_sessions_import_success, selectionSessions.Count));
+            }).TeeError(e => Growl.Error(e.Message));
+        }
+        catch (JsonException e)
+        {
+            Growl.Error(e.Message);
+        }
+    }
+}
+
+public class PresentedSessionConverter<TCourseSelection>(PresentedData<TCourseSelection> data) : IValueConverter
+    where TCourseSelection : ISelectionSession
+{
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (targetType == typeof(string) && value is TCourseSelection selection)
         {
-            return _data.GetValue(selection);
+            return data.GetValue(selection);
         }
 
         return value;

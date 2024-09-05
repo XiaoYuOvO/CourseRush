@@ -19,7 +19,7 @@
                 <RowDefinition Height="2*"></RowDefinition>
                 <RowDefinition Height="400" ></RowDefinition>
             </Grid.RowDefinitions>
-            <ToolBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="Auto" DockPanel.Dock="Left">
+            <ToolBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="Auto" DockPanel.Dock="Left" Name="ToolBar">
                 <ToolBar.Items>
                     <Menu Background="Transparent" VerticalAlignment="Center">
                         <MenuItem Name="FilesMenu" Header="{Binding Source={x:Static local:Language.ui_menu_file_op}}" Height="Auto">
@@ -27,6 +27,13 @@
                             <MenuItem Click="Import_OnClick"  Name="ImportButton" Header="{Binding Source={x:Static local:Language.ui_button_import}}"  Height="Auto"></MenuItem>
                         </MenuItem>
                     </Menu>
+                    <Separator Margin="10,0,5,0"/>
+                    <CheckBox Name="AutoStartCheck" Content="{x:Static local:Language.ui_label_should_start_after_add}" Click="AutoStart_OnClick" IsChecked="True" FlowDirection="RightToLeft"></CheckBox>
+                    <Separator Margin="10,0,5,0"/>
+                    <Button Height="Auto" Name="RemoveAllFinished" Click="RemoveAllFinished_OnClick" Content="{Binding Source={x:Static local:Language.ui_button_remove_all_finished}}" Margin="5,0,5,0"></Button>
+                    <Button Height="Auto" Name="PauseAll" Content="{Binding Source={x:Static local:Language.ui_button_pause_all}}" Click="PauseAll_OnClick" Margin="5,0,5,0"></Button>
+                    <Button Height="Auto" Name="ResumeAll" Content="{Binding Source={x:Static local:Language.ui_button_resume_all}}" Click="ResumeAll_OnClick" Margin="5,0,5,0"></Button>
+                    <Button Height="Auto" Name="RemoveAll" Content="{Binding Source={x:Static local:Language.ui_button_remove_all}}" Click="RemoveAll_OnClick" Style="{DynamicResource ButtonDanger}" Margin="5,0,5,0"></Button>
                 </ToolBar.Items>
             </ToolBar>
             <DockPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinWidth="100">

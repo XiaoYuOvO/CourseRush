@@ -14,4 +14,9 @@ public class TaskSerializationError(string message, JsonNode? errorNode = null, 
     {
         return $"{baseMessage}:    \nError json:{errorNode}";
     }
+
+    public new static TaskSerializationError Create(string message)
+    {
+        return new TaskSerializationError(message);
+    }
 }

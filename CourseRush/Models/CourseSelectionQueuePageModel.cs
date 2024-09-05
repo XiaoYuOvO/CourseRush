@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -29,6 +30,11 @@ public interface ICourseSelectionQueuePageModel
     public CourseDetailDrawer CreateCourseDetailDrawer();
     Task LoadTasksAsync(Stream openFile);
     Task SaveTasksAsync(Stream writeFile);
+    void RemoveAllFinished();
+    void RemoveAll();
+    void PauseAll(); 
+    void ResumeAll();
+    void SetAutoStart(bool isChecked);
 }
 
 public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQueuePageModel, ITaskLogger
@@ -36,12 +42,15 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
     where TError : BasicError, ISelectionError, ICombinableError<TError>
 {
     private readonly ObservableCollection<SelectionTask<TError, TCourse>> _tasks = [];
-    private Option<ICourseSelector<TError, TCourse>> _selector;
     private readonly CourseDetailDrawer<TCourse> _courseDetailDrawer = new();
     private readonly Paragraph _logParagraph = new();
     private readonly RichTextBox _loggerTextBlock;
     private readonly Action<AutoFontSizeChanged> _registerer;
     private readonly Action<SelectionTask<TError, TCourse>> _taskSubmit;
+    private TaskDetailPanel<TError, TCourse>? _taskDetailPanel;
+    
+    private Option<ICourseSelector<TError, TCourse>> _selector;
+    private bool _startAfterAdd = true;
 
     public CourseSelectionQueuePageModel(Action<AutoFontSizeChanged> registerer,
         Action<SelectionTask<TError, TCourse>> taskSubmit)
@@ -55,6 +64,7 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalContentAlignment = VerticalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            MinWidth = 300,
             IsReadOnly = true
         };
         _loggerTextBlock.TextChanged += (_, _) => _loggerTextBlock.MinWidth = _loggerTextBlock.RenderSize.Width;
@@ -66,7 +76,7 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
         return _selector.Tee(client =>
         {
             _tasks.Insert(0, task);
-            _ = task.InitializeAndStartTask(client);
+            if (_startAfterAdd) _ = task.InitializeAndStartTask(client);
         }).Match(_ => Result.Ok<UiError>(),
             _ => new UiError("Failed to submit task because the client is not present").Fail());
     }
@@ -74,6 +84,7 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
     public void SetClient(ICourseSelector<TError, TCourse> client)
     {
         _selector = client.ToOption();
+        if (_taskDetailPanel != null) _taskDetailPanel.Selector = _selector;
     }
 
     public void ApplyCourseConflict(TCourse course)
@@ -102,6 +113,11 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
         };
         frameworkElementFactory = new FrameworkElementFactory(typeof(TextBlock));
         frameworkElementFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(SelectionTask<TError, TCourse>.Name)));
+        frameworkElementFactory.SetBinding(TextBlock.FontSizeProperty, new Binding
+        {
+            Source = treeView,
+            Path = new PropertyPath("FontSize"),
+        });
         var taskTemplate = new DataTemplate
         {
             DataType = typeof(SelectionTask<TError, TCourse>),
@@ -110,7 +126,7 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
         var taskTemplateSelector = new TaskTemplateSelector(aggregatedTemplate, taskTemplate);
         treeView.ItemTemplateSelector = taskTemplateSelector;
         treeView.SelectedItemChanged += (_, args) => taskDetailPanel.Child.SetValue(FrameworkElement.DataContextProperty, args.NewValue);
-        taskDetailPanel.Child = CreateTaskDetailPanel(fontRegister);
+        taskDetailPanel.Child = _taskDetailPanel = CreateTaskDetailPanel(fontRegister);
         treeView.ItemsSource = _tasks;
         return treeView;
     }
@@ -166,6 +182,41 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
             WriteIndented = true
         };
         await Task.Run(()=>TaskTypes<TError, TCourse>.SerializeAll(_tasks).WriteTo(writer, jsonSerializerOptions));
+    }
+
+    public void RemoveAllFinished()
+    {
+        foreach (var selectionTask in _tasks.Where(task => task.Status.IsFinished()).ToList())
+        {
+            _tasks.Remove(selectionTask);
+            if (!selectionTask.Status.IsFinished()) selectionTask.Cancel();
+        }
+    }
+
+    public void RemoveAll()
+    {
+        _tasks.Clear();
+    }
+
+    public void PauseAll()
+    {
+        foreach (var selectionTask in _tasks)
+        {
+            selectionTask.Pause();
+        }
+    }
+
+    public void ResumeAll()
+    {
+        foreach (var selectionTask in _tasks)
+        {
+            selectionTask.Resume();
+        }
+    }
+
+    public void SetAutoStart(bool isChecked)
+    {
+        _startAfterAdd = isChecked;
     }
 
     private TaskDetailPanel<TError, TCourse> CreateTaskDetailPanel(Action<AutoFontSizeChanged> fontRegister)

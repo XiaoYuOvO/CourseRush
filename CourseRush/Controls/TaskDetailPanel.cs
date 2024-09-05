@@ -7,6 +7,7 @@ using CourseRush.Models;
 using HandyControl.Controls;
 using HandyControl.Data;
 using MahApps.Metro.Controls;
+using Resultful;
 using ComboBox = System.Windows.Controls.ComboBox;
 using NumericUpDown = HandyControl.Controls.NumericUpDown;
 using TextBox = System.Windows.Controls.TextBox;
@@ -16,6 +17,7 @@ namespace CourseRush.Controls;
 public class TaskDetailPanel<TError, TCourse> : DockPanel where TError : BasicError, ISelectionError, ICombinableError<TError> where TCourse : ICourse, IJsonSerializable<TCourse, TError>
 {
     private SelectionTask<TError, TCourse>? _selectedTask;
+    public Option<ICourseSelector<TError, TCourse>> Selector { get; set; }
     public event Action<SelectionTask<TError, TCourse>>? OnTaskCanceled; 
     public event Action<TCourse>? OnRequestShowCourse; 
     public TaskDetailPanel(Action<AutoFontSizeChanged> fontRegister)
@@ -143,10 +145,18 @@ public class TaskDetailPanel<TError, TCourse> : DockPanel where TError : BasicEr
                 _selectedTask.Resume();
                 pauseResumeButton.Content = CourseRush.Language.ui_button_pause;
             }
-            else
+            else if (_selectedTask.Status != TaskStatus.Uninitialized)
             {
                 _selectedTask.Pause();
                 pauseResumeButton.Content = CourseRush.Language.ui_button_resume;
+            }
+            else
+            {
+                Selector.Tee(selector =>
+                {
+                    _ = _selectedTask.InitializeAndStartTask(selector);
+                    pauseResumeButton.Content = CourseRush.Language.ui_button_pause;
+                });
             }
         };
         
@@ -212,7 +222,7 @@ public class TaskDetailPanel<TError, TCourse> : DockPanel where TError : BasicEr
             
             UpdateOperationButton(task);
             
-            pauseResumeButton.Content = _selectedTask.IsPaused ? CourseRush.Language.ui_button_resume : CourseRush.Language.ui_button_pause;
+            pauseResumeButton.Content = _selectedTask.IsPaused || _selectedTask.Status == TaskStatus.Uninitialized ? CourseRush.Language.ui_button_resume : CourseRush.Language.ui_button_pause;
             cancelDeleteButton.IsEnabled = true;
             statusLabel.Text = task.Status.LocalizedName;
             retryOptionBox.SelectedItem = task.RetryOption;

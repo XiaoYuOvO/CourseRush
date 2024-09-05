@@ -201,4 +201,31 @@
     <data name="ui.label.selection_session.default" xml:space="preserve">
         <value>Current Selection</value>
     </data>
+    <data name="ui.button.remove_all_finished" xml:space="preserve">
+        <value>Remove All Finished</value>
+    </data>
+    <data name="ui.button.pause_all" xml:space="preserve">
+        <value>Pause All</value>
+    </data>
+    <data name="ui.button.resume_all" xml:space="preserve">
+        <value>Resume All</value>
+    </data>
+    <data name="ui.button.remove_all" xml:space="preserve">
+        <value>Remove All</value>
+    </data>
+    <data name="ui.message.confirm_remove_all" xml:space="preserve">
+        <value>Are  you sure to remove all tasks?</value>
+    </data>
+    <data name="university.HNU_INTERNAL" xml:space="preserve">
+        <value>Hunan University (Internal Network)</value>
+    </data>
+    <data name="ui.messsage.sessions_file_not_array" xml:space="preserve">
+        <value>Sessions file should be json array!</value>
+    </data>
+    <data name="ui.message.sessions_import_success" xml:space="preserve">
+        <value>Successfully imported {0} sessions</value>
+    </data>
+    <data name="ui.label.should_start_after_add" xml:space="preserve">
+        <value>Auto Start Tasks</value>
+    </data>
 </root>

@@ -3,9 +3,14 @@ using System.Text;
 
 namespace CourseRush.Core;
 
-public interface ICombinableError<TError> where TError : BasicError
+public interface ICombinableError<TError> : IError<TError> where TError : BasicError, IError<TError>
 {
     static abstract TError Combine(IEnumerable<TError> errors);
+}
+
+public interface IError<out TError> where TError : IError<TError>
+{
+    static abstract TError Create(string message);
 }
 
 public class BasicError : ICombinableError<BasicError>
@@ -37,6 +42,11 @@ public class BasicError : ICombinableError<BasicError>
     public static BasicError Combine(IEnumerable<BasicError> errors)
     {
         return new BasicError("Combined Error", errors.ToArray());
+    }
+
+    public static BasicError Create(string message)
+    {
+        return new BasicError(message, []);
     }
 
     public override string ToString()

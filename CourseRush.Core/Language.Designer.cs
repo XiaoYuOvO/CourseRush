@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 
 namespace CourseRush.Core {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -62,6 +65,15 @@ namespace CourseRush.Core {
         internal static string course_campus {
             get {
                 return ResourceManager.GetString("course.campus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class Code.
+        /// </summary>
+        internal static string course_class_code {
+            get {
+                return ResourceManager.GetString("course.class_code", resourceCulture);
             }
         }
         
@@ -129,6 +141,33 @@ namespace CourseRush.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Daily End Time.
+        /// </summary>
+        internal static string course_selection_daily_end_time {
+            get {
+                return ResourceManager.GetString("course_selection.daily_end_time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Daily Start Time.
+        /// </summary>
+        internal static string course_selection_daily_start_time {
+            get {
+                return ResourceManager.GetString("course_selection.daily_start_time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End Time.
+        /// </summary>
+        internal static string course_selection_end_time {
+            get {
+                return ResourceManager.GetString("course_selection.end_time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Selection Method.
         /// </summary>
         internal static string course_selection_method {
@@ -170,6 +209,15 @@ namespace CourseRush.Core {
         internal static string course_selection_selection_term {
             get {
                 return ResourceManager.GetString("course_selection.selection_term", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Time.
+        /// </summary>
+        internal static string course_selection_start_time {
+            get {
+                return ResourceManager.GetString("course_selection.start_time", resourceCulture);
             }
         }
         
@@ -458,6 +506,15 @@ namespace CourseRush.Core {
         internal static string task_status_running {
             get {
                 return ResourceManager.GetString("task.status.running", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uninitialized.
+        /// </summary>
+        internal static string task_status_uninitialized {
+            get {
+                return ResourceManager.GetString("task.status.uninitialized", resourceCulture);
             }
         }
         

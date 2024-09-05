@@ -15,7 +15,7 @@ namespace CourseRush.HNU;
 public class HdjwClient(HdjwAuthResult authResult)
     : AuthClient<HdjwAuthResult>(authResult), 
         IResultConvertible<HdjwAuthResult, HdjwClient>, 
-        ISessionClient<HdjwError, HNUCourseSelection, HNUCourse, HNUSelectedCourse, HNUCourseCategory>
+        ISessionClient<HdjwError, HNUSelectionSession, HNUCourse, HNUSelectedCourse, HNUCourseCategory>
 {
     private static readonly Uri GetOngoingCourseSelectionsUri = new(
         "http://hdjw.hnu.edu.cn/resService/jwxtpt/v1/xsd/stuCourseCenterController/findXsxkjdList?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findXsxkjdList&sf_request_type=ajax");
@@ -26,7 +26,7 @@ public class HdjwClient(HdjwAuthResult authResult)
     private const string AvatarUriTemplate =
         "http://hdjw.hnu.edu.cn/resService/sys/v1/doc/view/{0}?resourceCode=ZYGL08&apiCode=framework.assembly.doc.controller.SysDocController.view&app=PCWEB&userRoleCode=student&resourceCode=ZYGL08&apiCode=framework.security.controller.SysUserController.roleList";
 
-    public Result<IReadOnlyList<HNUCourseSelection>, HdjwError> GetOngoingCourseSelections()
+    public Result<IReadOnlyList<HNUSelectionSession>, HdjwError> GetOngoingCourseSelections()
     {
         var request = new JsonObject
         {
@@ -41,10 +41,10 @@ public class HdjwClient(HdjwAuthResult authResult)
             .Bind(json => json.Require("data")
                 .Bind(data => data.Require("resRmd")
                     .Bind(resRmd => resRmd.Require("items")
-                        .Bind<IReadOnlyList<HNUCourseSelection>>(items =>
+                        .Bind<IReadOnlyList<HNUSelectionSession>>(items =>
                             (from jsonNode in items.AsArray()
                                 where jsonNode != null
-                                select HNUCourseSelection.FromJson(jsonNode.AsObject())).ToList()
+                                select HNUSelectionSession.FromJson(jsonNode.AsObject())).ToList()
                             .CombineResults()))));
     }
 
@@ -76,7 +76,7 @@ public class HdjwClient(HdjwAuthResult authResult)
         return Get(IsOnlineUri).Bind(response => response.ReadJsonObject()).MapError(HdjwError.Wrap).Bind(json => json.Require("online")).Map(node => node.GetValue<bool>());
     }
 
-    public ICourseSelectionClient<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseCategory> GetSelectionClient(HNUCourseSelection target)
+    public ICourseSelectionClient<HdjwError, HNUCourse, HNUSelectedCourse, HNUCourseCategory> GetSelectionClient(HNUSelectionSession target)
     {
         return new HNUCourseSelectClient(Auth, target);
     }

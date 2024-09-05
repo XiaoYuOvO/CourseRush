@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using CourseRush.Core;
@@ -105,7 +106,7 @@ public class EnumSearchProperty<TCourse> : SearchProperty<TCourse, ComboBox> whe
     protected override Predicate<TCourse> GetFilter()
     {
         var enumBoxSelectionBoxItem = InputElement.SelectedItem as string;
-        //This predicate may invoked in other non-STA threads so we need to cache the values
+        //This predicate may invoke in other non-STA threads, so we need to cache the values
         return course => _enumType.Extract(course).Trim().Equals(enumBoxSelectionBoxItem, StringComparison.Ordinal);
     }
 
@@ -132,12 +133,13 @@ public class StringSearchProperty<TCourse> : SearchProperty<TCourse, AutoComplet
     protected override Predicate<TCourse> GetFilter()
     {
         var text = InputElement.Text;
-        //This predicate may invoked in other non-STA threads so we need to cache the values
+        //This predicate may invoke in other non-STA threads, so we need to cache the values
         return course => _stringType.Extract(course).Trim().Contains(text);
     }
 
     public override void UpdateData(TCourse course)
     {
+        if (_strings.Count > 300) return;
         var trim = _stringType.Extract(course).Trim();
         if (!_strings.Contains(trim))
         {

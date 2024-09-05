@@ -11,7 +11,7 @@ public class RsaWebEncryptor
     {
         if (_initialized) return;
         V8ScriptEngine.Execute("var window = new Object");
-        V8ScriptEngine.Execute(V8ScriptEngine.Compile(HttpUtils.GetString(new Uri("http://cas.web.hnu.edu.cn/cas/js/login/security.js"))));
+        V8ScriptEngine.Execute(V8ScriptEngine.Compile(HttpUtils.GetString(new Uri("https://cas.hnu.edu.cn/cas/js/login/security.js"))));
         _initialized = true;
     }
 

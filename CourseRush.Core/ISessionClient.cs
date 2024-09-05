@@ -3,7 +3,7 @@ using Resultful;
 namespace CourseRush.Core;
 
 public interface ISessionClient<TError, TCourseSelection, TCourse, TSelectedCourse, TCourseCategory> where TError : BasicError
-    where TCourseSelection : ICourseSelection
+    where TCourseSelection : ISelectionSession
     where TCourse : ICourse
     where TCourseCategory : ICourseCategory
     where TSelectedCourse : ISelectedCourse

@@ -5,11 +5,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.56" />
-      <PackageReference Include="Microsoft.ClearScript.V8" Version="7.4.4" />
       <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.4" />
       <PackageReference Include="NodaTime" Version="3.1.11" />
       <PackageReference Include="Resultful" Version="0.2.0-beta05" />
