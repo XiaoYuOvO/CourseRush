@@ -27,7 +27,7 @@ public class HNUSelectedCourse(
     SelectionMethod selectionMethod)
     : HNUCourse(selectedStudentCount, totalStudentCount, totalLearningHours, totalCredits, teacherName, className,"",
         courseName, offerInstitution, campus, timeTable, teachingMethod, courseType, examinationMethod, id, code,
-        jczy010Id, electiveCourseType, groupName), ISelectedCourse, IPresentedDataProvider<HNUSelectedCourse>
+        jczy010Id, electiveCourseType, groupName), ISelectedCourse, IPresentedDataProvider<HNUSelectedCourse>, IJsonSerializable<HNUSelectedCourse, HdjwError>
 {
     public SelectionMethod SelectionMethod { get; } = selectionMethod;
 
@@ -35,18 +35,18 @@ public class HNUSelectedCourse(
     {
         return node.GetInt("xkrs", 0)
                 .Bind<HNUSelectedCourse>(xkrs => node.GetInt("pkrs", 0)
-                    .Bind<HNUSelectedCourse>(pkrs => node.RequireFloat("zxs")
-                        .Bind<HNUSelectedCourse>(zxs => node.RequireFloat("zxf")
+                    .Bind<HNUSelectedCourse>(pkrs => node.GetFloat("zxs", 0.0f)
+                        .Bind<HNUSelectedCourse>(zxs => node.GetFloat("zxf", 0.0f)
                             .Bind<HNUSelectedCourse>(zxf => node.GetString("skls_name", "无")
                                 .Bind<HNUSelectedCourse>(sklsName => node.RequireString("ktmc_name")
                                     .Bind<HNUSelectedCourse>(ktmcName => node.RequireString("kcmc_name")
-                                        .Bind<HNUSelectedCourse>(kcmcName => node.RequireString("kkdw_name")
-                                            .Bind<HNUSelectedCourse>(kkdwName => node.RequireString("xq_name")
+                                        .Bind<HNUSelectedCourse>(kcmcName => node.GetString("kkdw_name", "")
+                                            .Bind<HNUSelectedCourse>(kkdwName => node.GetString("xq_name","")
                                                 .Bind<HNUSelectedCourse>(xqName => node.GetString("kbinfo", "")
                                                     .Bind(HNUCourseTimeTable.FromString)
-                                                    .Bind<HNUSelectedCourse>(table => node.ParseInt("skfscode")
+                                                    .Bind<HNUSelectedCourse>(table => node.ParseInt("skfscode", "0")
                                                         .Map(IdToTeacherMethod)
-                                                        .Bind<HNUSelectedCourse>(teachingMethod => node.ParseInt("kclbcode")
+                                                        .Bind<HNUSelectedCourse>(teachingMethod => node.ParseInt("kclbcode","0")
                                                             .Map(HNUCourseType.TypeFromCode)
                                                             .Bind<HNUSelectedCourse>(courseType => node.ParseInt("khfscode", 0)
                                                                 .Map(IdToExaminationMethod)

@@ -1,4 +1,5 @@
 using System.Net;
+using OneOf;
 using Resultful;
 
 namespace CourseRush.Core.Network;
@@ -10,7 +11,7 @@ public class WebClient
     public delegate void RequestConfigurator(HttpRequestMessage request);
     public WebClient()
     {
-        // _handler.Proxy = new WebProxy("127.0.0.1",8888);
+        // Handler.Proxy = new WebProxy("127.0.0.1",8888);
         Handler.UseProxy = true;
         Handler.AutomaticDecompression = DecompressionMethods.All;
         Handler.UseCookies = true;
@@ -21,7 +22,7 @@ public class WebClient
         _client = new HttpClient(Handler);
     }
 
-    protected Result<WebResponse, WebError> EnsureSuccess(HttpResponseMessage response)
+    private Result<WebResponse, WebError> EnsureSuccess(HttpResponseMessage response)
     {
         if (response.IsSuccessStatusCode)
         {
@@ -41,6 +42,17 @@ public class WebClient
         var readAsStringAsync = httpResponseMessage.Content.ReadAsStringAsync();
         readAsStringAsync.Wait();
         return new WebError($"The result of request is not a redirect response: {readAsStringAsync.Result}");
+    }
+    
+    public Result<OneOf<RedirectionResponse, WebResponse>, WebError> GetRedirectedUriOrNormal(Uri uri,MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
+    {
+        var httpRequestMessage = CreateRequest(uri, accept, configurator:configurator);
+        var httpResponseMessage = _client.Send(httpRequestMessage);
+        if (httpResponseMessage.StatusCode == HttpStatusCode.Redirect)
+        {
+            return Result.Ok<OneOf<RedirectionResponse, WebResponse>, WebError>(new RedirectionResponse(httpResponseMessage, Handler));
+        }
+        return Result.Ok<OneOf<RedirectionResponse, WebResponse>, WebError>(new WebResponse(httpResponseMessage, Handler));
     }
 
     public Result<WebResponse, WebError> Get(Uri uri, Dictionary<string, string> content,MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
@@ -63,6 +75,14 @@ public class WebClient
         httpRequestMessage.Method = HttpMethod.Post;
         httpRequestMessage.Content = content;
         return EnsureSuccess(_client.Send(httpRequestMessage));
+    }
+    
+    public async Task<Result<WebResponse, WebError>> PostAsync(Uri uri, HttpContent? content = null, MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
+    {
+        var httpRequestMessage = CreateRequest(uri, accept, configurator:configurator);
+        httpRequestMessage.Method = HttpMethod.Post;
+        httpRequestMessage.Content = content;
+        return EnsureSuccess(await _client.SendAsync(httpRequestMessage));
     }
     
     public Result<WebResponse, WebError> Post(Uri uri, Dictionary<string, string> content, MediaType accept = MediaType.All, RequestConfigurator? configurator = null)

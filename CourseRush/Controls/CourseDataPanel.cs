@@ -108,7 +108,7 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
 {
     public CourseDataGrid CourseGrid { get; }
     private readonly StackPanel _searchPropertyGrid = new(){Visibility = Visibility.Collapsed, Orientation = Orientation.Vertical, HorizontalAlignment = HorizontalAlignment.Stretch};
-    private readonly ManualObservableCollection<TCourse> _courses = [];
+    private readonly List<TCourse> _courses = [];
     private readonly List<ISearchProperty<TCourse>> _searchProperties; 
     private readonly Button _searchApplyButton = new();
 
@@ -197,11 +197,12 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
             {
                 if (args.Key == Key.Enter)
                 {
-                    ApplyFilter();
+                    RebuildFilter();
                 }
             };
             _searchPropertyGrid.Children.Add(searchPanel);
         });
+        CourseGrid.ItemsSource = new ObservableCollection<TCourse>();
         
         InitializeSearchApplyButton();
 
@@ -227,7 +228,7 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
     private void InitializeSearchApplyButton()
     {
         _searchApplyButton.Content = CourseRush.Language.ui_button_apply;
-        _searchApplyButton.Click += (_, _) => ApplyFilter();
+        _searchApplyButton.Click += (_, _) => RebuildFilter();
         _searchApplyButton.Margin = new Thickness(0, 20, 0, 0);
         if (TryFindResource("ButtonPrimary") is Style style) _searchApplyButton.Style = style;
         _searchPropertyGrid.Children.Add(_searchApplyButton);
@@ -235,8 +236,14 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
 
     #region Custom Grid Wheel Handler
     private MouseWheelEventHandler? _mouseWheelEventHandler;
-    private void UpdateScrollerListener()
+    private bool _scrollHandlerInvalid = true;
+    public void UpdateScrollerListener()
     {
+        if (!_scrollHandlerInvalid)
+        {
+            return;
+        }
+        _scrollHandlerInvalid = false;
         var scrollViewer = GetScrollViewer(CourseGrid);
         if (scrollViewer == null) return;
         ScrollViewerWheelScrolling?.SetValue(scrollViewer, false);
@@ -283,21 +290,31 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
         return CourseGrid.SelectedItems.Cast<TCourse>().ToImmutableList();
     }
 
-    public void AddCourse(IReadOnlyList<TCourse> courses)
+    public void ReloadCourses(IReadOnlyList<TCourse> courses)
     {
-        foreach (var course in courses)
-        {
-            _courses.Add(course);
-            _searchProperties.ForEach(property => property.UpdateData(course));
-        }
-        ApplyFilter();
+        foreach (var course in courses) AddCourse(course);
         UpdateScrollerListener();
+    }
+
+    public void AddCourse(TCourse course)
+    {
+        _courses.Add(course);
+        this.Invoke(() => _searchProperties.ForEach(property => property.UpdateData(course)));
+        if (_predicateCache(course))
+        {
+            this.Invoke(() =>
+            {
+               var courseGridItemsSource = CourseGrid.ItemsSource as ObservableCollection<TCourse>;
+                courseGridItemsSource?.Add(course);
+            });
+        }
     }
 
     public void RefreshCourses(IReadOnlyList<TCourse> courses)
     {
         _courses.Clear();
-        AddCourse(courses);
+        _scrollHandlerInvalid = true;
+        ReloadCourses(courses);
     }
 
     public IEnumerable<TCourse> GetCourses()
@@ -335,34 +352,40 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
         CompareAndUpdate(ref _showOnlyInClassCourses, showOnlyInClassCourses, ref needUpdate);
         CompareAndUpdate(ref _showConflictCourses, showConflictCourses, ref needUpdate);
         CompareAndUpdate(ref _className, className, ref needUpdate);
-        if (needUpdate) ApplyFilter();
+        if (!needUpdate) return;
+        RebuildFilter();
     }
-
-    private void ApplyFilter()
+    private Predicate<TCourse> _predicateCache = _ => true;
+    private void RebuildFilter()
     {
         //Cache predicate in STA thread
-        Predicate<TCourse> predicate = _ => true;
+        _predicateCache = _ => true;
         if (!_showFullCourses)
         {
-            predicate = predicate.And(course => course.SelectedStudentCount < course.TotalStudentCount);
+            _predicateCache = _predicateCache.And(course => course.SelectedStudentCount < course.TotalStudentCount);
         }
 
         if (_showOnlyInClassCourses && _className != null)
         {
             //TODO Ranged declaration support: 化工[2201-3]班
-            predicate = predicate.And(course => course.ClassName.Contains(_className));
+            _predicateCache = _predicateCache.And(course => course.ClassName.Contains(_className));
         }
 
         if (!_showConflictCourses)
         {
-            predicate = predicate.And(course => course.ConflictsCache.Count == 0);
+            _predicateCache = _predicateCache.And(course => course.ConflictsCache.Count == 0);
         }
-        predicate = predicate.And(_searchProperties.Select(property => property.GetCurrentFilter()).Aggregate(CollectionUtils.AndCombine));
+        _predicateCache = _predicateCache.And(_searchProperties.Select(property => property.GetCurrentFilter()).Aggregate(CollectionUtils.AndCombine));
+        ApplyFilterToAll();
+    }
+
+    private void ApplyFilterToAll()
+    {
         //Run async filter in thread pool
         Task.Run(() =>
         {
             var courses = _courses.AsParallel().AsUnordered().WithMergeOptions(ParallelMergeOptions.AutoBuffered)
-                .Where(course => predicate(course)).ToList();
+                .Where(course => _predicateCache(course)).ToList();
             this.Invoke(() => CourseGrid.ItemsSource = new ObservableCollection<TCourse>(courses));
         });
     }
@@ -384,7 +407,7 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
     public override void ClearCourses()
     {
         _courses.Clear();
-        CourseGrid.ItemsSource = new List<TCourse>();
+        CourseGrid.ItemsSource = new ObservableCollection<TCourse>();
     }
 }
 

@@ -41,6 +41,7 @@ public partial class MainWindow
             StudentGravatar.Width = 80 * fontSizeFactor;
             StudentNameLabel.FontSize = 15 * fontSizeFactor;
             ClassLabel.FontSize = 14 * fontSizeFactor;
+            AccountLabel.FontSize = 14 * fontSizeFactor;
             CurrentSelectionLabel.FontSize = 14 * fontSizeFactor;
             SessionListBtn.FontSize = 20 * fontSizeFactor;
             SessionListBtn.Height = double.NaN;
@@ -117,8 +118,8 @@ public partial class MainWindow
     {
         _currentPage = page;
         NavFrame.Navigate(page);
-        _currentPage.Width = NavFrame.RenderSize.Width;
-        _currentPage.Height = NavFrame.RenderSize.Height;
+            _currentPage.Width = NavFrame.RenderSize.Width;
+            _currentPage.Height = NavFrame.RenderSize.Height;
         _currentPage.RenderSize = NavFrame.RenderSize;
     }
 }

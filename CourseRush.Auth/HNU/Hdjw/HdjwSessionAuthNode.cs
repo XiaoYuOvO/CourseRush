@@ -17,7 +17,7 @@ public class HdjwSessionAuthNode(params AuthNode[] requires) : AuthNode(new Auth
     internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
     {
         return client.Get(new Uri(HdjwIndex))
-            .Map(response => response.ReadHtml().Text)
+            .Map(response => response.ReadString())
             .Bind(indexResponse =>
             {
                 var startIndex = indexResponse.IndexOf("https://", StringComparison.Ordinal);

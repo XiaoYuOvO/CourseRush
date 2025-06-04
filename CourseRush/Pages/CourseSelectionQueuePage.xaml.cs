@@ -2,7 +2,6 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using CourseRush.Controls;
 using CourseRush.Models;
 using Microsoft.Win32;
 using MessageBox = HandyControl.Controls.MessageBox;
@@ -18,7 +17,6 @@ public partial class CourseSelectionQueuePage
         _model = model;
         InitializeComponent();
         var courseDetailDrawer = _model.CreateCourseDetailDrawer();
-        // Grid.SetRow(courseDetailDrawer, 3);
         Grid.Children.Add(courseDetailDrawer);
         var taskTreeView = _model.CreateTaskTreeView(TaskDetailPanel, registerer);
         Grid.SetRow(taskTreeView, 1);
@@ -38,6 +36,7 @@ public partial class CourseSelectionQueuePage
             PauseAll.FontSize = 14 * factor;
             ResumeAll.FontSize = 14 * factor;
             RemoveAll.FontSize = 14 * factor;
+            AutoStartCheck.FontSize = 14 * factor;
         });
     }
 
@@ -47,8 +46,6 @@ public partial class CourseSelectionQueuePage
         _loggerTextBlock.MinWidth = _loggerTextBlock.RenderSize.Width;
     }
     
-    
-
     private async void Export_OnClick(object sender, RoutedEventArgs e)
     {
         var openFileDialog = new OpenFileDialog

@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using CourseRush.Auth.HNU.Hdjw;
 using CourseRush.Core;
 using CourseRush.Core.Util;
+using Microsoft.ClearScript.JavaScript;
 using Resultful;
 
 namespace CourseRush.HNU;
@@ -23,28 +24,67 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
     //TODO Get max credits
     //TODO Get student time table
     //POST ?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findKcInfoByfl&sf_request_type=ajax 
-    public Result<IReadOnlyList<HNUCourse>, HdjwError> GetCoursesByCategory(HNUCourseCategory category)
+    public async IAsyncEnumerable<IEnumerable<Result<HNUCourse, HdjwError>>> GetCoursesByCategory(HNUCourseCategory category)
     {
-        return EnsureResultSuccess(Post(GetCoursesByCategoryUri, JsonContent.Create(GetBasicJson(new JsonObject
-            {
-                ["page"] = new JsonObject
-                {
-                    ["pageIndex"] = 0,
-                    ["pageSize"] = 0,
-                    ["orderBy"] = "",
-                    ["conditions"] = "QZDATASOFT"
-                },
-                ["xkfl"] = category.GetSubcategoriesJson(),
-                ["xklbbh"] = category.CategoryNumber.ToString()
-            }))))
-            .Bind(result => result.Require("data")
-                .Bind(data => data.RequireArray("showKclist")
-                    .Bind(kclist => kclist.RequireObjectArray()
-                        .Bind(courses =>
-                            (from course in courses select HNUCourse.FromJson(course))
-                            .CombineResults()))));
+        await foreach (var enumerable in EnsureResultSuccess(await PostAsync(GetCoursesByCategoryUri, JsonContent.Create(GetBasicJson(new JsonObject
+                           {
+                               ["page"] = new JsonObject
+                               {
+                                   ["pageIndex"] = 0,
+                                   ["pageSize"] = 0,
+                                   ["orderBy"] = "",
+                                   ["conditions"] = "QZDATASOFT"
+                               },
+                               ["xkfl"] = category.GetSubcategoriesJson(),
+                               ["xklbbh"] = category.CategoryNumber.ToString()
+                           }))))
+                           .Bind(result => result.Require("data")
+                               .Bind(data => data.RequireArray("showKclist").Bind(kclist =>
+                               {
+                                   if (kclist.Count != 0)
+                                       return kclist.RequireObjectArray().Map(ReadCourses)
+                                           .Map(courses => courses.AsAsyncEnumerable());
+                                   //Adapt for out of plan selections
+                                   return data.RequireObject("kcToNameMap")
+                                       .Map(array => from node in array select node.Key)
+                                       .Map(ids => GetSubCoursesInCategory(ids, category));
+                               }))).Match(results => results, error => error.SingletonEnumerable<HNUCourse, HdjwError>().AsAsyncEnumerable()))
+        {
+            yield return enumerable;
+        }
     }
-    
+
+    private static IEnumerable<Result<HNUCourse, HdjwError>> ReadCourses(IEnumerable<JsonObject> json)
+    {
+        return from jsonObject in json select HNUCourse.FromJson(jsonObject);
+    }
+
+    private async IAsyncEnumerable<IEnumerable<Result<HNUCourse, HdjwError>>> GetSubCoursesInCategory(IEnumerable<string> ids, HNUCourseCategory category)
+    {
+        foreach (var jczy010Id in ids)
+        {
+            yield return EnsureResultSuccess(await PostAsync(GetCoursesByCategoryUri,
+                                   JsonContent.Create(GetBasicJson(new JsonObject
+                                   {
+                                       ["page"] = new JsonObject
+                                       {
+                                           ["pageIndex"] = 0,
+                                           ["pageSize"] = 0,
+                                           ["orderBy"] = "",
+                                           ["conditions"] = "QZDATASOFT"
+                                       },
+                                       ["jczy010id"] = jczy010Id,
+                                       ["from"] = "sxxkrs",
+                                       ["xkfl"] = category.GetSubcategoriesJson(),
+                                       ["xklbbh"] = category.CategoryNumber.ToString()
+                                   }))))
+                               .Bind(result => result.Require("data")
+                                   .Bind(data => data.RequireArray("showKclist")
+                                       .Bind(kclist => kclist.RequireObjectArray().Map(ReadCourses))))
+                               .Match(courses => courses, ResultUtils.SingletonEnumerable<HNUCourse, HdjwError>);
+        }
+    }
+
     //POST /resService/jwxtpt/v1/xsd/stuCourseCenterController/findXsxkjdByOne?resourceCode=XSMH0303&apiCode=jw.xsd.courseCenter.controller.StuCourseCenterController.findXsxkjdByOne&sf_request_type=ajax 
     public Result<IReadOnlyList<HNUCourseCategory>, HdjwError> GetCategoriesInRound()
     {
@@ -84,7 +124,6 @@ public class HNUCourseSelectClient : HdjwClient, ICourseSelectionClient<HdjwErro
             ["txList"] = course.ToJsonArray(hnuCourse => GetBasicJson(new JsonObject
                 {
                     ["id"] = hnuCourse.Id,
-                    ["kcbh"] = hnuCourse.Code,
                     ["jczy010id"] = hnuCourse.Jczy010Id,
                     ["kcbh"] = hnuCourse.Code,
                     ["xkfscode"] = "1",

@@ -16,6 +16,12 @@ public static class HdjwJsonExtensions
         return jsonNode[nodeName]?.Ok<JsonNode, HdjwError>().TryBind<JsonNode, HdjwError, JsonArray>(node => node.AsArray(), HdjwError.Wrap) ?? HdjwError.JsonError($"Cannot find required field \"{nodeName}\" in json", jsonNode);
     }
 
+    public static Result<JsonObject, HdjwError> RequireObject(this JsonNode jsonNode, string nodeName)
+    {
+        return jsonNode[nodeName]?.Ok<JsonNode, HdjwError>().TryBind<JsonNode, HdjwError, JsonObject>(node => node.AsObject(), HdjwError.Wrap) ?? HdjwError.JsonError($"Cannot find required field \"{nodeName}\" in json", jsonNode);
+    }
+
+    
     public static Result<IEnumerable<JsonObject>, HdjwError> RequireObjectArray(this JsonArray array)
     {
         return array.Where(node => node is JsonObject).Select(node => node!.AsObject()).Ok<IEnumerable<JsonObject>, HdjwError>();
@@ -55,6 +61,11 @@ public static class HdjwJsonExtensions
     public static Result<int, HdjwError> GetInt(this JsonNode jsonNode, string nodeName, int fallbackValue)
     {
         return jsonNode[nodeName]?.GetValue<int>() ?? fallbackValue;
+    }
+    
+    public static Result<float, HdjwError> GetFloat(this JsonNode jsonNode, string nodeName, float fallbackValue)
+    {
+        return jsonNode[nodeName]?.GetValue<float>() ?? fallbackValue;
     }
     
     public static Result<float, HdjwError> RequireFloat(this JsonNode jsonNode, string nodeName)

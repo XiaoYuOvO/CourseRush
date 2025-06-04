@@ -34,7 +34,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
     where TCourseSelection : class, ISelectionSession, IPresentedDataProvider<TCourseSelection>, IJsonSerializable<TCourseSelection, TError>
     where TError : BasicError, ICombinableError<TError>, ISelectionError
     where TCourseCategory : ICourseCategory
-    where TSelectedCourse : class, TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>
+    where TSelectedCourse : class, TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>, IJsonSerializable<TSelectedCourse, TError>
     where TSessionClient : ISessionClient<TError, TCourseSelection, TCourse, TSelectedCourse, TCourseCategory>
 {
         
@@ -49,7 +49,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
     private readonly CourseSelectionListPageModel<TCourse, TCourseCategory> _courseSelectionListPageModel;
     private readonly SelectionSessionPageModel<TCourseSelection, TError> _selectionSessionsPageModel;
     private readonly CourseSelectionQueuePageModel<TError, TCourse> _selectionQueuePageModel;
-    private readonly CurrentCourseTablePageModel<TSelectedCourse> _currentCourseTablePageModel;
+    private readonly CurrentCourseTablePageModel<TSelectedCourse, TError> _currentCourseTablePageModel;
 
     private readonly CourseSelectionListPage _courseSelectionListPage;
     private readonly CourseSelectionQueuePage _selectionQueuePage;
@@ -69,13 +69,13 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
         _selectionSessionsPageModel.OnSessionSelected += OnSessionSelected;
         _selectionSessionsPage = new SelectionSessionsPage(_selectionSessionsPageModel, ReloadSession, RegisterFontSizeChanged);
 
-        _courseSelectionListPageModel = new CourseSelectionListPageModel<TCourse, TCourseCategory>(ReloadCourse, LoadCourses, SelectCourses);
+        _courseSelectionListPageModel = new CourseSelectionListPageModel<TCourse, TCourseCategory>(ReloadCourse, LoadCoursesWithConflictCheck, SelectCourses);
         _courseSelectionListPage = new CourseSelectionListPage(_courseSelectionListPageModel, RegisterFontSizeChanged);
 
         _selectionQueuePageModel = new CourseSelectionQueuePageModel<TError, TCourse>(RegisterFontSizeChanged, SubmitTask);
         _selectionQueuePage = new CourseSelectionQueuePage(_selectionQueuePageModel, RegisterFontSizeChanged);
             
-        _currentCourseTablePageModel = new CurrentCourseTablePageModel<TSelectedCourse>(RemoveCourseSelection);
+        _currentCourseTablePageModel = new CurrentCourseTablePageModel<TSelectedCourse, TError>(RemoveCourseSelection);
         _currentCourseTablePage = new CurrentCourseTablePage(_currentCourseTablePageModel, ReloadCourseTable);
         _currentCourseTablePage.RegisterAutoFontSize(RegisterFontSizeChanged);
         _currentCourseTablePageModel.RegisterAutoFontSize(RegisterFontSizeChanged);
@@ -107,25 +107,27 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
         }.Start();
     }
 
-    private void ReloadCourse(TCourseCategory category, Action<IReadOnlyList<TCourse>> reloadAction)
+    private async Task ReloadCourse(TCourseCategory category, Action<IEnumerable<TCourse>> reloadAction)
     {
-        Task.Run(() =>
+        await _selectionClientCache.TeeAsync(async client =>
         {
-            _selectionClientCache.Tee(client =>
-                client.GetCoursesByCategory(category)
-                    .Tee(CheckForCourseConflict)
-                    .Tee(reloadAction)
-                    .TeeError(error => Growl.Error(error.Message)));
+            await foreach (var results in client.GetCoursesByCategory(category).ConfigureAwait(false))
+            {
+                //TODO Course buffer
+                results.CombineResults().Tee(reloadAction).TeeError(error => Growl.Error(error.Message));
+            }
         });
     }
 
-    private void CheckForCourseConflict(IReadOnlyList<TCourse> courses)
+    private void CheckForCourseConflict(TCourse course)
     {
-        courses.AsParallel().ForAll(course =>
-        {
-            _currentCourseTablePageModel.ResolveCourseConflictWithCurrent(course);
-            _selectionQueuePageModel.ApplyCourseConflict(course);
-        });
+        _currentCourseTablePageModel.ResolveCourseConflictWithCurrent(course);
+        _selectionQueuePageModel.ApplyCourseConflict(course);
+    }
+
+    private void CheckForCoursesConflict(IReadOnlyList<TCourse> courses)
+    {
+        courses.AsParallel().ForAll(CheckForCourseConflict);
     }
 
     private void RegisterFontSizeChanged(AutoFontSizeChanged handler)
@@ -133,7 +135,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
         AutoFontSizeChanged += handler;
     }
 
-    private void LoadCourses(Stream stream, Action<IReadOnlyList<TCourse>> acceptor)
+    private void LoadCoursesWithConflictCheck(Stream stream, Action<IReadOnlyList<TCourse>> acceptor)
     {
         Task.Run(() =>
         {
@@ -145,7 +147,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
                     .ToList()
                     .CombineResults()
                     .TeeError(err => Growl.Error(err.Message))
-                    .Tee(CheckForCourseConflict).Tee(acceptor);
+                    .Tee(CheckForCoursesConflict).Tee(acceptor);
             }
             catch (JsonException e)
             {
@@ -176,6 +178,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
                 .TeeError(error => Growl.Error(error.Message))
                 .TeeAsync(async list => await Task.Run(() => _courseSelectionListPage.Invoke(() => _courseSelectionListPageModel.UpdateCategories(list))))))
             .Tee(client => _selectionQueuePageModel.SetClient(client))
+            .TeeAsync(async _ => await ReloadCourseTable())
             .ContinueWith(task => task.Exception.ToOption().Tee(ex => Growl.Error(ex!.Message)));
         SessionSelected?.Invoke(selection);
     }
@@ -275,7 +278,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
         //Run on task thread!
         if (status == TaskStatus.Completed)
         {
-            ReloadCourseTable();
+            _ = ReloadCourseTable();
             Task.Run(() => _courseSelectionListPageModel.CheckAllCoursesConflicts(task.ApplyPostSelectionCourseConflict));
         }
         else
@@ -308,7 +311,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
         return new ParallelSelectionTask<TError, TCourse>(courses.Select(course => new SubmitSelectionTask<TError, TCourse>(course)).ToList());
     }
 
-    private async void ReloadCourseTable()
+    private async Task ReloadCourseTable()
     {
         await _selectionClientCache.TeeAsync(async client =>
         {

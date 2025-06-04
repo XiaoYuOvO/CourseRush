@@ -62,9 +62,46 @@ public static class ResultUtils
                 successes.Add(oneOf.AsT0);
             }
         }
-        return errors.Count != 0 ? Result.Fail<IReadOnlyList<TResult>, TError>(TError.Combine(errors)) : successes.Ok<IReadOnlyList<TResult>, TError>();
+        return errors.Count != 0 ? TError.Combine(errors).Fail<IReadOnlyList<TResult>, TError>() : successes.Ok<IReadOnlyList<TResult>, TError>();
     }
     
+    public static Result<IReadOnlyList<TResult>, TError> CombineResultsDiscardError<TResult, TError>(this IEnumerable<Result<IReadOnlyList<TResult>, TError>> results) 
+        where TError : BasicError, ICombinableError<TError>
+    {
+        var successes = new List<TResult>();
+        foreach (var result in results)
+        {
+            var oneOf = result.ToOneOf();
+            if (!result.IsFail())
+            {
+                successes.AddRange(oneOf.AsT0);
+            }
+        }
+        return successes.Ok<IReadOnlyList<TResult>, TError>();
+    }
+
+    public static async IAsyncEnumerable<Result<TResult, TError>> FlattenAsyncEnumerable<TResult, TError>(
+        this Result<IAsyncEnumerable<Result<TResult, TError>>, TError> result)
+    {
+        var oneOf = result.ToOneOf();
+        if (oneOf.IsT1)
+        {
+            yield return oneOf.AsT1;
+        }
+        else
+        {
+            await foreach (var result1 in oneOf.AsT0)
+            {
+                yield return result1;
+            }
+        }
+    }
+
+    public static IEnumerable<Result<TResult, TError>> SingletonEnumerable<TResult, TError>(this TError error)
+    {
+        return [error.Fail<TResult, TError>()];
+    }
+
     public static VoidResult<TError> CombineResults<TError>(this IEnumerable<VoidResult<TError>> results) where TError : BasicError, ICombinableError<TError>
     {
         var errors = new List<TError>();

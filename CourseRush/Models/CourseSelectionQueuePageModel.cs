@@ -67,6 +67,7 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
             MinWidth = 300,
             IsReadOnly = true
         };
+        _loggerTextBlock.MouseDown += (_, _) => _loggerTextBlock.MinWidth = _loggerTextBlock.RenderSize.Width;
         _loggerTextBlock.TextChanged += (_, _) => _loggerTextBlock.MinWidth = _loggerTextBlock.RenderSize.Width;
     }
 
@@ -151,7 +152,7 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
                 return;
             }
 
-            (await Task.Run(()=>TaskTypes<TError, TCourse>.DeserializeAll(taskArray)).ConfigureAwait(true)).Tee(tasks =>
+            (await Task.Run(()=>TaskTypes<TError, TCourse>.DeserializeAll(taskArray))).Tee(tasks =>
             {
                 foreach (var selectionTask in tasks)
                 {
@@ -195,6 +196,11 @@ public class CourseSelectionQueuePageModel<TError, TCourse> : ICourseSelectionQu
 
     public void RemoveAll()
     {
+        foreach (var selectionTask in _tasks)
+        {
+            selectionTask.Pause();
+            selectionTask.Cancel();
+        }
         _tasks.Clear();
     }
 

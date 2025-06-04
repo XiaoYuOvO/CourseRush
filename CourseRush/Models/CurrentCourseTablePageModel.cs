@@ -1,7 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Unicode;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,6 +33,8 @@ public interface ICurrentCourseTablePageModel
     public void DisplayCoursesAtCurrentWeek();
     public int GetCurrentWeek();
     public void DisplayCompressedCourses();
+    Task SaveCoursesAsync(FileStream fileStream);
+    Task LoadCoursesAsync(Stream openFile);
     public void ClearCourses();
     public void UpdateTimeTable(WeekTimeTable timeTable);
 
@@ -34,8 +42,8 @@ public interface ICurrentCourseTablePageModel
     public void ConfigureOffTableCoursesDrawer(Drawer drawer);
 }
 
-public class CurrentCourseTablePageModel<TCourse>(Action<TCourse> removeSelection) : ICurrentCourseTablePageModel
-    where TCourse : class, ICourse, IPresentedDataProvider<TCourse>
+public class CurrentCourseTablePageModel<TCourse, TError>(Action<TCourse> removeSelection) : ICurrentCourseTablePageModel
+    where TCourse : class, ICourse, IPresentedDataProvider<TCourse>, IJsonSerializable<TCourse, TError> where TError : BasicError, ICombinableError<TError>
 {
     public CourseTable CourseTable { get; } = new()
     {
@@ -225,6 +233,48 @@ public class CurrentCourseTablePageModel<TCourse>(Action<TCourse> removeSelectio
         _compressedTimesCache.ForEach(time => CourseTable.AddCourse(time, RandomColor()));
         CourseTable.UpdateDisplay();
         _isDisplayingCompressed = true;
+    }
+
+    public async Task SaveCoursesAsync(FileStream fileStream)
+    {
+        var javaScriptEncoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+        await using var writer = new Utf8JsonWriter(fileStream, new JsonWriterOptions
+        {
+            Encoder = javaScriptEncoder,
+            Indented = true
+        });
+        var jsonSerializerOptions = new JsonSerializerOptions
+        {
+            Encoder = javaScriptEncoder,
+            WriteIndented = true
+        };
+        await Task.Run(()=>new JsonArray(Courses.Select<TCourse, JsonNode>(TCourse.ToJson).ToArray()).WriteTo(writer, jsonSerializerOptions));
+    }
+
+    public async Task LoadCoursesAsync(Stream openFile)
+    {
+        try
+        {
+            if (await JsonNode.ParseAsync(openFile) is not JsonArray sessionArray)
+            {
+                Growl.Error(Language.ui_messsage_sessions_file_not_array);
+                return;
+            }
+
+            (await Task.Run(() =>
+                (from node in sessionArray
+                    where node is JsonObject
+                    select TCourse.FromJson(node as JsonObject)).CombineResults())).Tee(
+                selectionSessions =>
+                {
+                    AddCourses(selectionSessions);
+                    Growl.Info(string.Format(Language.ui_message_sessions_import_success, selectionSessions.Count));
+                }).TeeError(e => Growl.Error(e.Message));
+        }
+        catch (JsonException e)
+        {
+            Growl.Error(e.Message);
+        }
     }
 
     public void ClearCourses()

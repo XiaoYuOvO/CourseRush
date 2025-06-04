@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using CourseRush.Controls;
@@ -16,12 +17,12 @@ namespace CourseRush.Models;
 public interface ICourseSelectionPageModel
 {
     void SubscribeCourseCategoryChanged(Action<List<CourseTabItem>> action);
-    void RefreshCourse(ICourseCategory category);
+    Task RefreshCourse(ICourseCategory category);
     void LoadCoursesForCategory(Stream fileStream, ICourseCategory category);
 }
 
 public class CourseSelectionListPageModel<TCourse, TCourseCategory>(
-    DelayedFunc<TCourseCategory, IReadOnlyList<TCourse>> courseTaskLoader,
+    DelayedAsyncFunc<TCourseCategory, IEnumerable<TCourse>> courseTaskLoader,
     DelayedFunc<Stream, IReadOnlyList<TCourse>> courseReader,
     Action<IReadOnlyList<TCourse>> selectionCallback)
     : ICourseSelectionPageModel
@@ -84,7 +85,7 @@ public class CourseSelectionListPageModel<TCourse, TCourseCategory>(
 
     private void AddCourse(TCourseCategory category, IReadOnlyList<TCourse> course)
     {
-        _courseDataByCategory[category].AddCourse(course);
+        _courseDataByCategory[category].ReloadCourses(course);
     }
 
     private void ClearCourses(TCourseCategory category)
@@ -97,14 +98,20 @@ public class CourseSelectionListPageModel<TCourse, TCourseCategory>(
         OnCourseCategoryAdded += action;
     }
 
-    public void RefreshCourse(ICourseCategory category)
+    public async Task RefreshCourse(ICourseCategory category)
     {
-        if (category is TCourseCategory tcategory)
+        if (category is TCourseCategory actualCategory)
         {
-            courseTaskLoader(tcategory, list => _courseDataByCategory[tcategory].Invoke(()=>
+            var courseDataPanel = _courseDataByCategory[actualCategory];
+            courseDataPanel.Invoke(() => courseDataPanel.ClearCourses());
+            await courseTaskLoader(actualCategory, courses => 
             {
-                _courseDataByCategory[tcategory].RefreshCourses(list);
-            }));
+                courseDataPanel.Invoke(() => courseDataPanel.UpdateScrollerListener());
+                foreach (var course in courses)
+                {
+                    courseDataPanel.AddCourse(course);    
+                }
+            });
         }
     }
 
@@ -120,6 +127,6 @@ public class CourseSelectionListPageModel<TCourse, TCourseCategory>(
     {
         if (category is not TCourseCategory tcategory) return;
         var courseDataGrid = _courseDataByCategory[tcategory];
-        courseReader(fileStream, list => courseDataGrid.Invoke(() => courseDataGrid.AddCourse(list)));
+        courseReader(fileStream, list => courseDataGrid.Invoke(() => courseDataGrid.ReloadCourses(list)));
     }
 }

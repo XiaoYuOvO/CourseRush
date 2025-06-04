@@ -51,7 +51,7 @@ public class HNUCourse(
                                             .Bind<HNUCourse>(kkdwName => jsonObject.RequireString("xq_name")
                                                 .Bind<HNUCourse>(xqName => jsonObject.GetString("kbinfo", "")
                                                     .Bind(HNUCourseTimeTable.FromString)
-                                                    .Bind<HNUCourse>(table => jsonObject.ParseInt("skfscode")
+                                                    .Bind<HNUCourse>(table => jsonObject.ParseInt("skfscode","0")
                                                         .Map(IdToTeacherMethod)
                                                         .Bind<HNUCourse>(teachingMethod => jsonObject.ParseInt("kclbcode")
                                                             .Map(HNUCourseType.TypeFromCode)

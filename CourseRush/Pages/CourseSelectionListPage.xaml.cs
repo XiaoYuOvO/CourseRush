@@ -1,8 +1,10 @@
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using CourseRush.Controls;
 using CourseRush.Core;
 using CourseRush.Models;
+using MahApps.Metro.Controls;
 using Microsoft.Win32;
 
 namespace CourseRush.Pages;
@@ -46,12 +48,14 @@ public partial class CourseSelectionListPage
         UpdateFilter();
     }
 
-    private void Refresh_OnClick(object sender, RoutedEventArgs e)
+    private async void Refresh_OnClick(object sender, RoutedEventArgs e)
     {
-        if (DataTableTab.Items[DataTableTab.SelectedIndex] is CourseTabItem courseTabItem)
+        RefreshButton.IsEnabled = false;
+        if (DataTableTab.SelectedIndex != -1 && DataTableTab.Items[DataTableTab.SelectedIndex] is CourseTabItem courseTabItem)
         {
-            _model.RefreshCourse(courseTabItem.Category);
+            await _model.RefreshCourse(courseTabItem.Category);
         }
+        RefreshButton.IsEnabled = true;
     }
 
     private void Import_OnClick(object sender, RoutedEventArgs e)

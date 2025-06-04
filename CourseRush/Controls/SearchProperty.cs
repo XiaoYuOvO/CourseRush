@@ -171,7 +171,7 @@ public class IntSearchProperty<TCourse> : SearchProperty<TCourse, RangeSlider> w
         return course =>
         {
             var extract = _searchType.Extract(course);
-            return startCache < extract && extract < endCache;
+            return startCache <= extract && extract <= endCache;
         };
     }
 
@@ -217,7 +217,7 @@ public class FloatSearchProperty<TCourse> : SearchProperty<TCourse, RangeSlider>
         return course =>
         {
             var extract = _searchType.Extract(course);
-            return startCache < extract && extract < endCache;
+            return startCache <= extract && extract <= endCache;
         };
     }
 

@@ -11,7 +11,7 @@ public interface ICourseSelector<TError, in TCourse> where TError : BasicError w
 public interface ICourseSelectionClient<TError, TCourse, TSelectedCourse, TCourseCategory> : ICourseSelector<TError, TCourse>
     where TError : BasicError where TCourse : ICourse where TCourseCategory : ICourseCategory where TSelectedCourse : ISelectedCourse
 {
-    public Result<IReadOnlyList<TCourse>, TError> GetCoursesByCategory(TCourseCategory category);
+    public IAsyncEnumerable<IEnumerable<Result<TCourse, TError>>>  GetCoursesByCategory(TCourseCategory category);
     public Result<IReadOnlyList<TCourseCategory>, TError> GetCategoriesInRound();
     public Result<IReadOnlyList<TSelectedCourse>, TError> GetCurrentCourseTable();
     public new VoidResult<TError> SelectCourse(TCourse course);

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CourseRush.Controls;
 using CourseRush.Models;
+using Microsoft.Win32;
 
 namespace CourseRush.Pages;
 
@@ -12,8 +15,8 @@ public partial class CurrentCourseTablePage
     private readonly ICurrentCourseTablePageModel _model;
     private bool _isDisplayingCompressedCourses;
     private readonly CourseDetailDrawer _courseInfoDrawer;
-    private readonly Action _courseTableReloader;
-    public CurrentCourseTablePage(ICurrentCourseTablePageModel model, Action courseTableReloader)
+    private readonly Func<Task> _courseTableReloader;
+    public CurrentCourseTablePage(ICurrentCourseTablePageModel model, Func<Task> courseTableReloader)
     {
         _model = model;
         _courseTableReloader = courseTableReloader;
@@ -45,16 +48,6 @@ public partial class CurrentCourseTablePage
             OffTableCoursesViewer.SetValue(FontSizeProperty, 13 * factor);
             _courseInfoDrawer.SetFontSize(16 * factor, 13 * factor);
         });
-    }
-
-    private void Export_OnClick(object sender, RoutedEventArgs e)
-    {
-        
-    }
-
-    private void Import_OnClick(object sender, RoutedEventArgs e)
-    {
-        
     }
 
     private void PrevWeekButton_OnClick(object sender, RoutedEventArgs e)
@@ -96,8 +89,35 @@ public partial class CurrentCourseTablePage
         }
     }
 
-    private void Refresh_OnClick(object sender, RoutedEventArgs e)
+    private async void Refresh_OnClick(object sender, RoutedEventArgs e)
     {
-        _courseTableReloader();
+        await _courseTableReloader();
+    }
+    
+    private async void Export_OnClick(object sender, RoutedEventArgs e)
+    {
+        var openFileDialog = new OpenFileDialog
+        {
+            Multiselect = false,
+            CheckFileExists = false,
+            DefaultExt = ".json"
+        };
+        if (!(openFileDialog.ShowDialog() ?? false)) return;
+        await using var fileStream = File.Open(openFileDialog.FileName, FileMode.Create, FileAccess.Write);
+        await _model.SaveCoursesAsync(fileStream);
+    }
+
+    private async void Import_OnClick(object sender, RoutedEventArgs e)
+    {
+        var openFileDialog = new OpenFileDialog
+        {
+            Multiselect = false,
+            ShowReadOnly = true,
+            CheckFileExists = true, 
+            DefaultExt = ".json"
+        };
+        if (!(openFileDialog.ShowDialog() ?? false)) return;
+        await using var openFile = openFileDialog.OpenFile();
+        await _model.LoadCoursesAsync(openFile);
     }
 }

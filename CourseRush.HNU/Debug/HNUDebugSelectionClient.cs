@@ -13,31 +13,37 @@ public class HNUDebugSelectionClient : HdjwDebugClient, ICourseSelectionClient<H
     {
     }
 
-    public Result<IReadOnlyList<HNUCourse>, HdjwError> GetCoursesByCategory(HNUCourseCategory category)
+    public async IAsyncEnumerable<IEnumerable<Result<HNUCourse, HdjwError>>> GetCoursesByCategory(
+        HNUCourseCategory category)
     {
         // Thread.Sleep(1000);
         if (category.CategoryNumber % 2 == 0)
         {
-            return ReadCourses("H:\\CSharpeProjects\\CourseRush\\hnu_courses_type3.json");
+            await foreach (var readCourse in ReadCourses("H:\\CSharpeProjects\\CourseRush\\hnu_courses_type3.json"))
+            {
+                yield return [readCourse];
+            }
         }
-        return ReadCourses("H:\\CSharpeProjects\\CourseRush\\hnu_courses_type1.json");
+
+        await foreach (var readCourse in ReadCourses("H:\\CSharpeProjects\\CourseRush\\hnu_courses_type1.json"))
+        {
+            yield return [readCourse];
+        }
     }
 
-    private List<HNUCourse> ReadCourses(string path)
+    private static async IAsyncEnumerable<Result<HNUCourse, HdjwError>> ReadCourses(string path)
     {
         // Thread.Sleep(1000);
-        using var fileStream = File.Open(path, FileMode.Open);
-        var array = JsonNode.Parse(fileStream)?["data"]?["showKclist"]?.AsArray();
-        var hnuCourses = new List<HNUCourse>();
-        if (array is null) return hnuCourses;
+        await using var fileStream = File.Open(path, FileMode.Open);
+        var array = (await JsonNode.ParseAsync(fileStream))?["data"]?["showKclist"]?.AsArray();
+        if (array == null) yield break;
         foreach (var jsonNode in array)
         {
             if (jsonNode != null)
             {
-                HNUCourse.FromJson(jsonNode.AsObject()).Tee(course => hnuCourses.Add(course));
+                yield return HNUCourse.FromJson(jsonNode.AsObject());
             }
         }
-        return hnuCourses;
     }
 
     public Result<IReadOnlyList<HNUCourseCategory>, HdjwError> GetCategoriesInRound()

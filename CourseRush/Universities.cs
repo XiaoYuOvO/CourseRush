@@ -53,7 +53,7 @@ public static class Universities
         where TAuthResult : AuthResult
         where TCourseCategory : ICourseCategory
         where TSelectionClient : ISessionClient<TError, TCourseSelection, TCourse, TSelectedCourse, TCourseCategory>, IResultConvertible<TAuthResult, TSelectionClient>
-        where TSelectedCourse : TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>
+        where TSelectedCourse : TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>, IJsonSerializable<TSelectedCourse, TError>
     {
         var universityProperty = new UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>(name, authChain);
         UniversityRegistry[name] = universityProperty;
@@ -97,7 +97,7 @@ public class UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelecti
     where TCourseCategory : ICourseCategory
     where TCourseSelection : class, ISelectionSession, IPresentedDataProvider<TCourseSelection>, IJsonSerializable<TCourseSelection, TError>
     where TSelectionClient : ISessionClient<TError, TCourseSelection, TCourse, TSelectedCourse, TCourseCategory>, IResultConvertible<TAuthResult, TSelectionClient>
-    where TSelectedCourse : TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>
+    where TSelectedCourse : TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>, IJsonSerializable<TSelectedCourse, TError>
 {
     public Result<Func<IMainWindowModel>, AuthError> LoginAndCreateMainWindowModel(UsernamePassword profile)
     {
