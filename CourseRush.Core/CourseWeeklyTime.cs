@@ -7,7 +7,6 @@ namespace CourseRush.Core;
 
 public abstract class CourseWeeklyTime(
     string teachingLocation,
-    string teachingCampus,
     IEnumerable<int> teachingWeek,
     IDictionary<DayOfWeek, ImmutableList<int>> weeklySchedule)
 {
@@ -18,7 +17,6 @@ public abstract class CourseWeeklyTime(
 
     public ImmutableList<int> TeachingWeek { get; } = teachingWeek.ToImmutableList();
     public string TeachingLocation { get; } = teachingLocation;
-    public string TeachingCampus { get; } = teachingCampus;
 
     private string? _toStringCache;
     public Option<ICourse> BindingCourse = Option<ICourse>.None;
@@ -30,7 +28,7 @@ public abstract class CourseWeeklyTime(
         if (_toStringCache != null) return _toStringCache;
         var scheduleString = string.Join("#",WeeklySchedule
             .Select(pair => $"{CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(pair.Key)}{GetSimplifiedRangeString(pair.Value)}节"));
-        return _toStringCache = $"{GetSimplifiedRangeString(TeachingWeek)}周 {scheduleString}@{TeachingLocation}({TeachingCampus})";
+        return _toStringCache = $"{GetSimplifiedRangeString(TeachingWeek)}周 {scheduleString}@{TeachingLocation}";
         
         string GetSimplifiedRangeString(ImmutableList<int> list)
         {
@@ -42,30 +40,24 @@ public abstract class CourseWeeklyTime(
     public ConflictResult? ResolveConflictWith(CourseWeeklyTime other)
     {
         var intersectWeeks = TeachingWeek.Intersect(other.TeachingWeek).ToImmutableList();
-        if (!intersectWeeks.Any()) return null;
+        if (intersectWeeks.IsEmpty) return null;
         var conflictMap = new Dictionary<DayOfWeek, List<int>>();
         foreach (var dayOfWeek in WeeklySchedule.Keys)
         {
             if (!other.WeeklySchedule.TryGetValue(dayOfWeek, out var value)) continue;
             var conflictLessonIds = value.Intersect(WeeklySchedule[dayOfWeek]).ToList();
-            if (conflictLessonIds.Any())
+            if (conflictLessonIds.Count != 0)
             {
                 conflictMap[dayOfWeek] = conflictLessonIds;
             }
         }
-        return conflictMap.Any() ? new ConflictResult(conflictMap.ToImmutableDictionary(), intersectWeeks) : null;
+        return conflictMap.Count != 0 ? new ConflictResult(conflictMap.ToImmutableDictionary(), intersectWeeks) : null;
     }
     
-    public class ConflictResult
+    public class ConflictResult(ImmutableDictionary<DayOfWeek, List<int>> conflictMap, ImmutableList<int> conflictWeeks)
     {
-        public ConflictResult(ImmutableDictionary<DayOfWeek, List<int>> conflictMap, ImmutableList<int> conflictWeeks)
-        {
-            ConflictMap = conflictMap;
-            ConflictWeeks = conflictWeeks;
-        }
-
-        public ImmutableDictionary<DayOfWeek, List<int>> ConflictMap { get; }
-        public ImmutableList<int> ConflictWeeks { get; }
+        public ImmutableDictionary<DayOfWeek, List<int>> ConflictMap { get; } = conflictMap;
+        public ImmutableList<int> ConflictWeeks { get; } = conflictWeeks;
     }
 
     public abstract string ToJsonString();
