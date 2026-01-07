@@ -166,7 +166,6 @@ public partial class CourseTable
                 });
                 textBlock.Inlines.Add(courseAndColor.Item1.TeachingLocation);
                 textBlock.Inlines.Add(new LineBreak());
-                textBlock.Inlines.Add(courseAndColor.Item1.TeachingCampus);
                 _courseInfoBlocks.Add(textBlock);
                 var border = new Border
                 {

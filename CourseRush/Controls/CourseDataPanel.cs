@@ -180,7 +180,8 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
                 },
                 CanUserReorder = true,
                 CanUserSort = true,
-                Header = data.DataTip
+                Header = data.DataTip,
+                Width = DataGridLength.SizeToCells
             };
             return column;
         }).Do(column => CourseGrid.Columns.Add(column));
@@ -320,14 +321,6 @@ public class CourseDataPanel<TCourse> : CourseDataPanel where TCourse : class, I
     public IEnumerable<TCourse> GetCourses()
     {
         return _courses;
-    }
-
-    public void CheckCourseConflicts(Action<TCourse> conflictChecker)
-    {
-        foreach (var course in _courses)
-        {
-            conflictChecker(course);
-        }
     }
 
     public override void SubscribeAutoFontResize(Action<AutoFontSizeChanged> register)

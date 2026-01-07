@@ -114,7 +114,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
             await foreach (var results in client.GetCoursesByCategory(category).ConfigureAwait(false))
             {
                 //TODO Course buffer
-                results.CombineResults().Tee(reloadAction).TeeError(error => Growl.Error(error.Message));
+                results.CombineResults().Tee(courses => courses.AsParallel().ForAll(CheckForCourseConflict)).Tee(reloadAction).TeeError(error => Growl.Error(error.Message));
             }
         });
     }
@@ -170,13 +170,14 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
         _currentSelection = selection;
         _selectionClientCache = _sessionClient?.GetSelectionClient(selection).ToOption() ?? Option<ICourseSelectionClient<TError, TCourse, TSelectedCourse, TCourseCategory>>.None;
         await _selectionClientCache
+            .TeeAsync(async client => (await client.InitializeSelectionAsync()).TeeError(err => Growl.Error(err.Message)))
             .TeeAsync(async client => await Task.Run(() =>
                 client.GetWeekTimeTable()
                     .Tee(table => _currentCourseTablePage.Invoke(() => _currentCourseTablePageModel.UpdateTimeTable(table)))
                     .TeeError(error => Growl.Error(error.Message))))
-            .TeeAsync(async client => await Task.Run(() => client.GetCategoriesInRound()
+            .TeeAsync(async client => await client.GetCategoriesInRoundAsync()
                 .TeeError(error => Growl.Error(error.Message))
-                .TeeAsync(async list => await Task.Run(() => _courseSelectionListPage.Invoke(() => _courseSelectionListPageModel.UpdateCategories(list))))))
+                .TeeAsync(async list => await Task.Run(() => _courseSelectionListPage.Invoke(() => _courseSelectionListPageModel.UpdateCategories(list)))))
             .Tee(client => _selectionQueuePageModel.SetClient(client))
             .TeeAsync(async _ => await ReloadCourseTable())
             .ContinueWith(task => task.Exception.ToOption().Tee(ex => Growl.Error(ex!.Message)));

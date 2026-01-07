@@ -11,8 +11,7 @@
     <AdornerDecorator>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="160"/>
-           
+            <ColumnDefinition Width="Auto" MinWidth="160" MaxWidth="400"/>
             <ColumnDefinition Width="9*" />
         </Grid.ColumnDefinitions>
         <!-- <Border BorderThickness="0,0,0,0" > -->
@@ -39,7 +38,7 @@
                 </hc:SideMenu>
             </DockPanel>
         <!-- </Border> -->
-        <GridSplitter Grid.Column="0" Width="5" DragIncrement="5" Background="{DynamicResource BorderBrush}"></GridSplitter>
+        <GridSplitter Grid.Column="0" Width="5" ResizeBehavior="CurrentAndNext" DragIncrement="5" Background="{DynamicResource BorderBrush}"></GridSplitter>
         <Frame Name="NavFrame" Grid.Column="1" BorderBrush="{x:Null}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" NavigationUIVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
     </Grid>
     </AdornerDecorator>
