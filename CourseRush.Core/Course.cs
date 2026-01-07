@@ -23,10 +23,11 @@ public interface ICourse
     public string ToSimpleString();
 }
 
-public abstract class Course<TCourse> : ICourse where TCourse : ICourse
+public abstract class Course<TCourseCategory> : ICourse where TCourseCategory : ICourseCategory
 {
-    protected Course(int selectedStudentCount, int totalStudentCount, float totalLearningHours, float totalCredits, string teacherName, string className, string courseName, string offerInstitution, string campus, CourseTimeTable timeTable, TeachingMethod teachingMethod, CourseType courseType, ExaminationMethod examinationMethod)
+    protected Course(TCourseCategory? category, int selectedStudentCount, int totalStudentCount, float totalLearningHours, float totalCredits, string teacherName, string className, string courseName, string offerInstitution, string campus, CourseTimeTable timeTable, TeachingMethod teachingMethod, CourseType courseType, ExaminationMethod examinationMethod)
     {
+        Category = category;
         SelectedStudentCount = selectedStudentCount;
         TotalStudentCount = totalStudentCount;
         TotalLearningHours = totalLearningHours;
@@ -43,6 +44,7 @@ public abstract class Course<TCourse> : ICourse where TCourse : ICourse
         timeTable.WeeklyInformation.ForEach(time => time.BindingCourse = this);
     }
 
+    public TCourseCategory? Category { get; }
     public int SelectedStudentCount { get; }
     public int TotalStudentCount { get; }
 
@@ -68,6 +70,8 @@ public abstract class Course<TCourse> : ICourse where TCourse : ICourse
     }
 
     public abstract void AddCourseSelectionToJson(JsonObject jsonObject);
+
+    public abstract void AddCourseSelectionToWebForms(Dictionary<string, string> webForms);
 
     public abstract override bool Equals(object? obj);
     

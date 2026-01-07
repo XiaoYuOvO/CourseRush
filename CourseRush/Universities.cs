@@ -38,8 +38,8 @@ public static class Universities
         UniversityProperty<HdjwError, HNUCourse, HNUSelectedCourse, HNUSelectionSession, HNUCourseCategory, HdjwAuthResult, HdjwClient>
         HNU = Register<HdjwError, HNUCourse, HNUSelectedCourse, HNUSelectionSession, HNUCourseCategory, HdjwAuthResult, HdjwClient>("HNU", HNUAuthChain.HdjwAuth);
     public static readonly
-        UniversityProperty<HdjwError, HNUCourse, HNUSelectedCourse, HNUSelectionSession, HNUCourseCategory, HdjwAuthResult, HdjwClient>
-        HNU_INTERNAL = Register<HdjwError, HNUCourse, HNUSelectedCourse, HNUSelectionSession, HNUCourseCategory, HdjwAuthResult, HdjwClient>("HNU_INTERNAL", HNUAuthChain.HdjwAuthInternal);
+        UniversityProperty<HdjwError, HNUCourse, HNUSelectedCourse, HNUSelectionSession, HNUCourseCategory, HdjwNewAuthResult, HdjwClient>
+        HNU_INTERNAL = Register<HdjwError, HNUCourse, HNUSelectedCourse, HNUSelectionSession, HNUCourseCategory, HdjwNewAuthResult, HdjwClient>("HNU_INTERNAL", HNUAuthChain.HdjwAuthInternal);
 
     public static readonly
         UniversityProperty<HdjwError, HNUCourse, HNUSelectedCourse, HNUSelectionSession, HNUCourseCategory, HdjwAuthResult, HdjwDebugClient>
@@ -47,7 +47,7 @@ public static class Universities
     
     private static UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>
         Register<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>(string name, AuthChain<TAuthResult> authChain)
-        where TCourse : Course<TCourse>, IPresentedDataProvider<TCourse>, IJsonSerializable<TCourse, TError>
+        where TCourse : Course<TCourseCategory>, IPresentedDataProvider<TCourse>, IJsonSerializable<TCourse, TError>
         where TCourseSelection : class, ISelectionSession, IPresentedDataProvider<TCourseSelection>, IJsonSerializable<TCourseSelection, TError>
         where TError : BasicError, ICombinableError<TError>, ISelectionError
         where TAuthResult : AuthResult
@@ -92,7 +92,7 @@ public class UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelecti
     (string name, AuthChain<TAuthResult> authChain)
     : IUniversity<TCourse, TError, TCourseSelection, TSelectionClient>
     where TError : BasicError, ICombinableError<TError>, ISelectionError
-    where TCourse : Course<TCourse>, IPresentedDataProvider<TCourse>, IJsonSerializable<TCourse, TError>
+    where TCourse : Course<TCourseCategory>, IPresentedDataProvider<TCourse>, IJsonSerializable<TCourse, TError>
     where TAuthResult : AuthResult
     where TCourseCategory : ICourseCategory
     where TCourseSelection : class, ISelectionSession, IPresentedDataProvider<TCourseSelection>, IJsonSerializable<TCourseSelection, TError>
