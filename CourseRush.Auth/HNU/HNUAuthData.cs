@@ -17,6 +17,9 @@ public class HNUAuthData
     public static readonly AuthDataKey<string> SID_SIG = new("sid.sig");  
     public static readonly AuthDataKey<string> SID_LEGACY = new("sid-legacy");   
     public static readonly AuthDataKey<string> SID_LEGACY_SIG = new("sid-legacy.sig");   
+    public static readonly AuthDataKey<string> BZB_NJW = new("bzb_njw");   
+    public static readonly AuthDataKey<string> BZB_JSXSD = new("bzb_jsxsd");   
+    public static readonly AuthDataKey<string> SERVERID = new("SERVERID");   
     
     public static readonly AuthDataKey<Uri> CAS_AUTH_REDIRECT_URL = new("CAS_AUTH_REDIRECT_URL");
 }

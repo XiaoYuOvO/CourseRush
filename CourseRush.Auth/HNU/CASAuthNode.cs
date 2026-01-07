@@ -5,12 +5,12 @@ using Resultful;
 namespace CourseRush.Auth.HNU;
 
 public class CASAuthNode(params AuthNode[] requires) : AuthNode(
-    new AuthConvention().Requires(CommonDataKey.UserName, CommonDataKey.Password).Provides(HNUAuthData.PC0,
+    new AuthConvention().Requires(CommonDataKey.UserName, CommonDataKey.Password, HNUAuthData.BZB_NJW).Provides(HNUAuthData.PC0,
         HNUAuthData.PF0, HNUAuthData.PV0, HNUAuthData.JSESSIONID, HNUAuthData.CAS_AUTH_REDIRECT_URL), requires)
 {
     private const string PubKey = "http://cas.hnu.edu.cn//cas/v2/getPubKey?sf_request_type=ajax";
 
-    protected virtual string CASLoginUrl => "http://cas.web.hnu.edu.cn/cas/login?service=https%3A%2F%2Fwebvpn2.hnu.edu.cn%3A443%2Fpassport%2Fv1%2Fauth%2Fcas";
+    protected virtual string CASLoginUrl => "http://cas.web.hnu.edu.cn/cas/login?service=http%3A%2F%2Fhdjw.hnu.edu.cn%2Fgld%2Fsso.jsp";
 
     internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
     {

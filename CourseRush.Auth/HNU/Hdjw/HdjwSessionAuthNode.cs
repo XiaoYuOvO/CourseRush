@@ -12,7 +12,7 @@ public class HdjwSessionAuthNode(params AuthNode[] requires) : AuthNode(new Auth
 {
     private const string HdjwIndex = "http://hdjw.hnu.edu.cn/";
 
-    private const string CasLoginHdjw = "https://cas.hnu.edu.cn/cas/login?service=http://hdjw.hnu.edu.cn/caslogin?redirect_url=/Njw2017/index.html";
+    private const string CasLoginHdjw = "http://cas.hnu.edu.cn/cas/login?service=http%3A%2F%2Fhdjw.hnu.edu.cn%2Fgld%2Fsso.jsp";
 
     internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
     {

@@ -8,7 +8,8 @@ public class HdjwAuthResult : AuthResult
     public static readonly Func<AuthDataTable, Result<HdjwAuthResult, AuthError>> Hdjw = CreateResult;
     public static readonly Func<AuthDataTable, Result<HdjwAuthResult, AuthError>> Debug = CreateDebugResult;
     private readonly string _session, _token, _authcode;
-    private HdjwAuthResult(
+
+    protected HdjwAuthResult(
         string session,
         string token,
         string authcode)
