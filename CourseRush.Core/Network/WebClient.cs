@@ -92,6 +92,14 @@ public class WebClient
         httpRequestMessage.Content = new FormUrlEncodedContent(content);
         return EnsureSuccess(_client.Send(httpRequestMessage));
     }
+    
+    public async Task<Result<WebResponse, WebError>> PostAsync(Uri uri, Dictionary<string, string> content, MediaType accept = MediaType.All, RequestConfigurator? configurator = null)
+    {
+        var httpRequestMessage = CreateRequest(uri, accept, configurator:configurator);
+        httpRequestMessage.Method = HttpMethod.Post;
+        httpRequestMessage.Content = new FormUrlEncodedContent(content);
+        return EnsureSuccess(await _client.SendAsync(httpRequestMessage));
+    }
 
     public Result<Cookie, WebError> GetCookie(string name)
     {
