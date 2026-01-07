@@ -5,21 +5,14 @@ using Resultful;
 
 namespace CourseRush.HNU;
 
-public class HNUCourseCategory : ICourseCategory
+public class HNUCourseCategory(string categoryId, string categoryName, string categoryOperator, string categoryQuery)
+    : ICourseCategory
 {
-    public string CategoryId { get; }
-    public string CategoryOperator { get; }
-    public string CategoryQuery { get; }
-    public string CategoryName { get; }
+    public string CategoryId { get; } = categoryId;
+    public string CategoryOperator { get; } = categoryOperator;
+    public string CategoryQuery { get; } = categoryQuery;
+    public string CategoryName { get; } = categoryName;
 
-    public HNUCourseCategory(string categoryId, string categoryName, string categoryOperator, string categoryQuery)
-    {
-        CategoryId = categoryId;
-        CategoryOperator = categoryOperator;
-        CategoryQuery = categoryQuery;
-        CategoryName = categoryName;
-    }
-    
     // protected HNUCourseCategory(string categoryId, int categoryNumber, string categoryName, List<HNUCourseSubcategory> subCategories): this(categoryId, categoryNumber, categoryName, subCategories)
     // {
     // }
