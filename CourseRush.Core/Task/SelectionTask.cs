@@ -75,6 +75,7 @@ public abstract class SelectionTask<TError, TCourse> : ISelectionTask
                         if (RetryOption.ShouldRetry(error))
                         {
                             Status = TaskStatus.Waiting;
+                            LogError(Language.task_log_failed, error);
                             _retryCount++;
                             return false;
                         }
