@@ -7,5 +7,13 @@ public interface ISelectionSession
     public string SelectionId { get; }
     public string SelectionTimeId { get; }
     public string SelectionTypeName { get; }
-    public void AddInfoToJson(JsonObject json);
+
+    public void AddInfoToJson(JsonObject json)
+    {
+    }
+
+    public string ApplyInfoToWebFormHeader(string request)
+    {
+        return request;
+    }
 }
