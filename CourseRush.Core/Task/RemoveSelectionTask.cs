@@ -13,7 +13,7 @@ public class RemoveSelectionTask<TError, TCourse>(TCourse course, ITaskLogger? l
     public override string Name => string.Format(Language.task_remove_task, TargetCourse.ToSimpleString());
     protected internal override Task<VoidResult<TError>> DoSelectionTask(ICourseSelector<TError, TCourse> selector)
     {
-        return Task.Run(() => selector.RemoveSelectedCourse([TargetCourse]));
+        return Task.Run(() => selector.RemoveSelectedCourse(TargetCourse));
     }
 
     public override void ApplyCourseConflict(TCourse course)
