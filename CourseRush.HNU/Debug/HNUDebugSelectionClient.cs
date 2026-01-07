@@ -13,17 +13,22 @@ public class HNUDebugSelectionClient : HdjwDebugClient, ICourseSelectionClient<H
     {
     }
 
+    public Task<VoidResult<HdjwError>> InitializeSelectionAsync()
+    {
+        return Task.FromResult(Result.Ok<HdjwError>());
+    }
+
     public async IAsyncEnumerable<IEnumerable<Result<HNUCourse, HdjwError>>> GetCoursesByCategory(
         HNUCourseCategory category)
     {
         // Thread.Sleep(1000);
-        if (category.CategoryNumber % 2 == 0)
-        {
-            await foreach (var readCourse in ReadCourses("H:\\CSharpeProjects\\CourseRush\\hnu_courses_type3.json"))
-            {
-                yield return [readCourse];
-            }
-        }
+        // if (category.CategoryNumber % 2 == 0)
+        // {
+        //     await foreach (var readCourse in ReadCourses("H:\\CSharpeProjects\\CourseRush\\hnu_courses_type3.json"))
+        //     {
+        //         yield return [readCourse];
+        //     }
+        // }
 
         await foreach (var readCourse in ReadCourses("H:\\CSharpeProjects\\CourseRush\\hnu_courses_type1.json"))
         {
@@ -46,13 +51,13 @@ public class HNUDebugSelectionClient : HdjwDebugClient, ICourseSelectionClient<H
         }
     }
 
-    public Result<IReadOnlyList<HNUCourseCategory>, HdjwError> GetCategoriesInRound()
+    public Task<Result<IReadOnlyList<HNUCourseCategory>, HdjwError>> GetCategoriesInRoundAsync()
     {
         // Thread.Sleep(1000);
         using var fileStream = File.Open("H:\\CSharpeProjects\\CourseRush\\hnu_course_categories.json", FileMode.Open);
         var array = JsonNode.Parse(fileStream)?.AsArray();
         var hnuCategories = new List<HNUCourseCategory>();
-        if (array is null) return hnuCategories;
+        if (array is null) return Task.FromResult<Result<IReadOnlyList<HNUCourseCategory>, HdjwError>>(hnuCategories);
         foreach (var jsonNode in array)
         {
             if (jsonNode is JsonObject o)
@@ -61,7 +66,7 @@ public class HNUDebugSelectionClient : HdjwDebugClient, ICourseSelectionClient<H
             }
         }
 
-        return hnuCategories;
+        return Task.FromResult<Result<IReadOnlyList<HNUCourseCategory>, HdjwError>>(hnuCategories);
     }
 
     public Result<IReadOnlyList<HNUSelectedCourse>, HdjwError> GetCurrentCourseTable()
@@ -82,7 +87,7 @@ public class HNUDebugSelectionClient : HdjwDebugClient, ICourseSelectionClient<H
         return Result.Ok<HdjwError>();
     }
 
-    public VoidResult<HdjwError> RemoveSelectedCourse(IReadOnlyList<HNUCourse> courses)
+    public VoidResult<HdjwError> RemoveSelectedCourse(HNUCourse courses)
     {
         Thread.Sleep(5000);
         if (Random.Shared.Next(2) == 1)
@@ -90,10 +95,7 @@ public class HNUDebugSelectionClient : HdjwDebugClient, ICourseSelectionClient<H
             return new HdjwError("Failed to remove course!");
         }
         
-        foreach (var hnuCourse in courses)
-        {
-            _selectedCourses.RemoveAll(selectedCourse => selectedCourse.Id.Equals(hnuCourse.Id));
-        }
+        _selectedCourses.RemoveAll(selectedCourse => selectedCourse.Id.Equals(courses.Id, StringComparison.Ordinal));
         
         return Result.Ok<HdjwError>();
     }

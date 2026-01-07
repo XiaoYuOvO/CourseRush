@@ -8,25 +8,25 @@ namespace CourseRush.HNU;
 public class HNUCourseCategory : ICourseCategory
 {
     public string CategoryId { get; }
-    public int CategoryNumber { get; }
+    public string CategoryOperator { get; }
+    public string CategoryQuery { get; }
     public string CategoryName { get; }
-    public IReadOnlyList<ICourseSubcategory> SubCategories { get; }
-    private readonly IReadOnlyList<HNUCourseSubcategory> _subCategories;
-    
-    protected HNUCourseCategory(string categoryId, int categoryNumber, string categoryName, IReadOnlyList<HNUCourseSubcategory> subCategories)
+
+    public HNUCourseCategory(string categoryId, string categoryName, string categoryOperator, string categoryQuery)
     {
         CategoryId = categoryId;
-        CategoryNumber = categoryNumber;
+        CategoryOperator = categoryOperator;
+        CategoryQuery = categoryQuery;
         CategoryName = categoryName;
-        SubCategories = _subCategories = subCategories;
     }
     
-    // protected HNUCourseCategory(string categoryId, int categoryNumber, string categoryName, List<HNUCourseSubcategory> subCategories) : this(categoryId, categoryNumber, categoryName, subCategories)
+    // protected HNUCourseCategory(string categoryId, int categoryNumber, string categoryName, List<HNUCourseSubcategory> subCategories): this(categoryId, categoryNumber, categoryName, subCategories)
     // {
     // }
 
     public static Result<HNUCourseCategory, HdjwError> FromJson(JsonObject json)
     {
+        //TODO Add query and operation
         var subcategories =
             json.Require("xkfl")
                 .Bind(xkfl =>
@@ -37,20 +37,12 @@ public class HNUCourseCategory : ICourseCategory
         return json.RequireString("id")
             .Bind<HNUCourseCategory>(id => json.ParseInt("xklbbh")
                 .Bind<HNUCourseCategory>(xklbbh => json.RequireString("xklb_name")
-                    .Bind<HNUCourseCategory>(xklbName => new HNUCourseCategory(id, xklbbh, xklbName, subcategories))));
+                    .Bind<HNUCourseCategory>(xklbName => new HNUCourseCategory(id, xklbName, id, id))));
     }
     
     public override string ToString()
     {
-        return $"{nameof(CategoryId)}: {CategoryId}, {nameof(CategoryNumber)}: {CategoryNumber}, {nameof(CategoryName)}: {CategoryName}, \n   {nameof(SubCategories)}: {string.Join("\n   ",SubCategories)}";
-    }
-
-    public JsonArray GetSubcategoriesJson()
-    {
-        return new JsonArray(_subCategories.Select(sub => new JsonObject
-        {
-            ["xkgl004id"] = sub.Xkgl004id
-        }).Cast<JsonNode>().ToArray());
+        return $"{nameof(CategoryId)}: {CategoryId}, {nameof(CategoryName)}: {CategoryName}";
     }
 }
 

@@ -7,6 +7,7 @@ using static CourseRush.Core.PresentedData<CourseRush.HNU.HNUCourse>;
 namespace CourseRush.HNU;
 
 public class HNUCourse(
+    HNUCourseCategory? category,
     int selectedStudentCount,
     int totalStudentCount,
     float totalLearningHours,
@@ -23,58 +24,72 @@ public class HNUCourse(
     ExaminationMethod examinationMethod,
     string id,
     string code,
-    string jczy010Id,
+    string jx02Id,
     string electiveCourseType,
     string groupName)
-    : Course<HNUCourse>(selectedStudentCount, totalStudentCount, totalLearningHours, totalCredits, teacherName,
+    : Course<HNUCourseCategory>(category, selectedStudentCount, totalStudentCount, totalLearningHours, totalCredits, teacherName,
             className, courseName, offerInstitution, campus, timeTable, teachingMethod, courseType, examinationMethod),
         IPresentedDataProvider<HNUCourse>, IJsonSerializable<HNUCourse, HdjwError>
 {
     public string Id { get; } = id;
     public string Code { get; } = code;
-    public string Jczy010Id { get; } = jczy010Id;
+    public string Jx02Id { get; } = jx02Id;
     public string ElectiveCourseType { get; } = electiveCourseType;
     public string GroupName { get; } = groupName;
     public string ClassCode { get; } = classCode;
 
-    public static Result<HNUCourse, HdjwError> FromJson(JsonObject jsonObject)
+    public static Result<HNUCourse, HdjwError> FromJson(JsonObject jsonObject, HNUCourseCategory? category = null)
     {
-        return jsonObject.GetString("kth", "")
-            .Bind<HNUCourse>(kth => jsonObject.GetInt("xkrs", 0)
+        return jsonObject.GetString("jx0404id", "")
+            .Bind<HNUCourse>(jx0404id => jsonObject.GetInt("xkrs", 0)
                 .Bind<HNUCourse>(xkrs => jsonObject.GetInt("pkrs", 0)
                     .Bind<HNUCourse>(pkrs => jsonObject.RequireFloat("zxs")
-                        .Bind<HNUCourse>(zxs => jsonObject.RequireFloat("zxf")
-                            .Bind<HNUCourse>(zxf => jsonObject.GetString("skls_name", "无")
-                                .Bind<HNUCourse>(sklsName => jsonObject.GetString("ktmc_name", "无")
-                                    .Bind<HNUCourse>(ktmcName => jsonObject.RequireString("kcmc_name")
-                                        .Bind<HNUCourse>(kcmcName => jsonObject.RequireString("kkdw_name")
-                                            .Bind<HNUCourse>(kkdwName => jsonObject.RequireString("xq_name")
-                                                .Bind<HNUCourse>(xqName => jsonObject.GetString("kbinfo", "")
-                                                    .Bind(HNUCourseTimeTable.FromString)
-                                                    .Bind<HNUCourse>(table => jsonObject.ParseInt("skfscode","0")
-                                                        .Map(IdToTeacherMethod)
-                                                        .Bind<HNUCourse>(teachingMethod => jsonObject.ParseInt("kclbcode")
-                                                            .Map(HNUCourseType.TypeFromCode)
-                                                            .Bind<HNUCourse>(courseType => jsonObject.ParseInt("khfscode", 0)
-                                                                .Map(IdToExaminationMethod)
-                                                                .Bind<HNUCourse>(examinationMethod => jsonObject
-                                                                    .RequireString("id")
-                                                                    .Bind<HNUCourse>(id => jsonObject.RequireString("kcbh")
-                                                                        .Bind<HNUCourse>(kcbh => jsonObject
-                                                                            .RequireString("jczy010id")
-                                                                            .Bind<HNUCourse>(jczy010Id => jsonObject
-                                                                                .GetString("szkclb_name", "无")
-                                                                                .Bind<HNUCourse>(szkclb => jsonObject
-                                                                                    .GetString("fzmc_name", "")
-                                                                                    .Bind<HNUCourse>(additionalName =>
-                                                                                        new HNUCourse(xkrs, pkrs, zxs,
-                                                                                            zxf, sklsName, ktmcName,
-                                                                                            kth, kcmcName, kkdwName,
-                                                                                            xqName, table,
-                                                                                            teachingMethod, courseType,
-                                                                                            examinationMethod, id, kcbh,
-                                                                                            jczy010Id, szkclb,
-                                                                                            additionalName))))))))))))))))))));
+                        .Bind<HNUCourse>(zxs => jsonObject.RequireFloat("xf")
+                            .Bind<HNUCourse>(xf => jsonObject.GetString("skls", "无")
+                                .Bind<HNUCourse>(sklsName => jsonObject.GetString("ktmc", "无")
+                                    .Bind<HNUCourse>(ktmcName => jsonObject.RequireString("kcmc")
+                                        .Bind<HNUCourse>(kcmcName => jsonObject.RequireString("dwmc")
+                                            .Bind<HNUCourse>(kkdwName => jsonObject.RequireString("xqmc")
+                                                .Bind<HNUCourse>(xqName => 
+                                                {
+                                                    var table = jsonObject.RequireArray("kkapList")
+                                                        .Bind(HNUCourseTimeTable.FromJson)
+                                                        .ReturnOrValue(_ => HNUCourseTimeTable.Empty);
+                                                        return jsonObject.ParseInt("skfs", "0")
+                                                            .Map(IdToTeacherMethod)
+                                                            .Bind<HNUCourse>(teachingMethod => jsonObject
+                                                                .ParseInt("kcxzm")
+                                                                .Map(HNUCourseType.TypeFromCode) //TODO Adapt new code
+                                                                .Bind<HNUCourse>(courseType => jsonObject
+                                                                    .ParseInt("khfscode", 0)
+                                                                    .Map(IdToExaminationMethod)
+                                                                    .Bind<HNUCourse>(examinationMethod => jsonObject
+                                                                        .GetString("kxh", "")
+                                                                        .Bind<HNUCourse>(id => jsonObject
+                                                                            .RequireString("kch")
+                                                                            .Bind<HNUCourse>(kcbh => jsonObject
+                                                                                .RequireString("jx02id")
+                                                                                .Bind<HNUCourse>(jx02id => jsonObject
+                                                                                    .GetString("tsTskflMc", "无")
+                                                                                    .Bind<HNUCourse>(szkclb =>
+                                                                                        jsonObject
+                                                                                            .GetString("fzmc", "")
+                                                                                            .Bind<
+                                                                                                HNUCourse>(additionalName =>
+                                                                                                new HNUCourse(category,
+                                                                                                    xkrs, pkrs, zxs,
+                                                                                                    xf, sklsName,
+                                                                                                    ktmcName,
+                                                                                                    jx0404id, kcmcName,
+                                                                                                    kkdwName,
+                                                                                                    xqName, table,
+                                                                                                    teachingMethod,
+                                                                                                    courseType,
+                                                                                                    examinationMethod,
+                                                                                                    id, kcbh,
+                                                                                                    jx02id, szkclb,
+                                                                                                    additionalName)))))))));
+                                                    }))))))))));
     }
 
     public JsonObject ToJson()
@@ -96,11 +111,13 @@ public class HNUCourse(
             ["khfscode"] = ExaminationMethodToId(ExaminationMethod).ToString(),
             ["id"] = Id,
             ["kcbh"] = Code,
-            ["jczy010id"] = Jczy010Id,
+            ["jczy010id"] = Jx02Id,
             ["szkclb_name"] = ElectiveCourseType,
             ["fzmc_name"] = GroupName
         };
     }
+
+    public static Result<HNUCourse, HdjwError> FromJson(JsonObject jsonObject) => FromJson(jsonObject, null);
 
     public override string ToSimpleString()
     {
@@ -109,7 +126,7 @@ public class HNUCourse(
 
     public override string ToString()
     {
-        return $"{base.ToString()}, {nameof(Id)}: {Id}, {nameof(Code)}: {Code}, {nameof(Jczy010Id)}: {Jczy010Id}, {nameof(ElectiveCourseType)} : {ElectiveCourseType}";
+        return $"{base.ToString()}, {nameof(Id)}: {Id}, {nameof(Code)}: {Code}, {nameof(Jx02Id)}: {Jx02Id}, {nameof(ElectiveCourseType)} : {ElectiveCourseType}";
     }
 
     protected static TeachingMethod IdToTeacherMethod(int id)
@@ -157,7 +174,7 @@ public class HNUCourse(
     public override void AddCourseSelectionToJson(JsonObject jsonObject)
     {
         jsonObject["id"] = Id;
-        jsonObject["jczy010id"] = Jczy010Id;
+        jsonObject["jczy010id"] = Jx02Id;
         jsonObject["xkfsid"] = "1";
         jsonObject["xkfs_name"] = "一选";
         jsonObject["zxf"] = TotalCredits.ToString(CultureInfo.InvariantCulture);
@@ -168,9 +185,18 @@ public class HNUCourse(
         jsonObject["khfs"] = ExaminationMethodToId(ExaminationMethod).ToString(CultureInfo.InvariantCulture);
     }
 
+    public override void AddCourseSelectionToWebForms(Dictionary<string, string> webForms)
+    {
+        webForms.Add("kcid", Jx02Id);
+        webForms.Add("cfbs", "null");
+        webForms.Add("jx0404id", ClassCode);
+        webForms.Add("xkzy", "");
+        webForms.Add("trjf", "");
+    }
+
     protected bool Equals(HNUCourse other)
     {
-        return Id == other.Id && Jczy010Id == other.Jczy010Id;
+        return Id == other.Id && Jx02Id == other.Jx02Id;
     }
 
     public override bool Equals(object? obj)
@@ -182,7 +208,7 @@ public class HNUCourse(
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, Jczy010Id);
+        return HashCode.Combine(Id, Jx02Id);
     }
 
     private static readonly List<PresentedData<HNUCourse>> PresentedData =
@@ -190,21 +216,21 @@ public class HNUCourse(
         OfString("course.code", course => course.Code),
         OfString("course.name", course => course.CourseName),
         OfString("course.group_name", course => course.GroupName),
-        OfString("course.class_code", course => course.ClassCode),
         OfString("course.teacher_name", course => course.TeacherName),
-        OfString("course.class_name", course => course.ClassName),
-        OfEnum("course.offer_institution", course => course.OfferInstitution),
-        OfEnum("course.campus", course => course.Campus),
         new("course.total_learning_hours", course => course.TotalLearningHours),
         new("course.total_credit", course => course.TotalCredits),
+        OfString("course.student_count", course => $"{course.SelectedStudentCount}/{course.TotalStudentCount}"),
+        OfEnum("course.campus", course => course.Campus),
+        OfEnum("course.offer_institution", course => course.OfferInstitution),
         OfEnum("course.type", course => course.CourseType.Name),
         OfEnum("course.elective_type", course => course.ElectiveCourseType),
         OfEnum("course.teaching_method", course => course.TeachingMethod.ToString()),
         OfEnum("course.examination_method", course => course.ExaminationMethod.ToString()),
-        OfString("course.student_count", course => $"{course.SelectedStudentCount}/{course.TotalStudentCount}"),
-        OfString("course.time_table", course => string.Join("|", course.TimeTable.WeeklyInformation))
+        OfString("course.time_table", course => string.Join("|", course.TimeTable.WeeklyInformation)),
+        OfString("course.class_code", course => course.ClassCode),
+        OfString("course.class_name", course => course.ClassName),
     ];
-    
+
     public static List<PresentedData<HNUCourse>> GetPresentedData()
     {
         return PresentedData;

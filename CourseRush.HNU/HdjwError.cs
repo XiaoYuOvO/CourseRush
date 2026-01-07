@@ -61,7 +61,8 @@ public class HdjwRequestError : HdjwError
         var result = new StringBuilder(baseMessage);
         if (ErrorCode != null)
             result.Append($"\nHdjw error code: {ErrorCode}");
-        result.Append($"\nRequest result: {RequestResult.ToJsonString()}");
+        if (baseMessage.Length == 0)
+            result.Append($"\nRequest result: {RequestResult.ToJsonString()}");
         return result.ToString();
     }
 }

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json.Nodes;
 using CourseRush.Core;
 using CourseRush.Core.Util;
@@ -15,9 +16,8 @@ public class HNUSelectionSession : ISelectionSession, IPresentedDataProvider<HNU
     public string SelectionStage { get; }
     public TimeOnly DailyStartTime { get; }
     public TimeOnly DailyEndTime { get; }
-    private readonly string xkgl017id; 
 
-    internal HNUSelectionSession(string selectionId, string selectionTimeId, string selectionTypeName, DateTime startTime, DateTime endTime, string selectionStage, TimeOnly dailyStartTime, TimeOnly dailyEndTime, string xkgl017Id)
+    internal HNUSelectionSession(string selectionId, string selectionTimeId, string selectionTypeName, DateTime startTime, DateTime endTime, string selectionStage, TimeOnly dailyStartTime, TimeOnly dailyEndTime)
     {
         SelectionId = selectionId;
         SelectionTimeId = selectionTimeId;
@@ -27,21 +27,19 @@ public class HNUSelectionSession : ISelectionSession, IPresentedDataProvider<HNU
         SelectionStage = selectionStage;
         DailyStartTime = dailyStartTime;
         DailyEndTime = dailyEndTime;
-        xkgl017id = xkgl017Id;
     }
 
     public static Result<HNUSelectionSession, HdjwError> FromJson(JsonObject jsonObject)
     {
-        return jsonObject.RequireString("id")
-            .Bind(id => jsonObject.RequireString("jczy013id")
-                .Bind(jczy013Id => jsonObject.RequireString("hd_name")
+        return jsonObject.RequireString("jx0502zbid")
+            .Bind(jx0502zbid => jsonObject.RequireString("xnxq01id")
+                .Bind(jczy013Id => jsonObject.RequireString("xklc_mc")
                     .Bind(hdName => jsonObject.RequireString("xkkssj").TryMap(DateTime.Parse, HdjwError.Wrap)
-                        .Bind(xkkssj => jsonObject.RequireString("xkjssj").TryMap(DateTime.Parse, HdjwError.Wrap)
-                            .Bind(xkjssj => jsonObject.RequireString("xkfs_name")
-                                .Bind(xkfsName => jsonObject.RequireString("mtkssj").TryMap(TimeOnly.Parse, HdjwError.Wrap)
-                                    .Bind(mtkssj => jsonObject.RequireString("mtjssj").TryMap(TimeOnly.Parse, HdjwError.Wrap)
-                                        .Bind<HNUSelectionSession>(mtjssj => jsonObject.RequireString("xkgl017id")
-                                            .Bind<HNUSelectionSession>(xkgl017id => new HNUSelectionSession(id, jczy013Id, hdName, xkkssj, xkjssj, xkfsName, mtkssj, mtjssj, xkgl017id))))))))));
+                        .Bind(xkkssj => jsonObject.RequireString("xkjzsj").TryMap(DateTime.Parse, HdjwError.Wrap)
+                            .Bind(xkjssj => jsonObject.RequireString("txkzmc")
+                                .Bind(xkfsName => jsonObject.RequireString("mtxkkssj").TryMap(TimeOnly.Parse, HdjwError.Wrap)
+                                    .Bind(mtkssj => jsonObject.RequireString("mtxkjssj").TryMap(TimeOnly.Parse, HdjwError.Wrap)
+                                            .Bind<HNUSelectionSession>(mtjssj => new HNUSelectionSession(jx0502zbid, jczy013Id, hdName, xkkssj, xkjssj, xkfsName, mtkssj, mtjssj)))))))));
     }
 
     public JsonObject ToJson()
@@ -91,8 +89,12 @@ public class HNUSelectionSession : ISelectionSession, IPresentedDataProvider<HNU
         {
             json["id"] = SelectionId; 
         }
-        json["xkgl017id"] = xkgl017id;
         json["xkgl019id"] = SelectionId;
         json["jczy013id"] = SelectionTimeId;
+    }
+
+    public string ApplyInfoToWebFormHeader(string request)
+    {
+        return $"{request}?jx0502zbid={SelectionId}";
     }
 }

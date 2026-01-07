@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json.Nodes;
 using CourseRush.Core.Util;
 using Resultful;
@@ -40,9 +41,19 @@ public static class HdjwJsonExtensions
 
     public static Result<int, HdjwError> ParseInt(this JsonNode jsonNode, string nodeName)
     {
-        return jsonNode.RequireString(nodeName).Bind(s => int.TryParse(s, out var num) ? num.Ok<int, HdjwError>() : HdjwError.JsonError($"Cannot parse integer", jsonNode));
+        return jsonNode.RequireString(nodeName).Bind(s => Parse<int>(jsonNode, s));
+    }
+
+    public static Result<TNumber, HdjwError> Parse<TNumber>(JsonNode jsonNode, string s) where TNumber : INumberBase<TNumber>
+    {
+        return TNumber.TryParse(s, provider:null, out var num) ? num.Ok<TNumber, HdjwError>() : HdjwError.JsonError($"Cannot parse {typeof(TNumber)}: {s}", jsonNode);
     }
     
+    public static Result<TNumber, HdjwError> Parse<TNumber>(this string s) where TNumber : INumberBase<TNumber>
+    {
+        return TNumber.TryParse(s, provider:null, out var num) ? num.Ok<TNumber, HdjwError>() : HdjwError.Create($"Cannot parse {typeof(TNumber)}: {s}");
+    }
+
     public static Result<int, HdjwError> ParseInt(this JsonNode jsonNode, string nodeName, string fallback)
     {
         return jsonNode.GetString(nodeName, fallback).Bind(s => int.TryParse(s, out var num) ? num.Ok<int, HdjwError>() : HdjwError.JsonError($"Cannot parse integer", jsonNode));
@@ -56,6 +67,11 @@ public static class HdjwJsonExtensions
     public static Result<int, HdjwError> RequireInt(this JsonNode jsonNode, string nodeName)
     {
         return jsonNode.Require(nodeName).Map(node => node.GetValue<int>());
+    }
+    
+    public static Result<int, HdjwError> ParseInt(this JsonNode jsonNode)
+    {
+        return jsonNode.Ok<JsonNode, HdjwError>().TryMap(node => int.Parse(node.GetValue<string>()), HdjwError.Wrap);
     }
     
     public static Result<int, HdjwError> GetInt(this JsonNode jsonNode, string nodeName, int fallbackValue)
