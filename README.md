@@ -1,7 +1,7 @@
 # CourseRush 📚🚀
 
 [![.NET 8.0](https://img.shields.io/badge/.NET-8.0-blue)](https://dotnet.microsoft.com/download/dotnet/8.0)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.html)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 **CourseRush** is a high-concurrency course registration assistant for Windows, built with **C# 8.0** and **WPF** on **.NET 8.0 Desktop**. Designed with extensibility in mind, it abstracts core functionalities to support various university course registration systems—currently featuring full support for **Hunan University (HNU)**.
 
