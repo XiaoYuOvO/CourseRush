@@ -55,7 +55,7 @@ Ensure you have the **.NET 8.0 Desktop Runtime** installed on your system.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/CourseRush.git
+   git clone https://github.com/XiaoYuOvO/CourseRush.git
    cd CourseRush
    ```
 
