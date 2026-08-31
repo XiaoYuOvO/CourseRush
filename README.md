@@ -21,9 +21,9 @@
 
 ---
 ## 🏫 Supported Universities 
-| Name | Status            |
-| --------- |-------------------|
-| Hunan University | ✅ Fully supported |
+| Name | Status                          |
+| --------- |---------------------------------|
+| Hunan University | ✅ Main funtions fully supported |
 ---
 
 ## 🧩 Project Structure
