@@ -224,4 +224,16 @@
     <data name="ui.label.should_start_after_add" xml:space="preserve">
         <value>任务添加后立即开始</value>
     </data>
+    <data name="ui.message.sms_send_status" xml:space="preserve">
+        <value>短信发送状态: {0}</value>
+    </data>
+    <data name="ui.button.send_sms" xml:space="preserve">
+        <value>发送短信</value>
+    </data>
+    <data name="ui.label.2fa_title" xml:space="preserve">
+        <value>双因认证</value>
+    </data>
+    <data name="ui.label.sms_2fa_tip" xml:space="preserve">
+        <value>点击发送按钮并在下方的输入框内输入CAS短信验证码</value>
+    </data>
 </root>

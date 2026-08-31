@@ -17,19 +17,25 @@ public class LoginInteractive : IAuthInteractive
     {
     }
 
-    public async Task<Result<string, AuthError>> RequestActionWithPayload(NamedAction? action, string title,
-        string description)
+    public async Task<Result<string, AuthError>> RequestActionWithPayload(NamedAction? action, TranslatableText title,
+        TranslatableText description)
     {
-        return await Dialog.Show(new LoginRequestDialogWithPayload(new LoginRequestDialogViewModel<string>(title, description, action))).GetResultAsync<Result<string, AuthError>>();
+        return await Dialog
+            .Show(new LoginRequestDialogWithPayload(new LoginRequestDialogViewModel<string>(
+                title.Translate(Language.ResourceManager), description.Translate(Language.ResourceManager), action)))
+            .GetResultAsync<Result<string, AuthError>>();
     }
 
-    public async Task<VoidResult<AuthError>> RequestAction(NamedAction? action, string title, string description)
+    public async Task<VoidResult<AuthError>> RequestAction(NamedAction? action, TranslatableText title,
+        TranslatableText description)
     {
-        return await Dialog.Show(new LoginRequestDialog(new LoginRequestDialogViewModel(title, description, action))).GetResultAsync<VoidResult<AuthError>>();
+        return await Dialog
+            .Show(new LoginRequestDialog(new LoginRequestDialogViewModel(title.Translate(Language.ResourceManager),
+                description.Translate(Language.ResourceManager), action))).GetResultAsync<VoidResult<AuthError>>();
     }
 
-    public void ShowInfo(string message)
+    public void ShowInfo(TranslatableText message)
     {
-        Application.Current.Invoke(() => Growl.Info(message));
+        Application.Current.Invoke(() => Growl.Info(message.Translate(Language.ResourceManager)));
     }
 }

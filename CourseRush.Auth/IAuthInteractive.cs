@@ -5,9 +5,9 @@ namespace CourseRush.Auth;
 
 public interface IAuthInteractive
 {
-    Task<Result<string, AuthError>> RequestActionWithPayload(NamedAction? action, string title, string description);
+    Task<Result<string, AuthError>> RequestActionWithPayload(NamedAction? action, TranslatableText title, TranslatableText description);
     
-    Task<VoidResult<AuthError>> RequestAction(NamedAction? action, string title, string description);
+    Task<VoidResult<AuthError>> RequestAction(NamedAction? action, TranslatableText title, TranslatableText description);
     
-    void ShowInfo(string message);
+    void ShowInfo(TranslatableText message);
 }

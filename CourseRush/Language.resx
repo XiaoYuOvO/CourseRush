@@ -228,4 +228,16 @@
     <data name="ui.label.should_start_after_add" xml:space="preserve">
         <value>Auto Start Tasks</value>
     </data>
+    <data name="ui.message.sms_send_status" xml:space="preserve">
+        <value>SMS send status: {0}</value>
+    </data>
+    <data name="ui.button.send_sms" xml:space="preserve">
+        <value>Send SMS</value>
+    </data>
+    <data name="ui.label.2fa_title" xml:space="preserve">
+        <value>Two Factor Authencation</value>
+    </data>
+    <data name="ui.label.sms_2fa_tip" xml:space="preserve">
+        <value>Click the send button and input the CAS SMS code below:</value>
+    </data>
 </root>

@@ -1,3 +1,3 @@
 namespace CourseRush.Core.Util;
 
-public record NamedAction(Action Action, string Name);
+public record NamedAction(Action Action, TranslatableText Name);

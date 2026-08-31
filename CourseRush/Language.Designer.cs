@@ -213,6 +213,15 @@ namespace CourseRush {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Send SMS.
+        /// </summary>
+        public static string ui_button_send_sms {
+            get {
+                return ResourceManager.GetString("ui.button.send_sms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Conflict Course.
         /// </summary>
         public static string ui_button_show_conflict_course {
@@ -263,6 +272,15 @@ namespace CourseRush {
         public static string ui_error_empty_username_password {
             get {
                 return ResourceManager.GetString("ui.error.empty_username_password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Two Factor Authencation.
+        /// </summary>
+        public static string ui_label_2fa_title {
+            get {
+                return ResourceManager.GetString("ui.label.2fa_title", resourceCulture);
             }
         }
         
@@ -434,6 +452,15 @@ namespace CourseRush {
         public static string ui_label_should_start_after_add {
             get {
                 return ResourceManager.GetString("ui.label.should_start_after_add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click the send button and input the CAS SMS code below:.
+        /// </summary>
+        public static string ui_label_sms_2fa_tip {
+            get {
+                return ResourceManager.GetString("ui.label.sms_2fa_tip", resourceCulture);
             }
         }
         
@@ -614,6 +641,15 @@ namespace CourseRush {
         public static string ui_message_sessions_import_success {
             get {
                 return ResourceManager.GetString("ui.message.sessions_import_success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SMS send status: {0}.
+        /// </summary>
+        public static string ui_message_sms_send_status {
+            get {
+                return ResourceManager.GetString("ui.message.sms_send_status", resourceCulture);
             }
         }
         

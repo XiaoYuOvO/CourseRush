@@ -70,8 +70,9 @@ public class CASAuthNode(params AuthNode[] requires) : AuthNode(
         var smsResult = await table.Interactive.RequestActionWithPayload(
             new NamedAction(
                 () => client.Get(new Uri(SendSmsUrl)).Tee(response =>
-                    table.Interactive.ShowInfo($"SMS Send status: {response.ReadString()}")), "Send SMS"), "2fa Auth",
-            "Click the action button and CAS SMS code below:");
+                    table.Interactive.ShowInfo(TranslatableText.Of("ui.message.sms_send_status",response.ReadString()))), "ui.button.send_sms"), 
+            "ui.label.2fa_title",
+            "ui.label.sms_2fa_tip");
         var execution = htmlDocument.DocumentNode.SelectSingleNode("//input[@name='execution']")
             .GetAttributeValue("value", "");
         if ((phone is null or "") || (execution is null or ""))

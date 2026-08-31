@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CourseRush.Controls"
              xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:ui="clr-namespace:CourseRush"
+             xmlns:util="clr-namespace:CourseRush.Util"
              xmlns:vm="clr-namespace:CourseRush.Models"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:LoginRequestDialogViewModelBase}"
              d:DesignHeight="400" d:DesignWidth="400">
@@ -38,7 +40,9 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
-                                <Button Grid.Column="1" HorizontalAlignment="Center" MinWidth="100" Content="{Binding PerformAction.Name}" Click="ButtonBase_OnClick"></Button>
+                                <!-- Intended Column Offset! Added by -->
+                                <!-- ReSharper disable once Xaml.IndexOutOfGridDefinition -->
+                                <Button Grid.Column="1" HorizontalAlignment="Center" MinWidth="100" Content="{Binding PerformAction.Name,Converter={x:Static util:TranslatableTextToStringConverter.Instance},FallbackValue={x:Static system:String.Empty}}" Click="ButtonBase_OnClick"></Button>
                             </Grid>
                         </hc:UniformSpacingPanel>
                         <hc:UniformSpacingPanel Grid.Row="1" Orientation="Horizontal"
