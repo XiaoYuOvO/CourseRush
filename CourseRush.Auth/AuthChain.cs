@@ -17,19 +17,26 @@ public class AuthChain<TResult> where TResult : AuthResult
         ValidateNode(finalNode);
     }
 
-    public Result<TResult, AuthError> Auth(UsernamePassword usernamePassword, WebClient client)
+    public async Task<Result<TResult, AuthError>> Auth(UsernamePassword usernamePassword, WebClient client, IAuthInteractive interactive)
     {
-        var authDataTable = new AuthDataTable();
+        var authDataTable = new AuthDataTable(interactive);
         authDataTable.UpdateData(CommonDataKey.UserName, usernamePassword.Username);
         authDataTable.UpdateData(CommonDataKey.Password, usernamePassword.Password);
-        return PopulateAuthNode(_finalNode, authDataTable, client).WithResult().Bind(_ => _resultFactory(authDataTable));
+        return (await PopulateAuthNode(_finalNode, authDataTable, client)).WithResult().Bind(_ => _resultFactory(authDataTable));
     }
 
-    private VoidResult<AuthError> PopulateAuthNode(AuthNode node, AuthDataTable dataTable, WebClient client)
+    private async Task<VoidResult<AuthError>> PopulateAuthNode(AuthNode node, AuthDataTable dataTable, WebClient client)
     {
-        return node.Requires
-            .Aggregate(Result.Ok<AuthError>(), (result, authNode) => result.Bind(_ => PopulateAuthNode(authNode, dataTable, client)))
-            .Bind(_ => node.Auth(dataTable, client));
+        var result = Result.Ok<AuthError>();
+        foreach (var nodeRequire in node.Requires)
+        {
+            result = await result.BindAsync(_ => PopulateAuthNode(nodeRequire, dataTable, client));
+        }
+
+        return await result.BindAsync(_ => node.Auth(dataTable, client));
+        // return await (node.Requires
+        //     .Aggregate(Result.Ok<AuthError>(), (result, authNode) => await result.BindAsync(_ => PopulateAuthNode(authNode, dataTable, client))))
+        //     .BindAsync(_ => node.Auth(dataTable, client));
     }
 
     private static ISet<IAuthDataKey> ValidateNode(AuthNode node)

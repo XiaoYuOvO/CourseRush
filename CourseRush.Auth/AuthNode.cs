@@ -29,7 +29,7 @@ public abstract class AuthNode
     /// <exception cref="InvalidDataException">
     /// When server returned data with invalid format  
     /// </exception>
-    internal abstract VoidResult<AuthError> Auth(AuthDataTable table, WebClient client);
+    internal abstract Task<VoidResult<AuthError>> Auth(AuthDataTable table, WebClient client);
     protected abstract string NodeName { get; }
 
     public AuthChain<TResult> Terminate<TResult>(Func<AuthDataTable, Result<TResult, AuthError>> resultFactory) where TResult : AuthResult

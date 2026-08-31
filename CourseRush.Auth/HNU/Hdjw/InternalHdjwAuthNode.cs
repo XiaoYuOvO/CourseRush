@@ -14,11 +14,12 @@ public class InternalHdjwAuthNode(params AuthNode[] requires) : AuthNode(
 {
     private const string LocationReplace = "location.replace(\"";
     private const string WebvpnHost = "http://webvpn2.hnu.edu.cn/";
-    internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
+    internal override Task<VoidResult<AuthError>> Auth(AuthDataTable table, WebClient client)
     {
-        return table.RequireData(HNUAuthData.CAS_AUTH_REDIRECT_URL)
+        return Task.FromResult(table.RequireData(HNUAuthData.CAS_AUTH_REDIRECT_URL)
             .BindAction(redirectUri => 
-                client.GetRedirectedUriOrNormal(redirectUri).Bind(response =>
+                client.GetRedirectedUriOrNormal(redirectUri)
+                    .Bind(response =>
                     {
                         return response.Match<Result<WebResponse,WebError>>(r =>
                         {
@@ -35,8 +36,8 @@ public class InternalHdjwAuthNode(params AuthNode[] requires) : AuthNode(
                     })
                     .Bind(_ => client.GetCookie(HNUAuthData.BZB_JSXSD.KeyName).Tee(token => table.UpdateData(HNUAuthData.BZB_JSXSD, token.Value)))
                     .Bind(_ => client.GetCookie(HNUAuthData.SERVERID.KeyName).Tee(session => table.UpdateData(HNUAuthData.SERVERID, session.Value)))
-                .MapError(error => new AuthError("Failed to get token in cas redirect", this, error)).DiscardValue())
-            .DiscardValue();
+                    .MapError(error => new AuthError("Failed to get token in cas redirect", this, error)).DiscardValue())
+            .DiscardValue());
     }
 
     protected override string NodeName => "InternalHdjwAuthNode";

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using CourseRush.Auth;
 using CourseRush.Auth.HNU;
 using CourseRush.Auth.HNU.Hdjw;
@@ -16,7 +17,7 @@ namespace CourseRush;
 
 public interface IMainWindowModelProvider
 {
-    public Result<Func<IMainWindowModel>, AuthError> LoginAndCreateMainWindowModel(UsernamePassword usernamePassword);
+    public Task<Result<Func<IMainWindowModel>, AuthError>> LoginAndCreateMainWindowModel(UsernamePassword usernamePassword, IAuthInteractive interactive);
 }
 
 public interface IUniversity<TCourse, TError, TCourseSelection, TCourseSelectionClient> : IMainWindowModelProvider
@@ -27,7 +28,8 @@ public interface IUniversity<TCourse, TError, TCourseSelection, TCourseSelection
 {
     public string Name { get; }
     
-    public Result<TCourseSelectionClient, AuthError> LoginAndCreateClient(UsernamePassword profile);
+    public Task<Result<TCourseSelectionClient, AuthError>> LoginAndCreateClient(UsernamePassword profile,
+        IAuthInteractive interactive);
 };
 
 public static class Universities
@@ -60,9 +62,9 @@ public static class Universities
         return universityProperty;
     }
 
-    public static Result<Func<IMainWindowModel>, AuthError> LoginAndGetMainWindowModelFromId(string id, UsernamePassword profile)
+    public static Task<Result<Func<IMainWindowModel>, AuthError>> LoginAndGetMainWindowModelFromId(string id, UsernamePassword profile, IAuthInteractive interactive)
     {
-        return UniversityRegistry[id].LoginAndCreateMainWindowModel(profile);
+        return UniversityRegistry[id].LoginAndCreateMainWindowModel(profile, interactive);
     }
 
     internal static List<UniversityInfo> GetAllUniversities()
@@ -99,16 +101,18 @@ public class UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelecti
     where TSelectionClient : ISessionClient<TError, TCourseSelection, TCourse, TSelectedCourse, TCourseCategory>, IResultConvertible<TAuthResult, TSelectionClient>
     where TSelectedCourse : TCourse, ISelectedCourse, IPresentedDataProvider<TSelectedCourse>, IJsonSerializable<TSelectedCourse, TError>
 {
-    public Result<Func<IMainWindowModel>, AuthError> LoginAndCreateMainWindowModel(UsernamePassword profile)
+    public async Task<Result<Func<IMainWindowModel>, AuthError>> LoginAndCreateMainWindowModel(UsernamePassword profile,
+        IAuthInteractive interactive)
     {
-        return LoginAndCreateClient(profile).Bind<Func<IMainWindowModel>>(result => new Func<IMainWindowModel>(() =>
+        return (await LoginAndCreateClient(profile, interactive)).Bind<Func<IMainWindowModel>>(result => new Func<IMainWindowModel>(() =>
             new MainWindowModel<UniversityProperty<TError, TCourse, TSelectedCourse, TCourseSelection, TCourseCategory, TAuthResult, TSelectionClient>
                 , TCourse, TSelectedCourse, TError, TCourseCategory, TCourseSelection, TSelectionClient>(this, profile, result)));
     }
 
-    public Result<TSelectionClient, AuthError> LoginAndCreateClient(UsernamePassword profile)
+    public async Task<Result<TSelectionClient, AuthError>> LoginAndCreateClient(UsernamePassword profile,
+        IAuthInteractive interactive)
     {
-        return authChain.Auth(profile, new WebClient()).Bind<TSelectionClient>(result =>
+        return (await authChain.Auth(profile, new WebClient(), interactive)).Bind<TSelectionClient>(result =>
             TSelectionClient.CreateFromResult(result));
     }
 

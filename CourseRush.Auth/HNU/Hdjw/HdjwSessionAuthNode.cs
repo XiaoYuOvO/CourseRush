@@ -14,9 +14,9 @@ public class HdjwSessionAuthNode(params AuthNode[] requires) : AuthNode(new Auth
 
     private const string CasLoginHdjw = "http://cas.hnu.edu.cn/cas/login?service=http%3A%2F%2Fhdjw.hnu.edu.cn%2Fgld%2Fsso.jsp";
 
-    internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
+    internal override Task<VoidResult<AuthError>> Auth(AuthDataTable table, WebClient client)
     {
-        return client.Get(new Uri(HdjwIndex))
+        return Task.FromResult(client.Get(new Uri(HdjwIndex))
             .Map(response => response.ReadString())
             .Bind(indexResponse =>
             {
@@ -48,7 +48,7 @@ public class HdjwSessionAuthNode(params AuthNode[] requires) : AuthNode(new Auth
                             table.UpdateData(SDP_APP_SESSION_80, sdpAppSession);
                             table.UpdateData(SESSION, decodedSession);
                             table.UpdateData(TOKEN, token);
-                        })))).DiscardValue();
+                        })))).DiscardValue());
     }
 
     protected override string NodeName => "HdjwCasLogin";

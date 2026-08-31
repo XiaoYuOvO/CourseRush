@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Windows;
 using CourseRush.Auth;
+using CourseRush.Controls;
 using HandyControl.Controls;
 using MahApps.Metro.Controls;
 using Resultful;
@@ -21,7 +22,7 @@ public partial class LoginWindow
         UsernameBox.Text = username;
     }
 
-    private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+    private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
         LoginButton.IsEnabled = false;
         var option = (UniversitySelection.SelectionBoxItem as UniversityInfo)?.ToOption<UniversityInfo>();
@@ -33,26 +34,22 @@ public partial class LoginWindow
             LoginButton.IsEnabled = true;
             return;
         }
-        new Thread(() =>
-        {
-            option.Value.Tee(info =>
+
+        await option.Value.TeeAsync(info => Universities
+            .LoginAndGetMainWindowModelFromId(info.Id,
+                new UsernamePassword(usernameBoxText, passwordBoxPassword), LoginInteractive.Instance)
+            .Tee(model => this.Invoke(() =>
             {
-                Universities
-                    .LoginAndGetMainWindowModelFromId(info.Id, new UsernamePassword(usernameBoxText, passwordBoxPassword))
-                    .Tee(model => this.Invoke(() =>
-                    {
-                        var mainWindow = new MainWindow(model.Invoke());
-                        mainWindow.Top = Top + Height / 2 - mainWindow.Height / 2;
-                        mainWindow.Left = Left + Width / 2 - mainWindow.Width / 2;
-                        mainWindow.Show();
-                        mainWindow.Title = $"COURSE RUSH >>> {info.Id}";
-                        Close();
-                    })).TeeError(error => this.Invoke(()=>
-                    {
-                        Growl.Error(error.Message);
-                        LoginButton.IsEnabled = true;
-                    }));
-            });
-        }).Start();
+                var mainWindow = new MainWindow(model.Invoke());
+                mainWindow.Top = Top + Height / 2 - mainWindow.Height / 2;
+                mainWindow.Left = Left + Width / 2 - mainWindow.Width / 2;
+                mainWindow.Show();
+                mainWindow.Title = $"COURSE RUSH >>> {info.Id}";
+                Close();
+            })).TeeError(error => this.Invoke(() =>
+            {
+                Growl.Error(error.Message);
+                LoginButton.IsEnabled = true;
+            })));
     }
 }

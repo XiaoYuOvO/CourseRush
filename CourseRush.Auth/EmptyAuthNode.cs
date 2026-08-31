@@ -9,10 +9,17 @@ public class EmptyAuthNode : AuthNode
     {
     }
 
-    internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
+    internal override Task<VoidResult<AuthError>> Auth(AuthDataTable table, WebClient client)
     {
-        Thread.Sleep(2000);
-        return Result.Ok<AuthError>();
+        try
+        {
+            Thread.Sleep(2000);
+            return Task.FromResult(Result.Ok<AuthError>());
+        }
+        catch (Exception exception)
+        {
+            return Task.FromException<VoidResult<AuthError>>(exception);
+        }
     }
 
     protected override string NodeName => "Empty";

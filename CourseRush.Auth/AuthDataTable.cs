@@ -2,9 +2,11 @@ using Resultful;
 
 namespace CourseRush.Auth;
 
-public class AuthDataTable
+public class AuthDataTable(IAuthInteractive interactive)
 {
     private readonly Dictionary<IAuthDataKey, object> _userAuthDataTable = new();
+
+    public IAuthInteractive Interactive { get; } = interactive;
 
     public Result<TResult, AuthError> RequireData<TResult>(AuthDataKey<TResult> key) where TResult : notnull
     {
@@ -13,7 +15,7 @@ public class AuthDataTable
 
     public AuthDataTable LimitedView(IEnumerable<IAuthDataKey> keys)
     {
-        var authDataTable = new AuthDataTable();
+        var authDataTable = new AuthDataTable(Interactive);
         foreach (var authDataKey in keys)
         {
             authDataTable._userAuthDataTable[authDataKey] = _userAuthDataTable[authDataKey];

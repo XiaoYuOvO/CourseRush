@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using CourseRush.Auth;
+using CourseRush.Controls;
 using CourseRush.Core;
 using CourseRush.Core.Task;
 using CourseRush.Core.Util;
@@ -92,7 +93,7 @@ public sealed class MainWindowModel<TUniversity, TCourse, TSelectedCourse, TErro
                 {
                     if (isOnline) return;
                     var dialog = _selectionSessionsPage.Invoke(() => Dialog.Show<ReloginDialog>("MainWindow"));
-                    _university.LoginAndCreateClient(_profile).Tee(client => {
+                    _ = _university.LoginAndCreateClient(_profile, LoginInteractive.Instance).Tee(client => {
                         _sessionClient = client;
                         _currentSelection.Tee(OnSessionSelected);
                         dialog.Invoke(dialog.Close);

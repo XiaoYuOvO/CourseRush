@@ -15,7 +15,7 @@ public class WebVpnAuthNode(params AuthNode[] requires) : AuthNode(new AuthConve
     private const string AuthConfig = "https://webvpn2.hnu.edu.cn/passport/v1/public/authConfig?clientType=SDPBrowserClient&platform=Windows&lang=zh-CN&mod=1&needTicket=1";
     private const string AccessCheck = "https://webvpn2.hnu.edu.cn/passport/v1/auth/accessCheck?clientType=SDPBrowserClient&platform=Windows&lang=zh-CN";
 
-    internal override VoidResult<AuthError> Auth(AuthDataTable table, WebClient client)
+    internal override Task<VoidResult<AuthError>> Auth(AuthDataTable table, WebClient client)
     {
         table.RequireData(CAS_AUTH_REDIRECT_URL)
             .Bind<WebResponse>(uri => client.GetRedirectedUri(uri)
@@ -24,7 +24,7 @@ public class WebVpnAuthNode(params AuthNode[] requires) : AuthNode(new AuthConve
                 .MapError(error => new AuthError("Failed to get cas auth redirect url", this, error))).DiscardValue();
         
         //Auth Config
-        return client.Get(new Uri(AuthConfig), accept:MediaType.Json).Bind(res => res.ReadJsonObject()).MapError(error => new AuthError("Failed to read AuthConfig json", this, error))
+        return Task.FromResult(client.Get(new Uri(AuthConfig), accept:MediaType.Json).Bind(res => res.ReadJsonObject()).MapError(error => new AuthError("Failed to read AuthConfig json", this, error))
             .Bind<string>(jsonDocument =>
         {
             if (jsonDocument["code"]?.GetValue<int>() != 0)
@@ -71,7 +71,7 @@ public class WebVpnAuthNode(params AuthNode[] requires) : AuthNode(new AuthConve
                         () => new AuthError("sid.legacy not found in cookie collection after access check", this)))
                     .Bind(_ => cookieCollection["sid-legacy.sig"].ToOption().AcceptOr(val => table.UpdateData(SID_LEGACY_SIG, val.Value), 
                         () => new AuthError("sid.sig not found in cookie collection after access check")));
-        });
+        }));
     }
 
     protected override string NodeName => "WebVPNAuth";
