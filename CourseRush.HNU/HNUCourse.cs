@@ -41,8 +41,8 @@ public class HNUCourse(
     public static Result<HNUCourse, HdjwError> FromJson(JsonObject jsonObject, HNUCourseCategory? category = null)
     {
         return jsonObject.GetString("jx0404id", "")
-            .Bind<HNUCourse>(jx0404id => jsonObject.GetInt("xkrs", 0)
-                .Bind<HNUCourse>(xkrs => jsonObject.GetInt("pkrs", 0)
+            .Bind<HNUCourse>(jx0404id => jsonObject.ParseInt("syrs", 0)
+                .Bind<HNUCourse>(syrs => jsonObject.GetInt("pkrs", 0)
                     .Bind<HNUCourse>(pkrs => jsonObject.RequireFloat("zxs")
                         .Bind<HNUCourse>(zxs => jsonObject.RequireFloat("xf")
                             .Bind<HNUCourse>(xf => jsonObject.GetString("skls", "无")
@@ -77,7 +77,7 @@ public class HNUCourse(
                                                                                             .Bind<
                                                                                                 HNUCourse>(additionalName =>
                                                                                                 new HNUCourse(category,
-                                                                                                    xkrs, pkrs, zxs,
+                                                                                                    pkrs - syrs, pkrs, zxs,
                                                                                                     xf, sklsName,
                                                                                                     ktmcName,
                                                                                                     jx0404id, kcmcName,
@@ -97,7 +97,7 @@ public class HNUCourse(
         return new JsonObject
         {
             ["xkrs"] = SelectedStudentCount,
-            ["pkrs"] = TotalStudentCount,
+            ["syrs"] = TotalStudentCount - SelectedStudentCount,
             ["zxs"] = TotalLearningHours,
             ["zxf"] = TotalCredits,
             ["skls_name"] = TeacherName,

@@ -24,7 +24,7 @@ public class HNUCourseCategory(string categoryId, string categoryName, string ca
             json.Require("xkfl")
                 .Bind(xkfl =>
                     (from jsonNode in xkfl.AsArray() where jsonNode != null
-                        select HNUCourseSubcategory.FromJson(jsonNode.AsObject())).ToList()
+                        select HNUCourseSubcategory.FromJson(jsonNode!.AsObject())).ToList()
                     .CombineResults())
                 .GetOrDefault(new List<HNUCourseSubcategory>());
         return json.RequireString("id")

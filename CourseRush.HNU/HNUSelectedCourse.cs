@@ -62,7 +62,7 @@ public class HNUSelectedCourse : HNUCourse, ISelectedCourse, IPresentedDataProvi
         return row.SelectSingleNode("td[1]//text()[normalize-space()]").ToOption().Map(node => node.InnerText.Trim()).Bind(courseCode => 
                 row.SelectSingleNode("td[2]//text()[normalize-space()]").ToOption().Map(node => node.InnerText.Trim()).Bind(courseName => 
                     row.SelectSingleNode("td[3]//text()").ToOption().Map(node => node.InnerText.Trim()).Bind(courseNote =>
-                        row.SelectSingleNode("td[4]//text()[normalize-space()]").ToOption().Map(node => node.InnerText.Trim()).Bind(teachingMethod => 
+                        row.SelectSingleNode("td[4]//text()").ToOption().Map(node => node.InnerText.Trim()).Bind(teachingMethod => 
                             row.SelectSingleNode("td[5]//text()[normalize-space()]").ToOption().Map(node => node.InnerText.Trim()).Bind(totalCredit =>
                                 row.SelectSingleNode("td[6]//text()[normalize-space()]").ToOption().Map(node => node.InnerText.Trim()).Bind(courseType =>
                                     row.SelectSingleNode("td[7]//text()[normalize-space()]").ToOption().Map(node => node.InnerText.Trim()).Bind(teacher => 
@@ -81,7 +81,7 @@ public class HNUSelectedCourse : HNUCourse, ISelectedCourse, IPresentedDataProvi
                                                                         courseId,
                                                                         courseCode, courseNote,
                                                                         SelectionMethod.Preset)))))))))))))
-            .Or(HdjwError.Create("Cannot read selected course"));
+            .Or(() => HdjwError.Create("Cannot read selected course"));
     }
 
     public static HNUSelectedCourse SelectFromCourse(HNUCourse course, SelectionMethod selectionMethod)
