@@ -11,7 +11,10 @@ public class WebClient
     public delegate void RequestConfigurator(HttpRequestMessage request);
     public WebClient()
     {
-        // Handler.Proxy = new WebProxy("127.0.0.1",8888);
+        if (Environment.GetEnvironmentVariable("COURSE_RUSH_DBG") != null)
+        {
+            Handler.Proxy = new WebProxy("127.0.0.1",8888);   
+        }
         Handler.UseProxy = true;
         Handler.AutomaticDecompression = DecompressionMethods.All;
         Handler.UseCookies = true;
